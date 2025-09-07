@@ -221,7 +221,7 @@ local loadingSpinner = Instance.new("TextLabel")
 loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
 loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
 loadingSpinner.BackgroundTransparency = 1
-loadingSpinner.Text = "🌈"
+loadingSpinner.Text = "🥰"
 loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
 loadingSpinner.TextSize = 20
 loadingSpinner.Font = Enum.Font.Gotham
@@ -334,7 +334,7 @@ musicButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Music%20ID"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))()
     end)
 end)
 
@@ -364,7 +364,7 @@ local graphicsIcon = Instance.new("TextLabel")
 graphicsIcon.Size = UDim2.new(0, 30, 0, 30)
 graphicsIcon.Position = UDim2.new(0, 10, 0, 10)
 graphicsIcon.BackgroundTransparency = 1
-graphicsIcon.Text = "🎨"
+graphicsIcon.Text = "⭐"
 graphicsIcon.TextColor3 = Color3.new(0.2, 0.4, 0.8)
 graphicsIcon.TextSize = 20
 graphicsIcon.Font = Enum.Font.Gotham
@@ -397,7 +397,7 @@ local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
 graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
-graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.Text = "⭐ Open Graphics"
 graphicsButton.TextColor3 = Color3.new(1, 1, 1)
 graphicsButton.TextSize = 10
 graphicsButton.Font = Enum.Font.Gotham
