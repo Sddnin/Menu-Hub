@@ -117,13 +117,13 @@ tabFrame.Position = UDim2.new(0, 10, 0, 15)
 tabFrame.BackgroundTransparency = 1
 tabFrame.Parent = innerFrame
 
-local tabs = {"Home", "Script", "Notifications", "Other"}
+local tabs = {"Home", "Script", "Other"}
 local tabButtons = {}
 
 for i, tabName in ipairs(tabs) do
     local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(0.25, -5, 1, 0)
-    tabButton.Position = UDim2.new((i-1) * 0.25, (i-1) * 2.5, 0, 0)
+    tabButton.Size = UDim2.new(0.33, -5, 1, 0)
+    tabButton.Position = UDim2.new((i-1) * 0.33, (i-1) * 2.5, 0, 0)
     tabButton.BackgroundColor3 = tabName == "Home" and Color3.new(0.2, 0.4, 0.8) or Color3.new(1, 1, 1)
     tabButton.Text = tabName
     tabButton.TextColor3 = tabName == "Home" and Color3.new(1, 1, 1) or Color3.new(0.5, 0.5, 0.5)
@@ -221,7 +221,7 @@ local loadingSpinner = Instance.new("TextLabel")
 loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
 loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
 loadingSpinner.BackgroundTransparency = 1
-loadingSpinner.Text = "☀️"
+loadingSpinner.Text = "🌈"
 loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
 loadingSpinner.TextSize = 20
 loadingSpinner.Font = Enum.Font.Gotham
@@ -246,127 +246,13 @@ local scriptsData = {
     {name = "ThunderZ", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()"}
 }
 
-local notifContent = Instance.new("ScrollingFrame")
-notifContent.Name = "NotifContent"
-notifContent.Size = UDim2.new(1, 0, 1, 0)
-notifContent.BackgroundTransparency = 1
-notifContent.ScrollBarThickness = 6
-notifContent.CanvasSize = UDim2.new(0, 0, 0, 300)
-notifContent.Visible = false
-notifContent.Parent = contentArea
-
--- Notification Header
-local notifHeader = Instance.new("TextLabel")
-notifHeader.Size = UDim2.new(1, 0, 0, 30)
-notifHeader.Position = UDim2.new(0, 0, 0, 5)
-notifHeader.BackgroundTransparency = 1
-notifHeader.Text = "🔔 Notifications & Updates"
-notifHeader.TextColor3 = Color3.new(0.2, 0.2, 0.2)
-notifHeader.TextSize = 14
-notifHeader.Font = Enum.Font.GothamBold
-notifHeader.Parent = notifContent
-
--- New Update Notification
-local updateFrame = Instance.new("Frame")
-updateFrame.Size = UDim2.new(1, -10, 0, 120)
-updateFrame.Position = UDim2.new(0, 5, 0, 40)
-updateFrame.BackgroundColor3 = Color3.new(0.9, 1, 0.9)
-updateFrame.BorderSizePixel = 0
-updateFrame.Parent = notifContent
-
-local updateCorner = Instance.new("UICorner")
-updateCorner.CornerRadius = UDim.new(0, 8)
-updateCorner.Parent = updateFrame
-
--- Update Badge
-local updateBadge = Instance.new("Frame")
-updateBadge.Size = UDim2.new(0, 60, 0, 20)
-updateBadge.Position = UDim2.new(0, 10, 0, 10)
-updateBadge.BackgroundColor3 = Color3.new(0.2, 0.8, 0.2)
-updateBadge.BorderSizePixel = 0
-updateBadge.Parent = updateFrame
-
-local badgeCorner = Instance.new("UICorner")
-badgeCorner.CornerRadius = UDim.new(0, 10)
-badgeCorner.Parent = updateBadge
-
-local badgeText = Instance.new("TextLabel")
-badgeText.Size = UDim2.new(1, 0, 1, 0)
-badgeText.BackgroundTransparency = 1
-badgeText.Text = "NEW"
-badgeText.TextColor3 = Color3.new(1, 1, 1)
-badgeText.TextSize = 10
-badgeText.Font = Enum.Font.GothamBold
-badgeText.Parent = updateBadge
-
--- Update Title
-local updateTitle = Instance.new("TextLabel")
-updateTitle.Size = UDim2.new(1, -80, 0, 25)
-updateTitle.Position = UDim2.new(0, 75, 0, 8)
-updateTitle.BackgroundTransparency = 1
-updateTitle.Text = "New Update - V1.1"
-updateTitle.TextColor3 = Color3.new(0.1, 0.5, 0.1)
-updateTitle.TextSize = 12
-updateTitle.Font = Enum.Font.GothamBold
-updateTitle.TextXAlignment = Enum.TextXAlignment.Left
-updateTitle.Parent = updateFrame
-
--- Update Content
-local updateContent = Instance.new("TextLabel")
-updateContent.Size = UDim2.new(1, -20, 0, 80)
-updateContent.Position = UDim2.new(0, 10, 0, 35)
-updateContent.BackgroundTransparency = 1
-updateContent.Text = "+ V1.1 Thêm các script có liên quan\n+ Animation khi loading\n+ Fix một số lỗi nhỏ"
-updateContent.TextColor3 = Color3.new(0.2, 0.2, 0.2)
-updateContent.TextSize = 11
-updateContent.Font = Enum.Font.Gotham
-updateContent.TextXAlignment = Enum.TextXAlignment.Left
-updateContent.TextYAlignment = Enum.TextYAlignment.Top
-updateContent.TextWrapped = true
-updateContent.Parent = updateFrame
-
--- Welcome Notification
-local welcomeFrame = Instance.new("Frame")
-welcomeFrame.Size = UDim2.new(1, -10, 0, 80)
-welcomeFrame.Position = UDim2.new(0, 5, 0, 170)
-welcomeFrame.BackgroundColor3 = Color3.new(1, 0.95, 1)
-welcomeFrame.BorderSizePixel = 0
-welcomeFrame.Parent = notifContent
-
-local welcomeCorner = Instance.new("UICorner")
-welcomeCorner.CornerRadius = UDim.new(0, 8)
-welcomeCorner.Parent = welcomeFrame
-
-local welcomeTitle = Instance.new("TextLabel")
-welcomeTitle.Size = UDim2.new(1, -20, 0, 25)
-welcomeTitle.Position = UDim2.new(0, 10, 0, 8)
-welcomeTitle.BackgroundTransparency = 1
-welcomeTitle.Text = "💖 Welcome to Mila!"
-welcomeTitle.TextColor3 = Color3.new(0.5, 0.2, 0.5)
-welcomeTitle.TextSize = 12
-welcomeTitle.Font = Enum.Font.GothamBold
-welcomeTitle.TextXAlignment = Enum.TextXAlignment.Left
-welcomeTitle.Parent = welcomeFrame
-
-local welcomeText = Instance.new("TextLabel")
-welcomeText.Size = UDim2.new(1, -20, 0, 40)
-welcomeText.Position = UDim2.new(0, 10, 0, 35)
-welcomeText.BackgroundTransparency = 1
-welcomeText.Text = "Thank you for using Mila UI! Enjoy all the features and scripts available."
-welcomeText.TextColor3 = Color3.new(0.3, 0.3, 0.3)
-welcomeText.TextSize = 10
-welcomeText.Font = Enum.Font.Gotham
-welcomeText.TextXAlignment = Enum.TextXAlignment.Left
-welcomeText.TextYAlignment = Enum.TextYAlignment.Top
-welcomeText.TextWrapped = true
-welcomeText.Parent = welcomeFrame
-
+-- Other Tab Content (removed notifContent)
 local otherContent = Instance.new("ScrollingFrame")
 otherContent.Name = "OtherContent"
 otherContent.Size = UDim2.new(1, 0, 1, 0)
 otherContent.BackgroundTransparency = 1
 otherContent.ScrollBarThickness = 6
-otherContent.CanvasSize = UDim2.new(0, 0, 0, 200)
+otherContent.CanvasSize = UDim2.new(0, 0, 0, 300)
 otherContent.Visible = false
 otherContent.Parent = contentArea
 
@@ -448,7 +334,7 @@ musicButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Music%20ID"))()
     end)
 end)
 
@@ -461,10 +347,90 @@ musicButton.MouseLeave:Connect(function()
     musicButton.BackgroundColor3 = Color3.new(0.6, 0.4, 0.8)
 end)
 
--- Coming Soon Feature (placeholder for future features)
+-- Graphics Feature
+local graphicsFrame = Instance.new("Frame")
+graphicsFrame.Size = UDim2.new(1, -10, 0, 80)
+graphicsFrame.Position = UDim2.new(0, 5, 0, 130)
+graphicsFrame.BackgroundColor3 = Color3.new(0.9, 0.95, 1)
+graphicsFrame.BorderSizePixel = 0
+graphicsFrame.Parent = otherContent
+
+local graphicsCorner = Instance.new("UICorner")
+graphicsCorner.CornerRadius = UDim.new(0, 8)
+graphicsCorner.Parent = graphicsFrame
+
+-- Graphics Icon and Title
+local graphicsIcon = Instance.new("TextLabel")
+graphicsIcon.Size = UDim2.new(0, 30, 0, 30)
+graphicsIcon.Position = UDim2.new(0, 10, 0, 10)
+graphicsIcon.BackgroundTransparency = 1
+graphicsIcon.Text = "🎨"
+graphicsIcon.TextColor3 = Color3.new(0.2, 0.4, 0.8)
+graphicsIcon.TextSize = 20
+graphicsIcon.Font = Enum.Font.Gotham
+graphicsIcon.Parent = graphicsFrame
+
+local graphicsTitle = Instance.new("TextLabel")
+graphicsTitle.Size = UDim2.new(1, -50, 0, 25)
+graphicsTitle.Position = UDim2.new(0, 45, 0, 8)
+graphicsTitle.BackgroundTransparency = 1
+graphicsTitle.Text = "Graphics Settings"
+graphicsTitle.TextColor3 = Color3.new(0.1, 0.3, 0.7)
+graphicsTitle.TextSize = 12
+graphicsTitle.Font = Enum.Font.GothamBold
+graphicsTitle.TextXAlignment = Enum.TextXAlignment.Left
+graphicsTitle.Parent = graphicsFrame
+
+local graphicsDesc = Instance.new("TextLabel")
+graphicsDesc.Size = UDim2.new(1, -50, 0, 20)
+graphicsDesc.Position = UDim2.new(0, 45, 0, 30)
+graphicsDesc.BackgroundTransparency = 1
+graphicsDesc.Text = "Enhance visual quality and performance"
+graphicsDesc.TextColor3 = Color3.new(0.4, 0.4, 0.4)
+graphicsDesc.TextSize = 10
+graphicsDesc.Font = Enum.Font.Gotham
+graphicsDesc.TextXAlignment = Enum.TextXAlignment.Left
+graphicsDesc.Parent = graphicsFrame
+
+-- Graphics Button
+local graphicsButton = Instance.new("TextButton")
+graphicsButton.Size = UDim2.new(0, 100, 0, 25)
+graphicsButton.Position = UDim2.new(0, 45, 0, 50)
+graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
+graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.TextColor3 = Color3.new(1, 1, 1)
+graphicsButton.TextSize = 10
+graphicsButton.Font = Enum.Font.Gotham
+graphicsButton.Parent = graphicsFrame
+
+local graphicsBtnCorner = Instance.new("UICorner")
+graphicsBtnCorner.CornerRadius = UDim.new(0, 5)
+graphicsBtnCorner.Parent = graphicsButton
+
+-- Graphics Button Events
+graphicsButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Graphics Settings")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))()
+    end)
+end)
+
+-- Graphics Button Hover Effects
+graphicsButton.MouseEnter:Connect(function()
+    graphicsButton.BackgroundColor3 = Color3.new(0.3, 0.5, 0.9)
+end)
+
+graphicsButton.MouseLeave:Connect(function()
+    graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
+end)
+
+-- Coming Soon Feature (moved down)
 local comingSoonFrame = Instance.new("Frame")
 comingSoonFrame.Size = UDim2.new(1, -10, 0, 60)
-comingSoonFrame.Position = UDim2.new(0, 5, 0, 130)
+comingSoonFrame.Position = UDim2.new(0, 5, 0, 220)
 comingSoonFrame.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
 comingSoonFrame.BorderSizePixel = 0
 comingSoonFrame.Parent = otherContent
@@ -526,7 +492,7 @@ local function createButton(name, text, position, callback, parent)
     
     local button = Instance.new("TextButton")
     button.Name = name
-    button.Size = UDim2.new(0, 95, 0, 25)
+    button.Size = UDim2.new(0, 100, 0, 25)
     button.Position = position
     button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
     button.Text = text
@@ -797,11 +763,11 @@ local function switchTab(tabName)
     -- Update tab buttons
     for name, tabData in pairs(tabButtons) do
         if name == tabName then
-            tabData.button.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
-            tabData.button.TextColor3 = Color3.new(1, 1, 1)
+            tabData.button.TextColor3 = Color3.new(0.2, 0.4, 0.8)
+            tabData.underline.Visible = true
         else
-            tabData.button.BackgroundColor3 = Color3.new(1, 1, 1)
             tabData.button.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+            tabData.underline.Visible = false
         end
     end
     
@@ -862,43 +828,43 @@ local function loadFlyScript()
     end)
 end
 
--- Create Home Tab Buttons (2x3 grid, smaller)
-createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 8, 0, 60), function()
+-- Create Home Tab Buttons (2x3 grid)
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 10, 0, 60), function()
     local speed = tonumber(speedSlider.Text) or 16
     humanoid.WalkSpeed = speed
     speedLabel.Text = "Speed: " .. speed
 end)
 
-createButton("JumpButton", "🦘 Jump", UDim2.new(0, 110, 0, 60), function()
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 120, 0, 60), function()
     local jump = tonumber(jumpSlider.Text) or 50
     humanoid.JumpPower = jump
     jumpLabel.Text = "Jump: " .. jump
 end)
 
-createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 212, 0, 60), function()
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 230, 0, 60), function()
     toggleNoclip()
 end)
 
-createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 8, 0, 95), function()
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 10, 0, 95), function()
     loadFlyScript()
 end)
 
-createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 110, 0, 95), function()
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 120, 0, 95), function()
     toggleInfiniteJump()
 end)
 
-createButton("TeleportButton", "📍 Players", UDim2.new(0, 212, 0, 95), function()
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 230, 0, 95), function()
     playerFrame.Visible = not playerFrame.Visible
     if playerFrame.Visible then
         updatePlayerList()
     end
 end)
 
-createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 8, 0, 130), function()
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 10, 0, 130), function()
     resetCamera()
 end)
 
-createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 110, 0, 130), function()
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 120, 0, 130), function()
     humanoid.WalkSpeed = originalWalkSpeed
     humanoid.JumpPower = originalJumpPower
     noclip = false
@@ -945,13 +911,10 @@ closeBtn.MouseButton1Click:Connect(function()
     playerFrame.Visible = false
 end)
 
--- Close button hover effect
-closeBtn.MouseEnter:Connect(function()
-    closeBtn.BackgroundColor3 = Color3.new(1, 0.3, 0.3)
-end)
-
-closeBtn.MouseLeave:Connect(function()
-    closeBtn.BackgroundColor3 = Color3.new(0.9, 0.4, 0.4)
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
 end)
 
 toggleButton.MouseButton1Click:Connect(function()
