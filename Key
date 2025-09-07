@@ -246,7 +246,7 @@ local scriptsData = {
     {name = "ThunderZ", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()"}
 }
 
--- Other Tab Content (removed notifContent)
+-- Other Tab Content
 local otherContent = Instance.new("ScrollingFrame")
 otherContent.Name = "OtherContent"
 otherContent.Size = UDim2.new(1, 0, 1, 0)
@@ -492,7 +492,7 @@ local function createButton(name, text, position, callback, parent)
     
     local button = Instance.new("TextButton")
     button.Name = name
-    button.Size = UDim2.new(0, 100, 0, 25)
+    button.Size = UDim2.new(0, 95, 0, 25)
     button.Position = position
     button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
     button.Text = text
@@ -763,18 +763,17 @@ local function switchTab(tabName)
     -- Update tab buttons
     for name, tabData in pairs(tabButtons) do
         if name == tabName then
-            tabData.button.TextColor3 = Color3.new(0.2, 0.4, 0.8)
-            tabData.underline.Visible = true
+            tabData.button.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
+            tabData.button.TextColor3 = Color3.new(1, 1, 1)
         else
+            tabData.button.BackgroundColor3 = Color3.new(1, 1, 1)
             tabData.button.TextColor3 = Color3.new(0.5, 0.5, 0.5)
-            tabData.underline.Visible = false
         end
     end
     
     -- Update content visibility
     homeContent.Visible = tabName == "Home"
     scriptContent.Visible = tabName == "Script"
-    notifContent.Visible = tabName == "Notifications"
     otherContent.Visible = tabName == "Other"
 end
 
@@ -828,43 +827,43 @@ local function loadFlyScript()
     end)
 end
 
--- Create Home Tab Buttons (2x3 grid)
-createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 10, 0, 60), function()
+-- Create Home Tab Buttons (2x3 grid, smaller)
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 8, 0, 60), function()
     local speed = tonumber(speedSlider.Text) or 16
     humanoid.WalkSpeed = speed
     speedLabel.Text = "Speed: " .. speed
 end)
 
-createButton("JumpButton", "🦘 Jump", UDim2.new(0, 120, 0, 60), function()
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 110, 0, 60), function()
     local jump = tonumber(jumpSlider.Text) or 50
     humanoid.JumpPower = jump
     jumpLabel.Text = "Jump: " .. jump
 end)
 
-createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 230, 0, 60), function()
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 212, 0, 60), function()
     toggleNoclip()
 end)
 
-createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 10, 0, 95), function()
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 8, 0, 95), function()
     loadFlyScript()
 end)
 
-createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 120, 0, 95), function()
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 110, 0, 95), function()
     toggleInfiniteJump()
 end)
 
-createButton("TeleportButton", "📍 Players", UDim2.new(0, 230, 0, 95), function()
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 212, 0, 95), function()
     playerFrame.Visible = not playerFrame.Visible
     if playerFrame.Visible then
         updatePlayerList()
     end
 end)
 
-createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 10, 0, 130), function()
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 8, 0, 130), function()
     resetCamera()
 end)
 
-createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 120, 0, 130), function()
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 110, 0, 130), function()
     humanoid.WalkSpeed = originalWalkSpeed
     humanoid.JumpPower = originalJumpPower
     noclip = false
@@ -911,10 +910,13 @@ closeBtn.MouseButton1Click:Connect(function()
     playerFrame.Visible = false
 end)
 
-minimizeBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
-    toggleButton.Visible = true
-    playerFrame.Visible = false
+-- Close button hover effect
+closeBtn.MouseEnter:Connect(function()
+    closeBtn.BackgroundColor3 = Color3.new(1, 0.3, 0.3)
+end)
+
+closeBtn.MouseLeave:Connect(function()
+    closeBtn.BackgroundColor3 = Color3.new(0.9, 0.4, 0.4)
 end)
 
 toggleButton.MouseButton1Click:Connect(function()
