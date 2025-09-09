@@ -20,7 +20,7 @@ local musicLibrary = {
     {name = "Clash Royale", id = "109699229726518"},
     {name = "Holiday", id = "1836006159"},
     {name = "Metamorphosis Remix", id = "15689451063"},
-    {name = "🫡", id = "1845922899"},
+    {name = "🚩", id = "1845922899"},
     {name = "Bình Bucu", id = "7000891754"},
     {name = "Anh bạn à!", id = "7108789306"},
     {name = "Cải Lương", id = "1843400900"},
@@ -94,7 +94,7 @@ minimizeButton.Size = UDim2.new(0, 30, 0, 25)
 minimizeButton.Position = UDim2.new(1, -70, 0, 7)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 minimizeButton.BorderSizePixel = 0
-minimizeButton.Text = "▢"
+minimizeButton.Text = "➖"
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeButton.TextSize = 14
 minimizeButton.Font = Enum.Font.GothamBold
@@ -110,7 +110,7 @@ closeButton.Size = UDim2.new(0, 30, 0, 25)
 closeButton.Position = UDim2.new(1, -35, 0, 7)
 closeButton.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
 closeButton.BorderSizePixel = 0
-closeButton.Text = "✕"
+closeButton.Text = "❌"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 14
 closeButton.Font = Enum.Font.GothamBold
@@ -324,7 +324,7 @@ minimizedCloseButton.Size = UDim2.new(0, 25, 0, 25)
 minimizedCloseButton.Position = UDim2.new(1, -27, 0, 5)
 minimizedCloseButton.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
 minimizedCloseButton.BorderSizePixel = 0
-minimizedCloseButton.Text = "✕"
+minimizedCloseButton.Text = "❌"
 minimizedCloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizedCloseButton.TextSize = 10
 minimizedCloseButton.Font = Enum.Font.GothamBold
