@@ -337,7 +337,7 @@ local graphicsIcon = Instance.new("TextLabel")
 graphicsIcon.Size = UDim2.new(0, 30, 0, 30)
 graphicsIcon.Position = UDim2.new(0, 10, 0, 10)
 graphicsIcon.BackgroundTransparency = 1
-graphicsIcon.Text = "🎨"
+graphicsIcon.Text = "⭐"
 graphicsIcon.TextColor3 = Color3.new(0.2, 0.4, 0.8)
 graphicsIcon.TextSize = 20
 graphicsIcon.Font = Enum.Font.Gotham
@@ -369,7 +369,7 @@ local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
 graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
-graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.Text = "⭐ Open Graphics"
 graphicsButton.TextColor3 = Color3.new(1, 1, 1)
 graphicsButton.TextSize = 10
 graphicsButton.Font = Enum.Font.Gotham
@@ -977,7 +977,7 @@ paintButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Draw"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))()
     end)
 end)
 
@@ -995,7 +995,7 @@ clientButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Cilent"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Cilent"))()
     end)
 end)
 
