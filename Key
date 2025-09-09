@@ -546,4 +546,571 @@ clientDesc.Size = UDim2.new(1, -50, 0, 20)
 clientDesc.Position = UDim2.new(0, 45, 0, 30)
 clientDesc.BackgroundTransparency = 1
 clientDesc.Text = "Advanced client configurations"
-clientDesc.TextC
+clientDesc.TextColor3 = Color3.new(0.4, 0.4, 0.4)
+clientDesc.TextSize = 10
+clientDesc.Font = Enum.Font.Gotham
+clientDesc.TextXAlignment = Enum.TextXAlignment.Left
+clientDesc.Parent = clientFrame
+
+-- Client Button
+local clientButton = Instance.new("TextButton")
+clientButton.Size = UDim2.new(0, 100, 0, 25)
+clientButton.Position = UDim2.new(0, 45, 0, 50)
+clientButton.BackgroundColor3 = Color3.new(0.3, 0.8, 0.3)
+clientButton.Text = "⚙️ Open Client"
+clientButton.TextColor3 = Color3.new(1, 1, 1)
+clientButton.TextSize = 10
+clientButton.Font = Enum.Font.Gotham
+clientButton.Parent = clientFrame
+
+local clientBtnCorner = Instance.new("UICorner")
+clientBtnCorner.CornerRadius = UDim.new(0, 5)
+clientBtnCorner.Parent = clientButton
+
+-- Client Button Events
+clientButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Client Settings")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Cilent"))()
+    end)
+end)
+
+-- Client Button Hover Effects
+clientButton.MouseEnter:Connect(function()
+    clientButton.BackgroundColor3 = Color3.new(0.2, 0.7, 0.2)
+end)
+
+clientButton.MouseLeave:Connect(function()
+    clientButton.BackgroundColor3 = Color3.new(0.3, 0.8, 0.3)
+end)
+
+-- Coming Soon Feature (moved down)
+local comingSoonFrame = Instance.new("Frame")
+comingSoonFrame.Size = UDim2.new(1, -10, 0, 60)
+comingSoonFrame.Position = UDim2.new(0, 5, 0, 400)
+comingSoonFrame.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
+comingSoonFrame.BorderSizePixel = 0
+comingSoonFrame.Parent = otherContent
+
+local comingSoonCorner = Instance.new("UICorner")
+comingSoonCorner.CornerRadius = UDim.new(0, 8)
+comingSoonCorner.Parent = comingSoonFrame
+
+local comingSoonText = Instance.new("TextLabel")
+comingSoonText.Size = UDim2.new(1, 0, 1, 0)
+comingSoonText.BackgroundTransparency = 1
+comingSoonText.Text = "🚀 More features coming soon..."
+comingSoonText.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+comingSoonText.TextSize = 12
+comingSoonText.Font = Enum.Font.Gotham
+comingSoonText.Parent = comingSoonFrame
+
+-- Player List (small, integrated)
+local playerFrame = Instance.new("Frame")
+playerFrame.Name = "PlayerFrame"
+playerFrame.Size = UDim2.new(0, 180, 0, 200)
+playerFrame.Position = UDim2.new(1, 10, 0, 0)
+playerFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
+playerFrame.BorderSizePixel = 0
+playerFrame.Visible = false
+playerFrame.Parent = mainFrame
+
+local playerFrameCorner = Instance.new("UICorner")
+playerFrameCorner.CornerRadius = UDim.new(0, 10)
+playerFrameCorner.Parent = playerFrame
+
+local playerTitle = Instance.new("TextLabel")
+playerTitle.Size = UDim2.new(1, 0, 0, 25)
+playerTitle.BackgroundTransparency = 1
+playerTitle.Text = "👥 Players"
+playerTitle.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+playerTitle.TextSize = 12
+playerTitle.Font = Enum.Font.GothamBold
+playerTitle.Parent = playerFrame
+
+local playerList = Instance.new("ScrollingFrame")
+playerList.Size = UDim2.new(1, -10, 1, -30)
+playerList.Position = UDim2.new(0, 5, 0, 25)
+playerList.BackgroundColor3 = Color3.new(1, 1, 1)
+playerList.ScrollBarThickness = 3
+playerList.Parent = playerFrame
+
+local playerListCorner = Instance.new("UICorner")
+playerListCorner.CornerRadius = UDim.new(0, 5)
+playerListCorner.Parent = playerList
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 2)
+listLayout.Parent = playerList
+
+-- Button Creation Function
+local function createButton(name, text, position, callback, parent)
+    parent = parent or homeContent
+    
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = UDim2.new(0, 100, 0, 25)
+    button.Position = position
+    button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
+    button.Text = text
+    button.TextColor3 = Color3.new(0.2, 0.3, 0.6)
+    button.TextSize = 10
+    button.Font = Enum.Font.Gotham
+    button.Parent = parent
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 5)
+    buttonCorner.Parent = button
+    
+    button.MouseButton1Click:Connect(callback)
+    
+    -- Hover effect
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.new(0.8, 0.85, 1)
+    end)
+    
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
+    end)
+    
+    return button
+end
+
+-- Speed/Jump Controls
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(0, 150, 0, 15)
+speedLabel.Position = UDim2.new(0, 10, 0, 10)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed: 16"
+speedLabel.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+speedLabel.TextSize = 10
+speedLabel.Font = Enum.Font.Gotham
+speedLabel.Parent = homeContent
+
+local speedSlider = Instance.new("TextBox")
+speedSlider.Size = UDim2.new(0, 60, 0, 20)
+speedSlider.Position = UDim2.new(0, 10, 0, 30)
+speedSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+speedSlider.Text = "16"
+speedSlider.TextColor3 = Color3.new(0, 0, 0)
+speedSlider.TextSize = 10
+speedSlider.PlaceholderText = "16"
+speedSlider.Parent = homeContent
+
+local speedCorner = Instance.new("UICorner")
+speedCorner.CornerRadius = UDim.new(0, 3)
+speedCorner.Parent = speedSlider
+
+local jumpLabel = Instance.new("TextLabel")
+jumpLabel.Size = UDim2.new(0, 150, 0, 15)
+jumpLabel.Position = UDim2.new(0, 200, 0, 10)
+jumpLabel.BackgroundTransparency = 1
+jumpLabel.Text = "Jump: 50"
+jumpLabel.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+jumpLabel.TextSize = 10
+jumpLabel.Font = Enum.Font.Gotham
+jumpLabel.Parent = homeContent
+
+local jumpSlider = Instance.new("TextBox")
+jumpSlider.Size = UDim2.new(0, 60, 0, 20)
+jumpSlider.Position = UDim2.new(0, 200, 0, 30)
+jumpSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+jumpSlider.Text = "50"
+jumpSlider.TextColor3 = Color3.new(0, 0, 0)
+jumpSlider.TextSize = 10
+jumpSlider.PlaceholderText = "50"
+jumpSlider.Parent = homeContent
+
+local jumpCorner = Instance.new("UICorner")
+jumpCorner.CornerRadius = UDim.new(0, 3)
+jumpCorner.Parent = jumpSlider
+
+-- Functions
+local function showLoadingAnimation(scriptName)
+    loadingText.Text = "Loading " .. scriptName .. "..."
+    loadingFrame.Visible = true
+    
+    -- Spinning animation
+    local spinConnection
+    spinConnection = RunService.Heartbeat:Connect(function()
+        if not loadingFrame.Visible then
+            spinConnection:Disconnect()
+            return
+        end
+        loadingSpinner.Rotation = loadingSpinner.Rotation + 5
+    end)
+    
+    -- Hide after 2 seconds
+    wait(2)
+    loadingFrame.Visible = false
+    if spinConnection then
+        spinConnection:Disconnect()
+    end
+end
+
+local function createScriptButton(scriptData, position)
+    local scriptFrame = Instance.new("Frame")
+    scriptFrame.Name = scriptData.name:gsub("%s", "")
+    scriptFrame.Size = UDim2.new(0, 180, 0, 60)
+    scriptFrame.Position = position
+    scriptFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
+    scriptFrame.BorderSizePixel = 0
+    scriptFrame.Parent = scriptsContainer
+    
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 8)
+    frameCorner.Parent = scriptFrame
+    
+    -- Script Name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, -10, 0, 25)
+    nameLabel.Position = UDim2.new(0, 5, 0, 5)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = scriptData.name
+    nameLabel.TextColor3 = Color3.new(0.2, 0.2, 0.2)
+    nameLabel.TextSize = 12
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = scriptFrame
+    
+    -- Execute Button (centered)
+    local executeBtn = Instance.new("TextButton")
+    executeBtn.Size = UDim2.new(0, 120, 0, 25)
+    executeBtn.Position = UDim2.new(0, 30, 0, 30)
+    executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
+    executeBtn.Text = "▶ Execute"
+    executeBtn.TextColor3 = Color3.new(1, 1, 1)
+    executeBtn.TextSize = 11
+    executeBtn.Font = Enum.Font.Gotham
+    executeBtn.Parent = scriptFrame
+    
+    local executeCorner = Instance.new("UICorner")
+    executeCorner.CornerRadius = UDim.new(0, 5)
+    executeCorner.Parent = executeBtn
+    
+    -- Button Events
+    executeBtn.MouseButton1Click:Connect(function()
+        spawn(function()
+            showLoadingAnimation(scriptData.name)
+        end)
+        
+        pcall(function()
+            loadstring(scriptData.code)()
+        end)
+    end)
+    
+    -- Hover effects
+    executeBtn.MouseEnter:Connect(function()
+        executeBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
+    end)
+    
+    executeBtn.MouseLeave:Connect(function()
+        executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
+    end)
+    
+    return scriptFrame
+end
+
+local function updateScriptList(searchTerm)
+    -- Clear existing scripts
+    for _, child in pairs(scriptsContainer:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    searchTerm = searchTerm:lower()
+    local row, col = 0, 0
+    local totalHeight = 0
+    
+    for _, scriptData in ipairs(scriptsData) do
+        if searchTerm == "" or scriptData.name:lower():find(searchTerm) then
+            local position = UDim2.new(0, col * 190, 0, row * 70)
+            createScriptButton(scriptData, position)
+            
+            col = col + 1
+            if col >= 2 then
+                col = 0
+                row = row + 1
+            end
+            totalHeight = (row + 1) * 70
+        end
+    end
+    
+    scriptsContainer.Size = UDim2.new(1, 0, 0, math.max(totalHeight, 400))
+    scriptContent.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 50)
+end
+local function updatePlayerList()
+    for _, child in pairs(playerList:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= player then
+            local playerContainer = Instance.new("Frame")
+            playerContainer.Size = UDim2.new(1, 0, 0, 35)
+            playerContainer.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
+            playerContainer.Parent = playerList
+            
+            local containerCorner = Instance.new("UICorner")
+            containerCorner.CornerRadius = UDim.new(0, 3)
+            containerCorner.Parent = playerContainer
+            
+            local playerName = Instance.new("TextLabel")
+            playerName.Size = UDim2.new(1, 0, 0, 15)
+            playerName.Position = UDim2.new(0, 5, 0, 2)
+            playerName.BackgroundTransparency = 1
+            playerName.Text = targetPlayer.Name
+            playerName.TextSize = 9
+            playerName.Font = Enum.Font.Gotham
+            playerName.TextColor3 = Color3.new(0.2, 0.2, 0.2)
+            playerName.TextXAlignment = Enum.TextXAlignment.Left
+            playerName.Parent = playerContainer
+            
+            local tpBtn = Instance.new("TextButton")
+            tpBtn.Size = UDim2.new(0, 35, 0, 15)
+            tpBtn.Position = UDim2.new(0, 5, 0, 17)
+            tpBtn.BackgroundColor3 = Color3.new(0.7, 0.9, 1)
+            tpBtn.Text = "TP"
+            tpBtn.TextSize = 8
+            tpBtn.Font = Enum.Font.Gotham
+            tpBtn.TextColor3 = Color3.new(0, 0.3, 0.6)
+            tpBtn.Parent = playerContainer
+            
+            local viewBtn = Instance.new("TextButton")
+            viewBtn.Size = UDim2.new(0, 35, 0, 15)
+            viewBtn.Position = UDim2.new(0, 45, 0, 17)
+            viewBtn.BackgroundColor3 = Color3.new(1, 0.9, 0.7)
+            viewBtn.Text = "View"
+            viewBtn.TextSize = 8
+            viewBtn.Font = Enum.Font.Gotham
+            viewBtn.TextColor3 = Color3.new(0.6, 0.3, 0)
+            viewBtn.Parent = playerContainer
+            
+            local tpCorner = Instance.new("UICorner")
+            tpCorner.CornerRadius = UDim.new(0, 2)
+            tpCorner.Parent = tpBtn
+            
+            local viewCorner = Instance.new("UICorner")
+            viewCorner.CornerRadius = UDim.new(0, 2)
+            viewCorner.Parent = viewBtn
+            
+            tpBtn.MouseButton1Click:Connect(function()
+                if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+                end
+            end)
+            
+            viewBtn.MouseButton1Click:Connect(function()
+                if targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+                    workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
+                end
+            end)
+        end
+    end
+    
+    playerList.CanvasSize = UDim2.new(0, 0, 0, (#Players:GetPlayers() - 1) * 37)
+end
+
+local function switchTab(tabName)
+    currentTab = tabName
+    
+    -- Update tab buttons
+    for name, tabData in pairs(tabButtons) do
+        if name == tabName then
+            tabData.button.TextColor3 = Color3.new(0.2, 0.4, 0.8)
+            tabData.underline.Visible = true
+        else
+            tabData.button.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+            tabData.underline.Visible = false
+        end
+    end
+    
+    -- Update content visibility
+    homeContent.Visible = tabName == "Home"
+    scriptContent.Visible = tabName == "Script"
+    notifContent.Visible = tabName == "Notifications"
+    otherContent.Visible = tabName == "Other"
+end
+
+local function toggleNoclip()
+    noclip = not noclip
+    if noclip then
+        local connection
+        connection = RunService.Stepped:Connect(function()
+            if not noclip then
+                connection:Disconnect()
+                return
+            end
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    else
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+local function toggleInfiniteJump()
+    infiniteJump = not infiniteJump
+    if infiniteJump then
+        jumpConnection = UserInputService.JumpRequest:Connect(function()
+            if character and character:FindFirstChild("Humanoid") then
+                character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+        end
+    end
+end
+
+local function resetCamera()
+    workspace.CurrentCamera.CameraSubject = character.Humanoid
+end
+
+local function loadFlyScript()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
+    end)
+end
+
+-- Create Home Tab Buttons (2x3 grid)
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 10, 0, 60), function()
+    local speed = tonumber(speedSlider.Text) or 16
+    humanoid.WalkSpeed = speed
+    speedLabel.Text = "Speed: " .. speed
+end)
+
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 120, 0, 60), function()
+    local jump = tonumber(jumpSlider.Text) or 50
+    humanoid.JumpPower = jump
+    jumpLabel.Text = "Jump: " .. jump
+end)
+
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 230, 0, 60), function()
+    toggleNoclip()
+end)
+
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 10, 0, 95), function()
+    loadFlyScript()
+end)
+
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 120, 0, 95), function()
+    toggleInfiniteJump()
+end)
+
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 230, 0, 95), function()
+    playerFrame.Visible = not playerFrame.Visible
+    if playerFrame.Visible then
+        updatePlayerList()
+    end
+end)
+
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 10, 0, 130), function()
+    resetCamera()
+end)
+
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 120, 0, 130), function()
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+    noclip = false
+    infiniteJump = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    speedSlider.Text = "16"
+    jumpSlider.Text = "50"
+    speedLabel.Text = "Speed: 16"
+    jumpLabel.Text = "Jump: 50"
+    playerFrame.Visible = false
+    resetCamera()
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = true
+        end
+    end
+end)
+
+-- Tab button events
+for tabName, tabData in pairs(tabButtons) do
+    tabData.button.MouseButton1Click:Connect(function()
+        switchTab(tabName)
+        if tabName == "Script" then
+            updateScriptList("")
+        end
+    end)
+end
+
+-- Search functionality
+searchBox.Changed:Connect(function(property)
+    if property == "Text" then
+        updateScriptList(searchBox.Text)
+    end
+end)
+
+-- Close/Toggle functionality
+closeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
+end)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    toggleButton.Visible = false
+end)
+
+-- Keyboard shortcut
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        if mainFrame.Visible then
+            mainFrame.Visible = false
+            toggleButton.Visible = true
+            playerFrame.Visible = false
+        else
+            mainFrame.Visible = true
+            toggleButton.Visible = false
+        end
+    end
+end)
+
+-- Character respawn handling
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+    noclip = false
+    infiniteJump = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    wait(1)
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+end)
+
+print("Mila UI (Tab Design) đã được tải thành công! 💖")
+print("Nhấn Right Shift để bật/tắt UI")
