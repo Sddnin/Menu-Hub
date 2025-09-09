@@ -102,7 +102,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0.7, 0, 1, 0)
 title.Position = UDim2.new(0, 15, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "🎮 GRAPHICS MASTER V4"
+title.Text = "🎮 GRAPHICS V4"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
 title.Font = Enum.Font.GothamBold
@@ -115,7 +115,7 @@ closeButton.Size = UDim2.new(0, 40, 0, 40)
 closeButton.Position = UDim2.new(1, -50, 0, 10)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
 closeButton.BorderSizePixel = 0
-closeButton.Text = "✕"
+closeButton.Text = "❌"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextScaled = true
 closeButton.Font = Enum.Font.GothamBold
@@ -155,7 +155,7 @@ enhanceTab.Size = UDim2.new(0.48, 0, 1, 0)
 enhanceTab.Position = UDim2.new(0, 0, 0, 0)
 enhanceTab.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
 enhanceTab.BorderSizePixel = 0
-enhanceTab.Text = "✨ TĂNG ĐỒ HỌA"
+enhanceTab.Text = "🔋 Graphics"
 enhanceTab.TextColor3 = Color3.fromRGB(255, 255, 255)
 enhanceTab.TextScaled = true
 enhanceTab.Font = Enum.Font.GothamBold
@@ -170,7 +170,7 @@ performanceTab.Size = UDim2.new(0.48, 0, 1, 0)
 performanceTab.Position = UDim2.new(0.52, 0, 0, 0)
 performanceTab.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
 performanceTab.BorderSizePixel = 0
-performanceTab.Text = "🚀 GIẢM ĐỒ HỌA"
+performanceTab.Text = "🪫 Graphics"
 performanceTab.TextColor3 = Color3.fromRGB(200, 200, 200)
 performanceTab.TextScaled = true
 performanceTab.Font = Enum.Font.GothamBold
@@ -645,9 +645,9 @@ local function nightVision()
     colorCorrection.Parent = Lighting
     
     settings.qualityLevel = "Night Vision"
-    statusLabel.Text = "🔍 Night Vision"
+    statusLabel.Text = "🌛 Night Vision"
     statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-    showNotification("🔍 Night Vision Enabled!", Color3.fromRGB(0, 255, 0))
+    showNotification("🌛 Night Vision Enabled!", Color3.fromRGB(0, 255, 0))
 end
 
 -- Weather Effects
