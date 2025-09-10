@@ -102,7 +102,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0.7, 0, 1, 0)
 title.Position = UDim2.new(0, 15, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "🎮 GRAPHICS V4"
+title.Text = "🎮 GRAPHICS MASTER V4"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
 title.Font = Enum.Font.GothamBold
@@ -115,7 +115,7 @@ closeButton.Size = UDim2.new(0, 40, 0, 40)
 closeButton.Position = UDim2.new(1, -50, 0, 10)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
 closeButton.BorderSizePixel = 0
-closeButton.Text = "❌"
+closeButton.Text = "✕"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextScaled = true
 closeButton.Font = Enum.Font.GothamBold
@@ -155,7 +155,7 @@ enhanceTab.Size = UDim2.new(0.48, 0, 1, 0)
 enhanceTab.Position = UDim2.new(0, 0, 0, 0)
 enhanceTab.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
 enhanceTab.BorderSizePixel = 0
-enhanceTab.Text = "🔋 Graphics"
+enhanceTab.Text = "✨ TĂNG ĐỒ HỌA"
 enhanceTab.TextColor3 = Color3.fromRGB(255, 255, 255)
 enhanceTab.TextScaled = true
 enhanceTab.Font = Enum.Font.GothamBold
@@ -170,7 +170,7 @@ performanceTab.Size = UDim2.new(0.48, 0, 1, 0)
 performanceTab.Position = UDim2.new(0.52, 0, 0, 0)
 performanceTab.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
 performanceTab.BorderSizePixel = 0
-performanceTab.Text = "🪫 Graphics"
+performanceTab.Text = "🚀 GIẢM ĐỒ HỌA"
 performanceTab.TextColor3 = Color3.fromRGB(200, 200, 200)
 performanceTab.TextScaled = true
 performanceTab.Font = Enum.Font.GothamBold
@@ -645,9 +645,9 @@ local function nightVision()
     colorCorrection.Parent = Lighting
     
     settings.qualityLevel = "Night Vision"
-    statusLabel.Text = "🌛 Night Vision"
+    statusLabel.Text = "🔍 Night Vision"
     statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-    showNotification("🌛 Night Vision Enabled!", Color3.fromRGB(0, 255, 0))
+    showNotification("🔍 Night Vision Enabled!", Color3.fromRGB(0, 255, 0))
 end
 
 -- Weather Effects
@@ -824,97 +824,79 @@ local function lowEndMode()
 end
 
 local function antiLag()
-    statusLabel.Text = "🔄 Ultra Anti-Lag..."
+    statusLabel.Text = "🔄 ULTRA Anti-Lag..."
     statusLabel.TextColor3 = Color3.fromRGB(255, 165, 0)
     
     local lagSources = 0
     local optimizedItems = 0
+    local destroyedItems = 0
     
-    -- PHASE 1: AGGRESSIVE SCRIPT OPTIMIZATION
-    for _, obj in pairs(Workspace:GetDescendants()) do
+    -- PHASE 1: NUCLEAR SCRIPT OPTIMIZATION
+    for _, obj in pairs(game:GetDescendants()) do
         if obj:IsA("LocalScript") or obj:IsA("Script") then
-            if not obj:IsDescendantOf(player.PlayerGui) and not obj:IsDescendantOf(player.PlayerScripts) then
-                -- Disable non-essential scripts
-                if obj.Name:lower():find("lag") or obj.Name:lower():find("spam") or obj.Name:lower():find("loop") then
+            -- Don't touch player's own scripts and essential game scripts
+            if not obj:IsDescendantOf(player) and not obj:IsDescendantOf(game.StarterGui) and 
+               not obj:IsDescendantOf(game.StarterPack) and not obj:IsDescendantOf(game.StarterPlayer) then
+                -- Disable ALL non-essential scripts aggressively
+                if obj.Name ~= "Animate" and obj.Name ~= "Health" and obj.Name ~= "Sound" then
                     obj.Disabled = true
+                    obj:Destroy() -- Complete removal
                     lagSources = lagSources + 1
                 end
             end
         end
     end
     
-    -- PHASE 2: ULTRA PARTICLE DESTRUCTION
-    for _, obj in pairs(Workspace:GetDescendants()) do
+    -- PHASE 2: COMPLETE PARTICLE ANNIHILATION
+    for _, obj in pairs(game:GetDescendants()) do
         if obj:IsA("ParticleEmitter") then
-            if obj.Rate > 20 then
-                obj.Rate = 5  -- Ultra reduction
-                obj.Lifetime = NumberRange.new(0.2, 0.5)  -- Short lifetime
-                obj.Speed = NumberRange.new(0, 5)  -- Slower particles
-                optimizedItems = optimizedItems + 1
-            end
-            -- Destroy excessive particles completely
-            if obj.Rate > 100 then
-                obj:Destroy()
-                lagSources = lagSources + 1
-            end
-        elseif obj:IsA("Fire") then
-            if obj.Size > 3 then
-                obj.Size = 1
-                obj.Heat = 5
-                optimizedItems = optimizedItems + 1
-            end
-            if obj.Size > 10 then
-                obj:Destroy()
-                lagSources = lagSources + 1
-            end
-        elseif obj:IsA("Smoke") then
-            if obj.Size > 2 then
-                obj.Size = 0.5
-                obj.RiseVelocity = 1
-                optimizedItems = optimizedItems + 1
-            end
-            if obj.Size > 8 then
-                obj:Destroy()
-                lagSources = lagSources + 1
-            end
-        elseif obj:IsA("Explosion") then
-            -- Remove all explosions immediately
+            -- Destroy ALL particles immediately, no mercy
             obj:Destroy()
-            lagSources = lagSources + 1
+            destroyedItems = destroyedItems + 1
+        elseif obj:IsA("Fire") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+        elseif obj:IsA("Smoke") then
+            obj:Destroy() 
+            destroyedItems = destroyedItems + 1
+        elseif obj:IsA("Explosion") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+        elseif obj:IsA("Beam") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+        elseif obj:IsA("Trail") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
         end
     end
     
-    -- PHASE 3: SOUND SYSTEM OPTIMIZATION
+    -- PHASE 3: COMPLETE SOUND DESTRUCTION
     for _, obj in pairs(game:GetDescendants()) do
         if obj:IsA("Sound") then
-            if obj.Volume > 0.3 and not obj.Playing then
-                obj.Volume = 0.1
-                optimizedItems = optimizedItems + 1
-            end
-            -- Remove sounds with high volume that aren't playing
-            if obj.Volume > 0.8 and not obj.Playing and not obj:IsDescendantOf(player) then
+            -- Keep only essential player sounds
+            if not obj:IsDescendantOf(player.Character or {}) then
                 obj:Destroy()
-                lagSources = lagSources + 1
-            end
-            -- Optimize sound properties
-            if obj.RollOffMode == Enum.RollOffMode.Linear then
-                obj.RollOffMode = Enum.RollOffMode.InverseTapered
+                destroyedItems = destroyedItems + 1
+            else
+                -- Minimize remaining sounds
+                obj.Volume = 0
+                obj.PlaybackSpeed = 0.1
                 optimizedItems = optimizedItems + 1
             end
         end
     end
     
-    -- PHASE 4: GRAPHICS DESTRUCTION MODE
-    for _, obj in pairs(Workspace:GetDescendants()) do
+    -- PHASE 4: EXTREME GRAPHICS ANNIHILATION
+    for _, obj in pairs(game:GetDescendants()) do
         if obj:IsA("BasePart") then
-            -- Ultra material optimization
-            if obj.Material ~= Enum.Material.SmoothPlastic then
-                obj.Material = Enum.Material.SmoothPlastic
-                optimizedItems = optimizedItems + 1
-            end
-            -- Remove shadows completely
+            -- Force minimal settings
+            obj.Material = Enum.Material.Plastic -- Even more basic than SmoothPlastic
+            obj.Shape = Enum.PartType.Block
             obj.CastShadow = false
-            -- Simplify surfaces
+            obj.CanCollide = obj.CanCollide -- Keep collision but remove all visual fluff
+            
+            -- Remove ALL surface details
             obj.TopSurface = Enum.SurfaceType.Smooth
             obj.BottomSurface = Enum.SurfaceType.Smooth
             obj.FrontSurface = Enum.SurfaceType.Smooth
@@ -922,209 +904,200 @@ local function antiLag()
             obj.LeftSurface = Enum.SurfaceType.Smooth
             obj.RightSurface = Enum.SurfaceType.Smooth
             
+            -- Force basic colors only
+            if obj.BrickColor ~= BrickColor.new("Medium stone grey") then
+                obj.BrickColor = BrickColor.new("Medium stone grey")
+                optimizedItems = optimizedItems + 1
+            end
+            
         elseif obj:IsA("MeshPart") then
-            obj.RenderFidelity = Enum.RenderFidelity.Performance
-            -- Remove complex textures
-            if obj.TextureID ~= "" then
-                obj.TextureID = ""
-                optimizedItems = optimizedItems + 1
-            end
-            
-        elseif obj:IsA("UnionOperation") then
-            obj.UsePartColor = true
-            obj.RenderFidelity = Enum.RenderFidelity.Performance
-            optimizedItems = optimizedItems + 1
-            
-        elseif obj:IsA("SpecialMesh") then
-            -- Simplify special meshes
-            if obj.MeshType ~= Enum.MeshType.Block then
-                obj.MeshType = Enum.MeshType.Block
-                optimizedItems = optimizedItems + 1
-            end
-            
-        elseif obj:IsA("Decal") or obj:IsA("Texture") then
-            -- Remove or simplify decals/textures
-            if obj.Transparency < 0.8 then
-                obj.Transparency = 0.9
-                optimizedItems = optimizedItems + 1
-            end
-            -- Remove high-resolution textures
-            if obj:IsA("Texture") then
-                obj.StudsPerTileU = math.max(obj.StudsPerTileU, 4)
-                obj.StudsPerTileV = math.max(obj.StudsPerTileV, 4)
-            end
-            
-        elseif obj:IsA("SurfaceGui") then
-            -- Optimize GUIs
-            if #obj:GetChildren() > 10 then
-                for i = 11, #obj:GetChildren() do
-                    obj:GetChildren()[i]:Destroy()
-                end
-                lagSources = lagSources + 1
-            end
-        end
-    end
-    
-    -- PHASE 5: LIGHTING ULTRA OPTIMIZATION
-    Lighting.Technology = Enum.Technology.Compatibility
-    Lighting.GlobalShadows = false
-    Lighting.ShadowSoftness = 0
-    
-    -- Remove ALL post-processing effects
-    for _, effect in pairs(Lighting:GetChildren()) do
-        if effect:IsA("PostEffect") then
-            effect:Destroy()
-            lagSources = lagSources + 1
-        end
-    end
-    
-    -- PHASE 6: WORKSPACE CLEANUP
-    for _, obj in pairs(Workspace:GetChildren()) do
-        -- Remove debris and unnecessary objects
-        if obj.Name:lower():find("debris") or obj.Name:lower():find("trash") or obj.Name:lower():find("lag") then
-            obj:Destroy()
-            lagSources = lagSources + 1
-        end
-        
-        -- Clean up excessive models
-        if obj:IsA("Model") and #obj:GetDescendants() > 500 then
-            -- Remove excessive children from large models
-            local descendants = obj:GetDescendants()
-            for i = 501, #descendants do
-                if descendants[i] and descendants[i]:IsA("BasePart") and descendants[i].CanCollide == false then
-                    descendants[i]:Destroy()
-                    lagSources = lagSources + 1
-                end
-            end
-        end
-    end
-    
-    -- PHASE 7: MEMORY AGGRESSIVE CLEANUP
-    -- Force garbage collection multiple times
-    for i = 1, 10 do
-        wait(0.1)
-        game:GetService("RunService").Heartbeat:Wait()
-    end
-    
-    -- PHASE 8: CAMERA OPTIMIZATION
-    if camera then
-        camera.FieldOfView = 70  -- Reset FOV for performance
-        -- Remove camera effects
-        for _, effect in pairs(camera:GetChildren()) do
-            if effect:IsA("PostEffect") then
-                effect:Destroy()
-                lagSources = lagSources + 1
-            end
-        end
-    end
-    
-    -- PHASE 9: PLAYER OPTIMIZATION
-    if player.Character then
-        for _, obj in pairs(player.Character:GetDescendants()) do
-            if obj:IsA("Accessory") or obj:IsA("Hat") then
-                -- Simplify accessories
-                for _, part in pairs(obj:GetDescendants()) do
-                    if part:IsA("MeshPart") or part:IsA("SpecialMesh") then
-                        part.RenderFidelity = Enum.RenderFidelity.Performance
-                        if part:IsA("MeshPart") then
-                            part.TextureID = ""
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    -- PHASE 10: FINAL OPTIMIZATIONS
-    -- Reduce quality settings
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-    
-    -- Disable unnecessary services
-    pcall(function()
-        game:GetService("SoundService").AmbientReverb = Enum.ReverbType.NoReverb
-        game:GetService("SoundService").DistanceFactor = 1
-        game:GetService("SoundService").DopplerScale = 0
-    end)
-    
-    -- Network optimization
-    pcall(function()
-        game:GetService("NetworkClient"):SetOutgoingKBPSLimit(50)
-    end)
-    
-    local totalOptimized = lagSources + optimizedItems
-    settings.qualityLevel = "Ultra Anti-Lag"
-    statusLabel.Text = "🛡️ Ultra Anti-Lag"
-    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-    
-    showNotification("🛡️ ULTRA ANTI-LAG: " .. totalOptimized .. " items optimized!", Color3.fromRGB(0, 255, 0), 4)
-    
-    -- Show detailed report
-    spawn(function()
-        wait(1)
-        showNotification("🚀 " .. lagSources .. " lag sources removed", Color3.fromRGB(255, 69, 0), 3)
-        wait(1)
-        showNotification("⚡ " .. optimizedItems .. " items optimized", Color3.fromRGB(255, 140, 0), 3)
-        wait(1)
-        showNotification("💾 Memory cleaned & performance maximized!", Color3.fromRGB(0, 191, 255), 3)
-    end)
-end
-
--- Add SUPER Anti-Lag as separate function
-local function superAntiLag()
-    statusLabel.Text = "🔄 SUPER Anti-Lag..."
-    statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-    
-    -- Call regular anti-lag first
-    antiLag()
-    
-    wait(1)
-    
-    -- SUPER PHASE: NUCLEAR OPTIMIZATION
-    local destroyed = 0
-    
-    -- Remove ALL non-essential objects
-    for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or 
-           obj:IsA("Explosion") or obj:IsA("Sound") then
-            if not obj:IsDescendantOf(player.Character) then
-                obj:Destroy()
-                destroyed = destroyed + 1
-            end
-        end
-        
-        -- Remove all decals and textures
-        if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SurfaceGui") then
-            obj:Destroy()
-            destroyed = destroyed + 1
-        end
-        
-        -- Simplify all meshes to basic blocks
-        if obj:IsA("SpecialMesh") then
-            obj.MeshType = Enum.MeshType.Block
-            obj.MeshId = ""
-            obj.TextureId = ""
-        elseif obj:IsA("MeshPart") then
+            -- Convert ALL MeshParts to basic blocks
             obj.MeshId = ""
             obj.TextureID = ""
             obj.RenderFidelity = Enum.RenderFidelity.Performance
+            obj.Material = Enum.Material.Plastic
+            obj.BrickColor = BrickColor.new("Medium stone grey")
+            optimizedItems = optimizedItems + 1
+            
+        elseif obj:IsA("UnionOperation") then
+            obj:Destroy() -- Remove ALL unions as they're performance heavy
+            destroyedItems = destroyedItems + 1
+            
+        elseif obj:IsA("SpecialMesh") then
+            -- Convert ALL special meshes to blocks
+            obj.MeshType = Enum.MeshType.Block
+            obj.MeshId = ""
+            obj.TextureId = ""
+            obj.Scale = Vector3.new(1, 1, 1)
+            optimizedItems = optimizedItems + 1
+            
+        elseif obj:IsA("Decal") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+            
+        elseif obj:IsA("Texture") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+            
+        elseif obj:IsA("SurfaceGui") then
+            -- Keep only essential GUIs
+            if not obj:IsDescendantOf(player.PlayerGui) then
+                obj:Destroy()
+                destroyedItems = destroyedItems + 1
+            end
+            
+        elseif obj:IsA("BillboardGui") or obj:IsA("SurfaceGui") then
+            if not obj:IsDescendantOf(player.PlayerGui) then
+                obj:Destroy()
+                destroyedItems = destroyedItems + 1
+            end
         end
     end
     
-    -- EXTREME lighting reduction
+    -- PHASE 5: LIGHTING TOTAL ANNIHILATION
+    Lighting.Technology = Enum.Technology.Legacy -- Most basic lighting
+    Lighting.GlobalShadows = false
+    Lighting.ShadowSoftness = 0
     Lighting.Brightness = 1
-    Lighting.Ambient = Color3.fromRGB(178, 178, 178)
-    Lighting.OutdoorAmbient = Color3.fromRGB(178, 178, 178)
-    Lighting.Technology = Enum.Technology.Legacy
+    Lighting.Ambient = Color3.fromRGB(255, 255, 255) -- Full ambient to remove all shadows
+    Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+    Lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+    Lighting.ColorShift_Top = Color3.new(0, 0, 0)
     
-    -- Force lowest quality
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+    -- DESTROY ALL post-processing effects
+    for _, effect in pairs(Lighting:GetChildren()) do
+        if effect:IsA("PostEffect") then
+            effect:Destroy()
+            destroyedItems = destroyedItems + 1
+        end
+    end
     
-    settings.qualityLevel = "SUPER Anti-Lag"
-    statusLabel.Text = "💀 SUPER Anti-Lag"
+    -- PHASE 6: WORKSPACE NUCLEAR CLEANUP
+    for _, obj in pairs(Workspace:GetChildren()) do
+        -- Remove decorative objects
+        if obj.Name:lower():find("debris") or obj.Name:lower():find("trash") or obj.Name:lower():find("decoration") or
+           obj.Name:lower():find("detail") or obj.Name:lower():find("effect") or obj.Name:lower():find("particle") then
+            obj:Destroy()
+            destroyedItems = destroyedItems + 1
+        end
+        
+        -- Simplify large models aggressively  
+        if obj:IsA("Model") and #obj:GetDescendants() > 100 then
+            local descendants = obj:GetDescendants()
+            -- Remove 80% of descendants from large models
+            for i = math.floor(#descendants * 0.2), #descendants do
+                if descendants[i] and descendants[i] ~= obj.PrimaryPart and 
+                   not descendants[i]:IsDescendantOf(player.Character or {}) then
+                    descendants[i]:Destroy()
+                    destroyedItems = destroyedItems + 1
+                end
+            end
+        end
+    end
+    
+    -- PHASE 7: EXTREME MEMORY OBLITERATION
+    -- Force aggressive garbage collection
+    for i = 1, 20 do
+        wait(0.05)
+        game:GetService("RunService").Heartbeat:Wait()
+        -- Force memory cleanup
+        collectgarbage("collect")
+    end
+    
+    -- PHASE 8: CAMERA TOTAL RESET
+    if camera then
+        camera.FieldOfView = 70
+        camera.CameraType = Enum.CameraType.Custom
+        
+        -- Remove ALL camera effects
+        for _, effect in pairs(camera:GetChildren()) do
+            effect:Destroy()
+            destroyedItems = destroyedItems + 1
+        end
+    end
+    
+    -- PHASE 9: PLAYER CHARACTER OPTIMIZATION
+    if player.Character then
+        for _, obj in pairs(player.Character:GetDescendants()) do
+            if obj:IsA("Accessory") or obj:IsA("Hat") then
+                -- Remove ALL accessories for maximum performance
+                obj:Destroy()
+                destroyedItems = destroyedItems + 1
+            elseif obj:IsA("Shirt") or obj:IsA("Pants") or obj:IsA("ShirtGraphic") then
+                obj:Destroy()
+                destroyedItems = destroyedItems + 1
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj:Destroy() 
+                destroyedItems = destroyedItems + 1
+            elseif obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
+                if obj:IsA("MeshPart") then
+                    obj.MeshId = ""
+                    obj.TextureID = ""
+                elseif obj:IsA("SpecialMesh") then
+                    obj.MeshType = Enum.MeshType.Block
+                    obj.MeshId = ""
+                    obj.TextureId = ""
+                end
+                optimizedItems = optimizedItems + 1
+            end
+        end
+    end
+    
+    -- PHASE 10: SYSTEM TOTAL OVERRIDE
+    -- Force absolute minimum quality
+    pcall(function()
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level01
+        settings().Rendering.EditQualityLevel = Enum.QualityLevel.Level01
+    end)
+    
+    -- Disable all unnecessary services
+    pcall(function()
+        game:GetService("SoundService").AmbientReverb = Enum.ReverbType.NoReverb
+        game:GetService("SoundService").DistanceFactor = 0.1
+        game:GetService("SoundService").DopplerScale = 0
+        game:GetService("SoundService").RolloffScale = 0.1
+    end)
+    
+    -- Network extreme optimization
+    pcall(function()
+        game:GetService("Players").MaxPlayers = 1 -- Reduce if possible
+    end)
+    
+    -- PHASE 11: FINAL DESTRUCTION WAVE
+    wait(0.5)
+    
+    -- Second sweep to catch anything that respawned
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or 
+           obj:IsA("Explosion") or obj:IsA("Beam") or obj:IsA("Trail") then
+            if not obj:IsDescendantOf(player) then
+                obj:Destroy()
+                destroyedItems = destroyedItems + 1
+            end
+        end
+    end
+    
+    local totalOptimized = lagSources + optimizedItems + destroyedItems
+    settings.qualityLevel = "NUCLEAR Anti-Lag"
+    statusLabel.Text = "💀 NUCLEAR MODE"
     statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
     
-    showNotification("💀 SUPER ANTI-LAG: " .. destroyed .. " objects DESTROYED!", Color3.fromRGB(255, 0, 0), 4)
-    showNotification("⚠️ NUCLEAR OPTIMIZATION COMPLETE!", Color3.fromRGB(255, 0, 0), 4)
+    showNotification("💀 NUCLEAR ANTI-LAG: " .. totalOptimized .. " items OBLITERATED!", Color3.fromRGB(255, 0, 0), 5)
+    
+    -- Show detailed destruction report
+    spawn(function()
+        wait(1)
+        showNotification("🗑️ " .. destroyedItems .. " objects DESTROYED", Color3.fromRGB(255, 0, 0), 4)
+        wait(1)  
+        showNotification("⚡ " .. optimizedItems .. " items MINIMIZED", Color3.fromRGB(255, 140, 0), 4)
+        wait(1)
+        showNotification("🚫 " .. lagSources .. " scripts ELIMINATED", Color3.fromRGB(255, 69, 0), 4)
+        wait(1)
+        showNotification("💥 TOTAL PERFORMANCE DESTRUCTION COMPLETE!", Color3.fromRGB(255, 0, 0), 4)
+        wait(1)
+        showNotification("⚠️ Game may look basic but FPS should be MAXIMUM!", Color3.fromRGB(255, 255, 0), 5)
+    end)
 end
 
 local function resetAll()
@@ -1232,13 +1205,12 @@ createAdvancedButton("Extreme", "🚀", extremePerformance, Color3.fromRGB(255, 
 createAdvancedButton("Performance", "⚡", performanceMode, Color3.fromRGB(255, 140, 0), performanceContent, 2)
 createAdvancedButton("FPS Boost", "📈", fpsBoostMode, Color3.fromRGB(0, 255, 0), performanceContent, 3)
 createAdvancedButton("Low-End", "📱", lowEndMode, Color3.fromRGB(128, 128, 128), performanceContent, 4)
-createAdvancedButton("Ultra Anti-Lag", "🛡️", antiLag, Color3.fromRGB(0, 255, 0), performanceContent, 5)
-createAdvancedButton("SUPER Anti-Lag", "💀", superAntiLag, Color3.fromRGB(255, 0, 0), performanceContent, 6)
-createAdvancedButton("Reset All", "🔄", resetAll, Color3.fromRGB(255, 165, 0), performanceContent, 7)
+createAdvancedButton("NUCLEAR Anti-Lag", "💀", antiLag, Color3.fromRGB(255, 0, 0), performanceContent, 5)
+createAdvancedButton("Reset All", "🔄", resetAll, Color3.fromRGB(255, 165, 0), performanceContent, 6)
 
 -- Update canvas sizes
 enhanceContent.CanvasSize = UDim2.new(0, 0, 0, math.ceil(8/3) * 48) -- 8 buttons, 3 columns
-performanceContent.CanvasSize = UDim2.new(0, 0, 0, math.ceil(7/3) * 48) -- 7 buttons, 3 columns
+performanceContent.CanvasSize = UDim2.new(0, 0, 0, math.ceil(6/3) * 48) -- 6 buttons, 3 columns
 
 -- FPS Monitor
 local fps = 0
@@ -1362,7 +1334,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     elseif input.KeyCode == Enum.KeyCode.F2 then
         extremePerformance()
     elseif input.KeyCode == Enum.KeyCode.F3 then
-        superAntiLag()
+        antiLag()
     elseif input.KeyCode == Enum.KeyCode.F4 then
         closeButton.MouseButton1Click:Fire()
     elseif input.KeyCode == Enum.KeyCode.F5 then
