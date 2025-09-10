@@ -14,8 +14,8 @@ screenGui.Parent = playerGui
 -- Tạo Frame chính (tăng chiều cao để chứa nhiều nút hơn)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 600, 0, 350)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -175)
+mainFrame.Size = UDim2.new(0, 650, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -325, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -122,7 +122,7 @@ vngTabCorner.Parent = vngTab
 -- Tạo content container
 local contentContainer = Instance.new("Frame")
 contentContainer.Name = "ContentContainer"
-contentContainer.Size = UDim2.new(1, 0, 0, 250)
+contentContainer.Size = UDim2.new(1, 0, 0, 300)
 contentContainer.Position = UDim2.new(0, 0, 0, 90)
 contentContainer.BackgroundTransparency = 1
 contentContainer.Parent = mainFrame
@@ -169,12 +169,12 @@ local function createExecutorButton(name, link, position, color, parent)
         math.max(0, color.G * 255 - 20),
         math.max(0, color.B * 255 - 20)
     )
-
+    
     button.MouseEnter:Connect(function()
         local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = hoverColor})
         tween:Play()
     end)
-
+    
     button.MouseLeave:Connect(function()
         local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = originalColor})
         tween:Play()
@@ -185,16 +185,16 @@ local function createExecutorButton(name, link, position, color, parent)
         local success = pcall(function()
             setclipboard(link)
         end)
-
+        
         if success then
             updateStatusLabel("✓ " .. name .. " link đã được copy!")
         else
             updateStatusLabel("Link " .. name .. ": " .. link)
         end
-
+        
         print(name .. " clicked! Link: " .. link)
     end)
-
+    
     return button
 end
 
@@ -202,7 +202,7 @@ end
 local function updateStatusLabel(text)
     statusLabel.Text = text
     statusLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
-
+    
     spawn(function()
         wait(3)
         statusLabel.Text = ""
@@ -211,24 +211,30 @@ end
 
 -- Tạo các executor buttons cho Global tab
 local deltaX = createExecutorButton("Delta X", "https://deltaexploits.gg/delta-executor-android", 
-    UDim2.new(0, 0, 0, 10), Color3.fromRGB(138, 43, 226), globalContent)
+    UDim2.new(0, 10, 0, 10), Color3.fromRGB(138, 43, 226), globalContent)
 
-local arceusX = createExecutorButton("Arceus X", "https://www.mediafire.com/file/p05mfj8v7bj1yd5/Roblox_Arceus_X_NEO_1.8.1.apk/file", 
-    UDim2.new(0, 130, 0, 10), Color3.fromRGB(30, 144, 255), globalContent)
+local arceusX = createExecutorButton("Arceus X", "https://www.mediafire.com/file/junxd0cfyumvk4x/Roblox_Arceus_X_NEO_1.8.2.apk/file", 
+    UDim2.new(0, 140, 0, 10), Color3.fromRGB(30, 144, 255), globalContent)
 
-local codeX = createExecutorButton("CodeX", "https://www.mediafire.com/file/kxpmihdc91o6tgz/Codex_v2.688.apk/file", 
-    UDim2.new(0, 260, 0, 10), Color3.fromRGB(255, 69, 0), globalContent)
+local codeX = createExecutorButton("CodeX", "https://www.mediafire.com/file/8rt7pihmwkrflb6/Codex_v2.689.apk/file", 
+    UDim2.new(0, 270, 0, 10), Color3.fromRGB(255, 69, 0), globalContent)
 
 local vegaX = createExecutorButton("Vega X", "https://github.com/1f0yt/community/releases/download/Vegax/Vega.X.apk", 
-    UDim2.new(0, 390, 0, 10), Color3.fromRGB(50, 205, 50), globalContent)
+    UDim2.new(0, 400, 0, 10), Color3.fromRGB(50, 205, 50), globalContent)
 
-local ronix = createExecutorButton("Ronix", "https://wrdcdn.net/r/154522/1757349822750/Ronix_688_(arm64).apk", 
-    UDim2.new(0, 0, 0, 55), Color3.fromRGB(220, 20, 60), globalContent)
+local cryptic = createExecutorButton("Cryptic", "https://www.mediafire.com/file/epd1xj3gsc3vmkx/Cryptic+2.689.880+APK.apk/file", 
+    UDim2.new(0, 530, 0, 10), Color3.fromRGB(255, 20, 147), globalContent)
+
+local evon = createExecutorButton("Evon", "https://evon.cc/android/dl-a/Evon.apk", 
+    UDim2.new(0, 10, 0, 55), Color3.fromRGB(75, 0, 130), globalContent)
+
+local klrn = createExecutorButton("Klrn", "https://wrdcdn.net/r/54921/1757365485565/krnl_release_2.689.880_2025.9.7_47.apk", 
+    UDim2.new(0, 140, 0, 55), Color3.fromRGB(220, 20, 60), globalContent)
 
 -- Tạo thông tin hướng dẫn
 local infoLabel = Instance.new("TextLabel")
 infoLabel.Size = UDim2.new(1, 0, 0, 20)
-infoLabel.Position = UDim2.new(0, 0, 0, 100)
+infoLabel.Position = UDim2.new(0, 0, 0, 110)
 infoLabel.BackgroundTransparency = 1
 infoLabel.Text = "Click vào bất kỳ executor nào để copy link download"
 infoLabel.TextColor3 = Color3.fromRGB(100, 100, 100)
@@ -240,7 +246,7 @@ infoLabel.Parent = globalContent
 -- Tạo status label để hiển thị thông báo
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 20)
-statusLabel.Position = UDim2.new(0, 0, 0, 125)
+statusLabel.Position = UDim2.new(0, 0, 0, 135)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = ""
 statusLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
@@ -260,10 +266,13 @@ vngContent.Parent = contentContainer
 
 -- Tạo các executor buttons cho VNG tab
 local arceusXVNG = createExecutorButton("Arceus X VNG", "https://www.mediafire.com/file/n3xmh2d41nprj9u/Roblox_-_VNG_Arceus_X_NEO_1.8.1.apk/file", 
-    UDim2.new(0, 0, 0, 10), Color3.fromRGB(30, 144, 255), vngContent)
+    UDim2.new(0, 10, 0, 10), Color3.fromRGB(30, 144, 255), vngContent)
 
 local codeXVNG = createExecutorButton("CodeX VNG", "https://www.mediafire.com/file/ndx38qpru8fnldp/Codex+VNG.apk/file", 
-    UDim2.new(0, 150, 0, 10), Color3.fromRGB(255, 69, 0), vngContent)
+    UDim2.new(0, 160, 0, 10), Color3.fromRGB(255, 69, 0), vngContent)
+
+local klrnVNG = createExecutorButton("Klrn VNG", "https://wrdcdn.net/r/54921/1757466914053/krnl_vng_release_2.688.861_2025.9.10_22.apk", 
+    UDim2.new(0, 310, 0, 10), Color3.fromRGB(220, 20, 60), vngContent)
 
 -- Tạo thông tin hướng dẫn cho VNG
 local vngInfoLabel = Instance.new("TextLabel")
@@ -296,7 +305,7 @@ updateStatusLabel = function(text)
     else
         vngStatusLabel.Text = text
     end
-
+    
     spawn(function()
         wait(3)
         if currentTab == "Global" then
@@ -317,26 +326,26 @@ local function switchTab(tabName)
         globalTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
         globalTab.TextColor3 = Color3.fromRGB(255, 255, 255)
         globalTab.Font = Enum.Font.SourceSansBold
-
+        
         vngTab.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
         vngTab.TextColor3 = Color3.fromRGB(80, 80, 80)
         vngTab.Font = Enum.Font.SourceSans
-
+        
         -- Hiển thị content
         globalContent.Visible = true
         vngContent.Visible = false
         currentTab = "Global"
-
+        
     elseif tabName == "VNG" then
         -- Cập nhật tab appearance
         vngTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
         vngTab.TextColor3 = Color3.fromRGB(255, 255, 255)
         vngTab.Font = Enum.Font.SourceSansBold
-
+        
         globalTab.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
         globalTab.TextColor3 = Color3.fromRGB(80, 80, 80)
         globalTab.Font = Enum.Font.SourceSans
-
+        
         -- Hiển thị content
         globalContent.Visible = false
         vngContent.Visible = true
@@ -347,7 +356,7 @@ end
 -- Tạo hiệu ứng hover cho các nút
 local function createHoverEffect(button, hoverColor, originalColor)
     local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-
+    
     button.MouseEnter:Connect(function()
         if button == globalTab and currentTab ~= "Global" then
             local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = hoverColor})
@@ -360,7 +369,7 @@ local function createHoverEffect(button, hoverColor, originalColor)
             tween:Play()
         end
     end)
-
+    
     button.MouseLeave:Connect(function()
         if button == globalTab and currentTab ~= "Global" then
             local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = originalColor})
@@ -397,18 +406,18 @@ closeButton.MouseButton1Click:Connect(function()
         Size = UDim2.new(0, 0, 0, 0)
     })
     closeTween:Play()
-
+    
     closeTween.Completed:Connect(function()
         screenGui:Destroy()
     end)
-
+    
     print("GUI closed")
 end)
 
 -- Tạo hiệu ứng mở GUI
 mainFrame.Size = UDim2.new(0, 0, 0, 0)
 local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-    Size = UDim2.new(0, 600, 0, 350)
+    Size = UDim2.new(0, 650, 0, 400)
 })
 openTween:Play()
 
