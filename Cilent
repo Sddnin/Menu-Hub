@@ -447,4 +447,4 @@ headerBar.InputEnded:Connect(function(input)
     end
 end)
 
-print("Client GUI with tabs loaded successfully!")
+print("Client GUI with tabs loaded successfully!") 
