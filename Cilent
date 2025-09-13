@@ -14,8 +14,8 @@ screenGui.Parent = playerGui
 -- Tạo Frame chính (tăng chiều cao để chứa nhiều nút hơn)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 650, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -325, 0.5, -200)
+mainFrame.Size = UDim2.new(0, 700, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -350, 0.5, -225)
 mainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -122,7 +122,7 @@ vngTabCorner.Parent = vngTab
 -- Tạo content container
 local contentContainer = Instance.new("Frame")
 contentContainer.Name = "ContentContainer"
-contentContainer.Size = UDim2.new(1, 0, 0, 300)
+contentContainer.Size = UDim2.new(1, 0, 0, 350)
 contentContainer.Position = UDim2.new(0, 0, 0, 90)
 contentContainer.BackgroundTransparency = 1
 contentContainer.Parent = mainFrame
@@ -214,22 +214,25 @@ local deltaX = createExecutorButton("Delta X", "https://deltaexploits.gg/delta-e
     UDim2.new(0, 10, 0, 10), Color3.fromRGB(138, 43, 226), globalContent)
 
 local arceusX = createExecutorButton("Arceus X", "https://www.mediafire.com/file/junxd0cfyumvk4x/Roblox_Arceus_X_NEO_1.8.2.apk/file", 
-    UDim2.new(0, 140, 0, 10), Color3.fromRGB(30, 144, 255), globalContent)
+    UDim2.new(0, 130, 0, 10), Color3.fromRGB(30, 144, 255), globalContent)
 
 local codeX = createExecutorButton("CodeX", "https://www.mediafire.com/file/8rt7pihmwkrflb6/Codex_v2.689.apk/file", 
-    UDim2.new(0, 270, 0, 10), Color3.fromRGB(255, 69, 0), globalContent)
+    UDim2.new(0, 250, 0, 10), Color3.fromRGB(255, 69, 0), globalContent)
 
 local vegaX = createExecutorButton("Vega X", "https://github.com/1f0yt/community/releases/download/Vegax/Vega.X.apk", 
-    UDim2.new(0, 400, 0, 10), Color3.fromRGB(50, 205, 50), globalContent)
+    UDim2.new(0, 370, 0, 10), Color3.fromRGB(50, 205, 50), globalContent)
 
 local cryptic = createExecutorButton("Cryptic", "https://www.mediafire.com/file/epd1xj3gsc3vmkx/Cryptic+2.689.880+APK.apk/file", 
-    UDim2.new(0, 530, 0, 10), Color3.fromRGB(255, 20, 147), globalContent)
+    UDim2.new(0, 490, 0, 10), Color3.fromRGB(255, 20, 147), globalContent)
 
 local evon = createExecutorButton("Evon", "https://evon.cc/android/dl-a/Evon.apk", 
-    UDim2.new(0, 10, 0, 55), Color3.fromRGB(75, 0, 130), globalContent)
+    UDim2.new(0, 610, 0, 10), Color3.fromRGB(75, 0, 130), globalContent)
 
 local klrn = createExecutorButton("Klrn", "https://wrdcdn.net/r/54921/1757365485565/krnl_release_2.689.880_2025.9.7_47.apk", 
-    UDim2.new(0, 140, 0, 55), Color3.fromRGB(220, 20, 60), globalContent)
+    UDim2.new(0, 10, 0, 55), Color3.fromRGB(220, 20, 60), globalContent)
+
+local trigon = createExecutorButton("Trigon", "https://www.mediafire.com/file/8u7y5i55tz2m9s8/Trigon_2.689.880.apk/file", 
+    UDim2.new(0, 130, 0, 55), Color3.fromRGB(255, 165, 0), globalContent)
 
 -- Tạo thông tin hướng dẫn
 local infoLabel = Instance.new("TextLabel")
@@ -268,11 +271,14 @@ vngContent.Parent = contentContainer
 local arceusXVNG = createExecutorButton("Arceus X VNG", "https://www.mediafire.com/file/n3xmh2d41nprj9u/Roblox_-_VNG_Arceus_X_NEO_1.8.1.apk/file", 
     UDim2.new(0, 10, 0, 10), Color3.fromRGB(30, 144, 255), vngContent)
 
-local codeXVNG = createExecutorButton("CodeX VNG", "https://www.mediafire.com/file/ndx38qpru8fnldp/Codex+VNG.apk/file", 
+local codeXVNG = createExecutorButton("CodeX VNG", "https://www.mediafire.com/file/3piv87u6044r554/Codex_v2.689_VNG.apk/file", 
     UDim2.new(0, 160, 0, 10), Color3.fromRGB(255, 69, 0), vngContent)
 
 local klrnVNG = createExecutorButton("Klrn VNG", "https://wrdcdn.net/r/54921/1757466914053/krnl_vng_release_2.688.861_2025.9.10_22.apk", 
     UDim2.new(0, 310, 0, 10), Color3.fromRGB(220, 20, 60), vngContent)
+
+local crypticVNG = createExecutorButton("Cryptic VNG", "https://www.mediafire.com/file/pf4k4kacl46v02b/Cryptic+2.689.880+VNG.apk/file", 
+    UDim2.new(0, 460, 0, 10), Color3.fromRGB(255, 20, 147), vngContent)
 
 -- Tạo thông tin hướng dẫn cho VNG
 local vngInfoLabel = Instance.new("TextLabel")
@@ -417,7 +423,7 @@ end)
 -- Tạo hiệu ứng mở GUI
 mainFrame.Size = UDim2.new(0, 0, 0, 0)
 local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-    Size = UDim2.new(0, 650, 0, 400)
+    Size = UDim2.new(0, 700, 0, 450)
 })
 openTween:Play()
 
@@ -447,4 +453,4 @@ headerBar.InputEnded:Connect(function(input)
     end
 end)
 
-print("Client GUI with tabs loaded successfully!") 
+print("Client GUI with tabs loaded successfully!")
