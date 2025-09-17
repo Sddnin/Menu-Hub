@@ -1,6 +1,5 @@
--- Mila UI Script for Roblox (Tab Design)
--- Tạo bởi: Assistant
--- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump
+-- Mila Script for Roblox (Tab Design)
+-- Tạo bởi: Mila
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -209,11 +208,11 @@ local languages = {
         fly = "🕊️ Bay",
         infJump = "♾️ Vô hạn nhảy",
         players = "📍 Người chơi",
-        resetCam = "📷 Reset Cam",
-        resetAll = "🔄 Reset tất cả",
-        esp = "👻 ESP/Wallhack",
+        resetCam = "📷 Đặt lại Cam",
+        resetAll = "🔄 Đặt lại tất cả",
+        esp = "👻 Định vị",
         aimbot = "🔍 Aimbot",
-        antiAFK = "⚡ Anti-AFK",
+        antiAFK = "⚡ Chống văng",
         language = "🌍 Ngôn ngữ",
         -- Other
         searchPlayers = "🔍 Tìm người chơi...",
@@ -222,7 +221,7 @@ local languages = {
         loadingScript = "Đang tải",
         execute = "▶ Chạy",
         favorite = "⭐",
-        unfavorite = "☆"
+        unfavorite = "❌"
     },
     en = {
         -- Tab Names  
@@ -249,7 +248,7 @@ local languages = {
         loadingScript = "Loading",
         execute = "▶ Execute",
         favorite = "⭐",
-        unfavorite = "☆"
+        unfavorite = "❌"
     }
 }
 
@@ -283,7 +282,7 @@ local loadingSpinner = Instance.new("TextLabel")
 loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
 loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
 loadingSpinner.BackgroundTransparency = 1
-loadingSpinner.Text = "⭕"
+loadingSpinner.Text = "🥰"
 loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
 loadingSpinner.TextSize = 20
 loadingSpinner.Font = Enum.Font.Gotham
@@ -317,7 +316,7 @@ local loadingSpinner = Instance.new("TextLabel")
 loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
 loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
 loadingSpinner.BackgroundTransparency = 1
-loadingSpinner.Text = "⭕"
+loadingSpinner.Text = "🥰"
 loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
 loadingSpinner.TextSize = 20
 loadingSpinner.Font = Enum.Font.Gotham
@@ -472,7 +471,7 @@ local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
 graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
-graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.Text = "🎮 Open Graphics"
 graphicsButton.TextColor3 = Color3.new(1, 1, 1)
 graphicsButton.TextSize = 10
 graphicsButton.Font = Enum.Font.Gotham
