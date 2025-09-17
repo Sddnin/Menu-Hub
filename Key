@@ -1,5 +1,5 @@
 -- Mila UI Script for Roblox (Tab Design)
--- Tạo bởi: Mila
+-- Tạo bởi: Assistant
 -- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump
 
 local Players = game:GetService("Players")
@@ -15,10 +15,16 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Variables
 local noclip = false
 local infiniteJump = false
+local esp = false
+local aimbot = false
+local antiAFK = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
 local jumpConnection
+local antiAFKConnection
 local currentTab = "Home"
+local currentLanguage = "vi" -- "vi" for Vietnamese, "en" for English
+local favoriteScripts = {}
 
 -- UI Creation
 local screenGui = Instance.new("ScreenGui")
@@ -141,13 +147,13 @@ contentArea.Position = UDim2.new(0, 10, 0, 55)
 contentArea.BackgroundTransparency = 1
 contentArea.Parent = innerFrame
 
--- Home Tab Content
+-- Home Tab Content (updated canvas size for new buttons)
 local homeContent = Instance.new("ScrollingFrame")
 homeContent.Name = "HomeContent"
 homeContent.Size = UDim2.new(1, 0, 1, 0)
 homeContent.BackgroundTransparency = 1
 homeContent.ScrollBarThickness = 4
-homeContent.CanvasSize = UDim2.new(0, 0, 0, 250)
+homeContent.CanvasSize = UDim2.new(0, 0, 0, 300)
 homeContent.Parent = contentArea
 
 -- Script Tab Content
@@ -189,6 +195,100 @@ scriptsContainer.Position = UDim2.new(0, 0, 0, 40)
 scriptsContainer.BackgroundTransparency = 1
 scriptsContainer.Parent = scriptContent
 
+-- Language System
+local languages = {
+    vi = {
+        -- Tab Names
+        home = "Trang chủ",
+        script = "Script",
+        other = "Khác",
+        -- Home Tab
+        speed = "🏃 Tốc độ",
+        jump = "🦘 Nhảy",
+        noclip = "👻 Xuyên tường", 
+        fly = "🕊️ Bay",
+        infJump = "♾️ Vô hạn nhảy",
+        players = "📍 Người chơi",
+        resetCam = "📷 Reset Cam",
+        resetAll = "🔄 Reset tất cả",
+        esp = "👻 ESP/Wallhack",
+        aimbot = "🔍 Aimbot",
+        antiAFK = "⚡ Anti-AFK",
+        language = "🌍 Ngôn ngữ",
+        -- Other
+        searchPlayers = "🔍 Tìm người chơi...",
+        searchScripts = "🔍 Tìm scripts...",
+        otherFeatures = "🔧 Tính năng khác",
+        loadingScript = "Đang tải",
+        execute = "▶ Chạy",
+        favorite = "⭐",
+        unfavorite = "☆"
+    },
+    en = {
+        -- Tab Names  
+        home = "Home",
+        script = "Script", 
+        other = "Other",
+        -- Home Tab
+        speed = "🏃 Speed",
+        jump = "🦘 Jump",
+        noclip = "👻 Noclip",
+        fly = "🕊️ Fly", 
+        infJump = "♾️ Inf Jump",
+        players = "📍 Players",
+        resetCam = "📷 Reset Cam",
+        resetAll = "🔄 Reset All",
+        esp = "👻 ESP/Wallhack", 
+        aimbot = "🔍 Aimbot",
+        antiAFK = "⚡ Anti-AFK",
+        language = "🌍 Language",
+        -- Other
+        searchPlayers = "🔍 Search players...",
+        searchScripts = "🔍 Search scripts...", 
+        otherFeatures = "🔧 Other Features",
+        loadingScript = "Loading",
+        execute = "▶ Execute",
+        favorite = "⭐",
+        unfavorite = "☆"
+    }
+}
+
+local function getText(key)
+    return languages[currentLanguage][key] or key
+end
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(0, 200, 0, 100)
+loadingFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+loadingFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+loadingFrame.BackgroundTransparency = 0.3
+loadingFrame.BorderSizePixel = 0
+loadingFrame.Visible = false
+loadingFrame.Parent = screenGui
+
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 10)
+loadingCorner.Parent = loadingFrame
+
+local loadingText = Instance.new("TextLabel")
+loadingText.Size = UDim2.new(1, 0, 0, 30)
+loadingText.Position = UDim2.new(0, 0, 0, 10)
+loadingText.BackgroundTransparency = 1
+loadingText.Text = "Loading Script..."
+loadingText.TextColor3 = Color3.new(1, 1, 1)
+loadingText.TextSize = 14
+loadingText.Font = Enum.Font.GothamBold
+loadingText.Parent = loadingFrame
+
+local loadingSpinner = Instance.new("TextLabel")
+loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
+loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
+loadingSpinner.BackgroundTransparency = 1
+loadingSpinner.Text = "⭕"
+loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
+loadingSpinner.TextSize = 20
+loadingSpinner.Font = Enum.Font.Gotham
+loadingSpinner.Parent = loadingFrame
+
 -- Loading Animation Frame
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Size = UDim2.new(0, 200, 0, 100)
@@ -217,32 +317,32 @@ local loadingSpinner = Instance.new("TextLabel")
 loadingSpinner.Size = UDim2.new(1, 0, 0, 30)
 loadingSpinner.Position = UDim2.new(0, 0, 0, 40)
 loadingSpinner.BackgroundTransparency = 1
-loadingSpinner.Text = "🥰"
+loadingSpinner.Text = "⭕"
 loadingSpinner.TextColor3 = Color3.new(1, 1, 1)
 loadingSpinner.TextSize = 20
 loadingSpinner.Font = Enum.Font.Gotham
 loadingSpinner.Parent = loadingFrame
 
--- Scripts Data
+-- Scripts Data with favorites
 local scriptsData = {
-    {name = "Infinity Yield", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()"},
-    {name = "Airflow", code = "loadstring(game:HttpGet(\"https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua\"))()"},
-    {name = "H4X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua\", true))()"},
-    {name = "R15 Emote", code = "loadstring(game:HttpGetAsync(\"https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui\"))()"},
-    {name = "Skull Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua'))()"},
-    {name = "Nameless Admin", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-nameless-admin-15646\"))()"},
-    {name = "NatHub", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua\"))()"},
-    {name = "Arceus X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3\"))()"},
-    {name = "Shader", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))()"},
-    {name = "Native", code = "loadstring(game:HttpGet(\"https://getnative.cc/script/loader\"))()"},
-    {name = "Nolag", code = "loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua\"))()"},
-    {name = "Limit Hub", code = "loadstring(game:HttpGet(('https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua')))()"},
-    {name = "Speed Hub X", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062\"))()"},
-    {name = "Lunor", code = "loadstring(game:HttpGet(\"https://lunor.dev/loader\"))()"},
-    {name = "ThunderZ", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()"},
-    {name = "AFEM-Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-AFEM-14048\"))()"},
-    {name = "R6 Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-Fe-R6-Animations-37331\"))()"},
-    {name = "Farm Diamond 99 Night", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/99-Nights-in-the-Forest-Farm-diamond-v2-50169\"))()"}
+    {name = "Infinity Yield", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()", favorite = false},
+    {name = "Airflow", code = "loadstring(game:HttpGet(\"https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua\"))()", favorite = false},
+    {name = "H4X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua\", true))()", favorite = false},
+    {name = "R15 Emote", code = "loadstring(game:HttpGetAsync(\"https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui\"))()", favorite = false},
+    {name = "Skull Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua'))()", favorite = false},
+    {name = "Nameless Admin", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-nameless-admin-15646\"))()", favorite = false},
+    {name = "NatHub", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua\"))()", favorite = false},
+    {name = "Arceus X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3\"))()", favorite = false},
+    {name = "Shader", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))()", favorite = false},
+    {name = "Native", code = "loadstring(game:HttpGet(\"https://getnative.cc/script/loader\"))()", favorite = false},
+    {name = "Nolag", code = "loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua\"))()", favorite = false},
+    {name = "Limit Hub", code = "loadstring(game:HttpGet(('https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua')))()", favorite = false},
+    {name = "Speed Hub X", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062\"))()", favorite = false},
+    {name = "Lunor", code = "loadstring(game:HttpGet(\"https://lunor.dev/loader\"))()", favorite = false},
+    {name = "ThunderZ", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()", favorite = false},
+    {name = "AFEM-Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-AFEM-14048\"))()", favorite = false},
+    {name = "R6 Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-Fe-R6-Animations-37331\"))()", favorite = false},
+    {name = "Farm Diamond 99 Night", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/99-Nights-in-the-Forest-Farm-diamond-v2-50169\"))()", favorite = false}
 }
 
 -- Other Tab Content
@@ -552,18 +652,18 @@ local listLayout = Instance.new("UIListLayout")
 listLayout.Padding = UDim.new(0, 2)
 listLayout.Parent = playerList
 
--- Button Creation Function
+-- Button Creation Function (updated button size for 3 columns)
 local function createButton(name, text, position, callback, parent)
     parent = parent or homeContent
     
     local button = Instance.new("TextButton")
     button.Name = name
-    button.Size = UDim2.new(0, 95, 0, 25)
+    button.Size = UDim2.new(0, 90, 0, 25)
     button.Position = position
     button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
     button.Text = text
     button.TextColor3 = Color3.new(0.2, 0.3, 0.6)
-    button.TextSize = 10
+    button.TextSize = 9
     button.Font = Enum.Font.Gotham
     button.Parent = parent
     
@@ -657,12 +757,40 @@ local function showLoadingAnimation(scriptName)
     end
 end
 
+-- Functions
+local function showLoadingAnimation(scriptName)
+    loadingText.Text = getText("loadingScript") .. " " .. scriptName .. "..."
+    loadingFrame.Visible = true
+    
+    -- Spinning animation
+    local spinConnection
+    spinConnection = RunService.Heartbeat:Connect(function()
+        if not loadingFrame.Visible then
+            spinConnection:Disconnect()
+            return
+        end
+        loadingSpinner.Rotation = loadingSpinner.Rotation + 5
+    end)
+    
+    -- Hide after 2 seconds
+    wait(2)
+    loadingFrame.Visible = false
+    if spinConnection then
+        spinConnection:Disconnect()
+    end
+end
+
+local function toggleFavorite(scriptData)
+    scriptData.favorite = not scriptData.favorite
+    updateScriptList(searchBox.Text or "")
+end
+
 local function createScriptButton(scriptData, position)
     local scriptFrame = Instance.new("Frame")
     scriptFrame.Name = scriptData.name:gsub("%s", "")
-    scriptFrame.Size = UDim2.new(0, 180, 0, 60)
+    scriptFrame.Size = UDim2.new(0, 180, 0, 70)
     scriptFrame.Position = position
-    scriptFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
+    scriptFrame.BackgroundColor3 = scriptData.favorite and Color3.new(1, 0.95, 0.8) or Color3.new(0.95, 0.95, 0.98)
     scriptFrame.BorderSizePixel = 0
     scriptFrame.Parent = scriptsContainer
     
@@ -670,24 +798,35 @@ local function createScriptButton(scriptData, position)
     frameCorner.CornerRadius = UDim.new(0, 8)
     frameCorner.Parent = scriptFrame
     
+    -- Favorite Button
+    local favoriteBtn = Instance.new("TextButton")
+    favoriteBtn.Size = UDim2.new(0, 20, 0, 20)
+    favoriteBtn.Position = UDim2.new(1, -25, 0, 5)
+    favoriteBtn.BackgroundTransparency = 1
+    favoriteBtn.Text = scriptData.favorite and getText("favorite") or getText("unfavorite")
+    favoriteBtn.TextColor3 = Color3.new(1, 0.7, 0)
+    favoriteBtn.TextSize = 14
+    favoriteBtn.Font = Enum.Font.Gotham
+    favoriteBtn.Parent = scriptFrame
+    
     -- Script Name
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, -10, 0, 25)
+    nameLabel.Size = UDim2.new(1, -30, 0, 25)
     nameLabel.Position = UDim2.new(0, 5, 0, 5)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = scriptData.name
     nameLabel.TextColor3 = Color3.new(0.2, 0.2, 0.2)
-    nameLabel.TextSize = 12
+    nameLabel.TextSize = 11
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = scriptFrame
     
-    -- Execute Button (centered)
+    -- Execute Button
     local executeBtn = Instance.new("TextButton")
     executeBtn.Size = UDim2.new(0, 120, 0, 25)
-    executeBtn.Position = UDim2.new(0, 30, 0, 30)
+    executeBtn.Position = UDim2.new(0, 30, 0, 35)
     executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
-    executeBtn.Text = "▶ Execute"
+    executeBtn.Text = getText("execute")
     executeBtn.TextColor3 = Color3.new(1, 1, 1)
     executeBtn.TextSize = 11
     executeBtn.Font = Enum.Font.Gotham
@@ -698,6 +837,10 @@ local function createScriptButton(scriptData, position)
     executeCorner.Parent = executeBtn
     
     -- Button Events
+    favoriteBtn.MouseButton1Click:Connect(function()
+        toggleFavorite(scriptData)
+    end)
+    
     executeBtn.MouseButton1Click:Connect(function()
         spawn(function()
             showLoadingAnimation(scriptData.name)
@@ -732,9 +875,22 @@ local function updateScriptList(searchTerm)
     local row, col = 0, 0
     local totalHeight = 0
     
+    -- Sort: favorites first, then alphabetical
+    local sortedScripts = {}
     for _, scriptData in ipairs(scriptsData) do
+        table.insert(sortedScripts, scriptData)
+    end
+    
+    table.sort(sortedScripts, function(a, b)
+        if a.favorite ~= b.favorite then
+            return a.favorite
+        end
+        return a.name < b.name
+    end)
+    
+    for _, scriptData in ipairs(sortedScripts) do
         if searchTerm == "" or scriptData.name:lower():find(searchTerm) then
-            local position = UDim2.new(0, col * 190, 0, row * 70)
+            local position = UDim2.new(0, col * 190, 0, row * 80)
             createScriptButton(scriptData, position)
             
             col = col + 1
@@ -742,7 +898,7 @@ local function updateScriptList(searchTerm)
                 col = 0
                 row = row + 1
             end
-            totalHeight = (row + 1) * 70
+            totalHeight = (row + 1) * 80
         end
     end
     
@@ -904,57 +1060,95 @@ local function loadFlyScript()
     end)
 end
 
--- Create Home Tab Buttons
-createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 8, 0, 60), function()
+-- Create Home Tab Buttons (updated with new features)
+createButton("SpeedButton", getText("speed"), UDim2.new(0, 5, 0, 60), function()
     local speed = tonumber(speedSlider.Text) or 16
     humanoid.WalkSpeed = speed
     speedLabel.Text = "Speed: " .. speed
 end)
 
-createButton("JumpButton", "🦘 Jump", UDim2.new(0, 110, 0, 60), function()
+createButton("JumpButton", getText("jump"), UDim2.new(0, 105, 0, 60), function()
     local jump = tonumber(jumpSlider.Text) or 50
     humanoid.JumpPower = jump
     jumpLabel.Text = "Jump: " .. jump
 end)
 
-createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 212, 0, 60), function()
+createButton("NoclipButton", getText("noclip"), UDim2.new(0, 205, 0, 60), function()
     toggleNoclip()
 end)
 
-createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 8, 0, 95), function()
+createButton("FlyButton", getText("fly"), UDim2.new(0, 5, 0, 90), function()
     loadFlyScript()
 end)
 
-createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 110, 0, 95), function()
+createButton("InfiniteJumpButton", getText("infJump"), UDim2.new(0, 105, 0, 90), function()
     toggleInfiniteJump()
 end)
 
-createButton("TeleportButton", "📍 Players", UDim2.new(0, 212, 0, 95), function()
+createButton("TeleportButton", getText("players"), UDim2.new(0, 205, 0, 90), function()
     playerFrame.Visible = not playerFrame.Visible
     if playerFrame.Visible then
         updatePlayerList("")
     end
 end)
 
-createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 8, 0, 130), function()
+createButton("ESPButton", getText("esp"), UDim2.new(0, 5, 0, 120), function()
+    toggleESP()
+end)
+
+createButton("AimbotButton", getText("aimbot"), UDim2.new(0, 105, 0, 120), function()
+    toggleAimbot()
+end)
+
+createButton("AntiAFKButton", getText("antiAFK"), UDim2.new(0, 205, 0, 120), function()
+    toggleAntiAFK()
+end)
+
+createButton("LanguageButton", getText("language"), UDim2.new(0, 5, 0, 150), function()
+    switchLanguage()
+end)
+
+createButton("CameraButton", getText("resetCam"), UDim2.new(0, 105, 0, 150), function()
     resetCamera()
 end)
 
-createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 110, 0, 130), function()
+createButton("ResetButton", getText("resetAll"), UDim2.new(0, 205, 0, 150), function()
     humanoid.WalkSpeed = originalWalkSpeed
     humanoid.JumpPower = originalJumpPower
     noclip = false
     infiniteJump = false
+    esp = false
+    aimbot = false
+    antiAFK = false
+    
     if jumpConnection then
         jumpConnection:Disconnect()
         jumpConnection = nil
     end
+    
+    if antiAFKConnection then
+        antiAFKConnection:Disconnect()
+        antiAFKConnection = nil
+    end
+    
     speedSlider.Text = "16"
     jumpSlider.Text = "50"
     speedLabel.Text = "Speed: 16"
     jumpLabel.Text = "Jump: 50"
     playerFrame.Visible = false
     resetCamera()
+    
+    -- Remove ESP
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer.Character then
+            if targetPlayer.Character:FindFirstChild("ESPHighlight") then
+                targetPlayer.Character.ESPHighlight:Destroy()
+            end
+            if targetPlayer.Character:FindFirstChild("Head") and targetPlayer.Character.Head:FindFirstChild("ESPName") then
+                targetPlayer.Character.Head.ESPName:Destroy()
+            end
+        end
+    end
     
     for _, part in pairs(character:GetChildren()) do
         if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
