@@ -1,5 +1,5 @@
 -- Mila UI Script for Roblox (Tab Design)
--- Tạo bởi: Assistant
+-- Tạo bởi: Mila
 -- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump
 
 local Players = game:GetService("Players")
@@ -623,7 +623,7 @@ local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
 graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
-graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.Text = "🎮 Open Graphics"
 graphicsButton.TextColor3 = Color3.new(1, 1, 1)
 graphicsButton.TextSize = 10
 graphicsButton.Font = Enum.Font.Gotham
