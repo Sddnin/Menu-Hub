@@ -1259,7 +1259,7 @@ spawn(function()
     showNotification("🎉 Music Player 2.0+ đã sẵn sàng!", colors.accent, "🎵")
 end)
 
-print("🎵 MUSIC PLAYER 2.0+ - ENHANCED VERSION LOADED! 🎵")
+print("🎵 MUSIC PLAYER V2 - ENHANCED VERSION LOADED! 🎵")
 print("✅ ALL BUGS FIXED + NEW FEATURES!")
 print("")
 print("🆕 FEATURES:")
