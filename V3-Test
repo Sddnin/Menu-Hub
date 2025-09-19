@@ -1,0 +1,423 @@
+-- Roblox Command UI - Compact Version
+-- Hệ thống lệnh với ô nhập chat, UI nhỏ gọn
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Biến lưu trạng thái
+local isNoclip = false
+local originalWalkSpeed = 16
+local originalJumpPower = 50
+local isMinimized = false
+
+-- Tạo ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CommandUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Frame chính (ngang và nhỏ hơn)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.Parent = mainFrame
+
+-- Title bar
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 35)
+titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = titleBar
+
+local titleText = Instance.new("TextLabel")
+titleText.Size = UDim2.new(1, -100, 1, 0)
+titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "⚡ Command Console"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextSize = 14
+titleText.TextXAlignment = Enum.TextXAlignment.Left
+titleText.Font = Enum.Font.GothamBold
+titleText.Parent = titleBar
+
+-- Minimize button
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton.Position = UDim2.new(1, -60, 0, 5)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Text = "−"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextSize = 14
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Parent = titleBar
+
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 6)
+minimizeCorner.Parent = minimizeButton
+
+-- Close button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -30, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+closeButton.BorderSizePixel = 0
+closeButton.Text = "✕"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 12
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+-- Content frame (có thể ẩn khi minimize)
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- Chat output frame (nhỏ hơn, ngang)
+local outputFrame = Instance.new("Frame")
+outputFrame.Name = "OutputFrame"
+outputFrame.Size = UDim2.new(0.6, -10, 1, -50)
+outputFrame.Position = UDim2.new(0, 10, 0, 5)
+outputFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+outputFrame.BorderSizePixel = 0
+outputFrame.Parent = contentFrame
+
+local outputCorner = Instance.new("UICorner")
+outputCorner.CornerRadius = UDim.new(0, 6)
+outputCorner.Parent = outputFrame
+
+local outputScroll = Instance.new("ScrollingFrame")
+outputScroll.Size = UDim2.new(1, -8, 1, -8)
+outputScroll.Position = UDim2.new(0, 4, 0, 4)
+outputScroll.BackgroundTransparency = 1
+outputScroll.ScrollBarThickness = 4
+outputScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 70)
+outputScroll.Parent = outputFrame
+
+local outputLayout = Instance.new("UIListLayout")
+outputLayout.SortOrder = Enum.SortOrder.LayoutOrder
+outputLayout.Padding = UDim.new(0, 2)
+outputLayout.Parent = outputScroll
+
+-- Help frame bên phải
+local helpFrame = Instance.new("Frame")
+helpFrame.Name = "HelpFrame"
+helpFrame.Size = UDim2.new(0.4, -10, 1, -50)
+helpFrame.Position = UDim2.new(0.6, 0, 0, 5)
+helpFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+helpFrame.BorderSizePixel = 0
+helpFrame.Parent = contentFrame
+
+local helpCorner = Instance.new("UICorner")
+helpCorner.CornerRadius = UDim.new(0, 6)
+helpCorner.Parent = helpFrame
+
+local helpScroll = Instance.new("ScrollingFrame")
+helpScroll.Size = UDim2.new(1, -8, 1, -8)
+helpScroll.Position = UDim2.new(0, 4, 0, 4)
+helpScroll.BackgroundTransparency = 1
+helpScroll.ScrollBarThickness = 4
+helpScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 70)
+helpScroll.Parent = helpFrame
+
+local helpText = Instance.new("TextLabel")
+helpText.Size = UDim2.new(1, -5, 0, 300)
+helpText.Position = UDim2.new(0, 2, 0, 0)
+helpText.BackgroundTransparency = 1
+helpText.Text = [[💡 LỆNH CƠ BẢN:
+
+🏃 speed [số] - Tăng tốc độ
+   unspeed - Tắt tốc độ
+
+🦘 jump [số] - Tăng sức nhảy  
+   unjump - Tắt sức nhảy
+
+✈️ fly - Bật Vehicle Fly GUI
+   (Script từ GitHub)
+
+👻 noclip - Đi xuyên tường
+   unnoclip - Tắt xuyên tường
+
+🔄 reset - Làm mới nhân vật
+   clear - Xóa chat
+
+VÍ DỤ:
+> speed 150
+> fly
+> noclip
+> reset]]
+helpText.TextColor3 = Color3.fromRGB(180, 180, 180)
+helpText.TextSize = 10
+helpText.TextXAlignment = Enum.TextXAlignment.Left
+helpText.TextYAlignment = Enum.TextYAlignment.Top
+helpText.Font = Enum.Font.Gotham
+helpText.TextWrapped = true
+helpText.Parent = helpScroll
+
+helpScroll.CanvasSize = UDim2.new(0, 0, 0, 300)
+
+-- Chat input frame
+local inputFrame = Instance.new("Frame")
+inputFrame.Name = "InputFrame"
+inputFrame.Size = UDim2.new(1, -20, 0, 35)
+inputFrame.Position = UDim2.new(0, 10, 1, -40)
+inputFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+inputFrame.BorderSizePixel = 0
+inputFrame.Parent = contentFrame
+
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 6)
+inputCorner.Parent = inputFrame
+
+local chatInput = Instance.new("TextBox")
+chatInput.Name = "ChatInput"
+chatInput.Size = UDim2.new(1, -60, 1, -8)
+chatInput.Position = UDim2.new(0, 8, 0, 4)
+chatInput.BackgroundTransparency = 1
+chatInput.Text = ""
+chatInput.PlaceholderText = "Nhập lệnh..."
+chatInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+chatInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+chatInput.TextSize = 12
+chatInput.TextXAlignment = Enum.TextXAlignment.Left
+chatInput.Font = Enum.Font.Gotham
+chatInput.ClearTextOnFocus = false
+chatInput.Parent = inputFrame
+
+local sendButton = Instance.new("TextButton")
+sendButton.Name = "SendButton"
+sendButton.Size = UDim2.new(0, 45, 0, 27)
+sendButton.Position = UDim2.new(1, -49, 0, 4)
+sendButton.BackgroundColor3 = Color3.fromRGB(60, 120, 220)
+sendButton.BorderSizePixel = 0
+sendButton.Text = "Gửi"
+sendButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+sendButton.TextSize = 10
+sendButton.Font = Enum.Font.GothamBold
+sendButton.Parent = inputFrame
+
+local sendCorner = Instance.new("UICorner")
+sendCorner.CornerRadius = UDim.new(0, 4)
+sendCorner.Parent = sendButton
+
+-- Hàm thêm tin nhắn vào output
+local function addMessage(message, color)
+    local msgFrame = Instance.new("Frame")
+    msgFrame.Size = UDim2.new(1, -5, 0, 16)
+    msgFrame.BackgroundTransparency = 1
+    msgFrame.Parent = outputScroll
+    
+    local msgText = Instance.new("TextLabel")
+    msgText.Size = UDim2.new(1, 0, 1, 0)
+    msgText.BackgroundTransparency = 1
+    msgText.Text = message
+    msgText.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+    msgText.TextSize = 10
+    msgText.TextXAlignment = Enum.TextXAlignment.Left
+    msgText.Font = Enum.Font.Gotham
+    msgText.Parent = msgFrame
+    
+    -- Auto scroll to bottom
+    outputScroll.CanvasSize = UDim2.new(0, 0, 0, outputLayout.AbsoluteContentSize.Y + 5)
+    outputScroll.CanvasPosition = Vector2.new(0, outputScroll.CanvasSize.Y.Offset)
+end
+
+-- Các hàm xử lý lệnh
+local function setSpeed(speed)
+    local num = tonumber(speed)
+    if num and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = num
+        addMessage("✅ Tốc độ: " .. num, Color3.fromRGB(100, 255, 100))
+    else
+        addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function resetSpeed()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = originalWalkSpeed
+        addMessage("✅ Reset tốc độ: " .. originalWalkSpeed, Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function setJump(power)
+    local num = tonumber(power)
+    if num and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.JumpPower = num
+        addMessage("✅ Sức nhảy: " .. num, Color3.fromRGB(100, 255, 100))
+    else
+        addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function resetJump()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.JumpPower = originalJumpPower
+        addMessage("✅ Reset sức nhảy: " .. originalJumpPower, Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function loadVehicleFly()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
+        addMessage("✈️ Đã tải Vehicle Fly GUI", Color3.fromRGB(100, 255, 100))
+    end)
+end
+
+local noclipConnection
+local function startNoclip()
+    if isNoclip then 
+        addMessage("⚠️ Noclip đã bật!", Color3.fromRGB(255, 200, 100))
+        return 
+    end
+    
+    isNoclip = true
+    addMessage("👻 Bật noclip", Color3.fromRGB(100, 255, 100))
+    
+    noclipConnection = game:GetService('RunService').Stepped:Connect(function()
+        if isNoclip and player.Character then
+            for _,v in pairs(player.Character:GetChildren()) do
+                if v:IsA('BasePart') then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end)
+end
+
+local function stopNoclip()
+    if not isNoclip then
+        addMessage("⚠️ Noclip chưa bật!", Color3.fromRGB(255, 200, 100))
+        return
+    end
+    
+    isNoclip = false
+    if noclipConnection then
+        noclipConnection:Disconnect()
+    end
+    
+    if player.Character then
+        for _,v in pairs(player.Character:GetChildren()) do
+            if v:IsA('BasePart') then
+                v.CanCollide = true
+            end
+        end
+    end
+    addMessage("✅ Tắt noclip", Color3.fromRGB(100, 255, 100))
+end
+
+-- Xử lý lệnh
+local function processCommand(input)
+    local args = string.split(string.lower(input), " ")
+    local command = args[1]
+    
+    addMessage("> " .. input, Color3.fromRGB(150, 150, 255))
+    
+    if command == "speed" and args[2] then
+        setSpeed(args[2])
+    elseif command == "unspeed" then
+        resetSpeed()
+    elseif command == "jump" and args[2] then
+        setJump(args[2])
+    elseif command == "unjump" then
+        resetJump()
+    elseif command == "fly" then
+        loadVehicleFly()
+    elseif command == "noclip" then
+        startNoclip()
+    elseif command == "unnoclip" then
+        stopNoclip()
+    elseif command == "reset" then
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.Health = 0
+            addMessage("🔄 Reset nhân vật", Color3.fromRGB(100, 255, 100))
+        end
+    elseif command == "clear" then
+        -- Clear chat
+        for _,child in pairs(outputScroll:GetChildren()) do
+            if child:IsA("Frame") then
+                child:Destroy()
+            end
+        end
+        outputScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    else
+        addMessage("❌ Lệnh không tồn tại!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+-- Sự kiện gửi lệnh
+local function sendCommand()
+    local input = chatInput.Text:gsub("^%s*(.-)%s*$", "%1")
+    if input ~= "" then
+        processCommand(input)
+        chatInput.Text = ""
+    end
+end
+
+sendButton.MouseButton1Click:Connect(sendCommand)
+chatInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        sendCommand()
+    end
+end)
+
+-- Sự kiện minimize/maximize
+minimizeButton.MouseButton1Click:Connect(function()
+    if isMinimized then
+        -- Mở rộng
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 500, 0, 280)})
+        tween:Play()
+        contentFrame.Visible = true
+        minimizeButton.Text = "−"
+        isMinimized = false
+    else
+        -- Thu gọn
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 500, 0, 35)})
+        tween:Play()
+        contentFrame.Visible = false
+        minimizeButton.Text = "+"
+        isMinimized = true
+    end
+end)
+
+-- Sự kiện đóng
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Phím tắt F1
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F1 then
+        screenGui.Enabled = not screenGui.Enabled
+    end
+end)
+
+-- Welcome message
+addMessage("⚡ Console sẵn sàng!", Color3.fromRGB(100, 255, 100))
+
+print("Compact Command Console loaded! Press F1 to toggle.")
