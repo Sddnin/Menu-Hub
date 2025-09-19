@@ -1,5 +1,5 @@
--- 🎵 Roblox Music Player 2.0
--- Tạo bởi Mila
+-- 🎵 Roblox Music Player 2.0+ - FIXED VERSION
+-- Tạo bởi Mila | Version 2.0+ Fixed
 -- ✨ Features: 5 Tabs, Pinned Music (Max 3), Volume Max, All Bugs Fixed
 
 local Players = game:GetService("Players")
@@ -29,8 +29,6 @@ local musicLibrary = {
 
 -- 💾 User Data
 local userData = {
-    pinned = {},
-    favorites = {},
     history = {},
     theme = "dark",
     repeatMode = "off",
@@ -83,7 +81,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(0, 200, 1, 0)
 titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "🎵 Music Player V2"
+titleLabel.Text = "🎵 Music Player 2.0+"
 titleLabel.TextColor3 = colors.text
 titleLabel.TextSize = 18
 titleLabel.Font = Enum.Font.GothamBold
@@ -96,7 +94,7 @@ minimizeBtn.Size = UDim2.new(0, 30, 0, 25)
 minimizeBtn.Position = UDim2.new(1, -70, 0, 12)
 minimizeBtn.BackgroundColor3 = colors.secondary
 minimizeBtn.BorderSizePixel = 0
-minimizeBtn.Text = "➖"
+minimizeBtn.Text = "▢"
 minimizeBtn.TextColor3 = colors.text
 minimizeBtn.TextSize = 14
 minimizeBtn.Font = Enum.Font.GothamBold
@@ -111,7 +109,7 @@ closeBtn.Size = UDim2.new(0, 30, 0, 25)
 closeBtn.Position = UDim2.new(1, -35, 0, 12)
 closeBtn.BackgroundColor3 = colors.danger
 closeBtn.BorderSizePixel = 0
-closeBtn.Text = "❌"
+closeBtn.Text = "✕"
 closeBtn.TextColor3 = colors.text
 closeBtn.TextSize = 14
 closeBtn.Font = Enum.Font.GothamBold
@@ -239,17 +237,17 @@ tabFrame.Parent = mainFrame
 
 -- Tab Buttons
 local tabButtons = {}
-local tabNames = {"🆔 Manual", "📋 Library", "📌 Pinned", "❤️ Favorites", "📜 History"}
+local tabNames = {"🆔 Manual", "📋 Library", "🎲 Random Box", "📜 History"}
 
 for i, tabName in ipairs(tabNames) do
     local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(0.2, -4, 1, 0)
-    tabBtn.Position = UDim2.new((i-1) * 0.2, (i-1) * 4, 0, 0)
+    tabBtn.Size = UDim2.new(0.25, -3, 1, 0)
+    tabBtn.Position = UDim2.new((i-1) * 0.25, (i-1) * 3, 0, 0)
     tabBtn.BackgroundColor3 = i == 1 and colors.accent or colors.secondary
     tabBtn.BorderSizePixel = 0
     tabBtn.Text = tabName
     tabBtn.TextColor3 = colors.text
-    tabBtn.TextSize = 10
+    tabBtn.TextSize = 11
     tabBtn.Font = Enum.Font.GothamBold
     tabBtn.TextScaled = true
     tabBtn.Parent = tabFrame
@@ -311,7 +309,7 @@ manualControlFrame.BackgroundTransparency = 1
 manualControlFrame.Parent = manualTab
 
 local playManualBtn = Instance.new("TextButton")
-playManualBtn.Size = UDim2.new(0.32, 0, 1, 0)
+playManualBtn.Size = UDim2.new(0.48, 0, 1, 0)
 playManualBtn.Position = UDim2.new(0, 0, 0, 0)
 playManualBtn.BackgroundColor3 = colors.accent
 playManualBtn.BorderSizePixel = 0
@@ -326,8 +324,8 @@ playManualCorner.CornerRadius = UDim.new(0, 6)
 playManualCorner.Parent = playManualBtn
 
 local stopBtn = Instance.new("TextButton")
-stopBtn.Size = UDim2.new(0.32, 0, 1, 0)
-stopBtn.Position = UDim2.new(0.34, 0, 0, 0)
+stopBtn.Size = UDim2.new(0.48, 0, 1, 0)
+stopBtn.Position = UDim2.new(0.52, 0, 0, 0)
 stopBtn.BackgroundColor3 = colors.danger
 stopBtn.BorderSizePixel = 0
 stopBtn.Text = "⏹️ Stop"
@@ -339,21 +337,6 @@ stopBtn.Parent = manualControlFrame
 local stopBtnCorner = Instance.new("UICorner")
 stopBtnCorner.CornerRadius = UDim.new(0, 6)
 stopBtnCorner.Parent = stopBtn
-
-local pinBtn = Instance.new("TextButton")
-pinBtn.Size = UDim2.new(0.32, 0, 1, 0)
-pinBtn.Position = UDim2.new(0.68, 0, 0, 0)
-pinBtn.BackgroundColor3 = colors.warning
-pinBtn.BorderSizePixel = 0
-pinBtn.Text = "📌 Pin"
-pinBtn.TextColor3 = colors.text
-pinBtn.TextSize = 14
-pinBtn.Font = Enum.Font.GothamBold
-pinBtn.Parent = manualControlFrame
-
-local pinBtnCorner = Instance.new("UICorner")
-pinBtnCorner.CornerRadius = UDim.new(0, 6)
-pinBtnCorner.Parent = pinBtn
 
 -- TAB 2: Library
 local libraryTab = Instance.new("Frame")
@@ -397,57 +380,145 @@ libraryLayout.SortOrder = Enum.SortOrder.LayoutOrder
 libraryLayout.Padding = UDim.new(0, 3)
 libraryLayout.Parent = libraryScroll
 
--- TAB 3: Pinned
-local pinnedTab = Instance.new("Frame")
-pinnedTab.Size = UDim2.new(1, 0, 1, 0)
-pinnedTab.BackgroundTransparency = 1
-pinnedTab.Visible = false
-pinnedTab.Parent = contentFrame
+-- TAB 3: Random Box
+local randomTab = Instance.new("Frame")
+randomTab.Size = UDim2.new(1, 0, 1, 0)
+randomTab.BackgroundTransparency = 1
+randomTab.Visible = false
+randomTab.Parent = contentFrame
 
-local pinnedScroll = Instance.new("ScrollingFrame")
-pinnedScroll.Size = UDim2.new(1, -10, 1, -10)
-pinnedScroll.Position = UDim2.new(0, 5, 0, 5)
-pinnedScroll.BackgroundColor3 = colors.secondary
-pinnedScroll.BorderSizePixel = 0
-pinnedScroll.ScrollBarThickness = 6
-pinnedScroll.ScrollBarImageColor3 = colors.accent
-pinnedScroll.Parent = pinnedTab
+-- Random Box UI
+local randomBoxFrame = Instance.new("Frame")
+randomBoxFrame.Size = UDim2.new(1, -20, 0, 120)
+randomBoxFrame.Position = UDim2.new(0, 10, 0, 20)
+randomBoxFrame.BackgroundColor3 = colors.secondary
+randomBoxFrame.BorderSizePixel = 2
+randomBoxFrame.BorderColor3 = colors.warning
+randomBoxFrame.Parent = randomTab
 
-local pinnedScrollCorner = Instance.new("UICorner")
-pinnedScrollCorner.CornerRadius = UDim.new(0, 8)
-pinnedScrollCorner.Parent = pinnedScroll
+local randomBoxCorner = Instance.new("UICorner")
+randomBoxCorner.CornerRadius = UDim.new(0, 12)
+randomBoxCorner.Parent = randomBoxFrame
 
-local pinnedLayout = Instance.new("UIListLayout")
-pinnedLayout.SortOrder = Enum.SortOrder.LayoutOrder
-pinnedLayout.Padding = UDim.new(0, 3)
-pinnedLayout.Parent = pinnedScroll
+-- Mystery box icon
+local mysteryIcon = Instance.new("TextLabel")
+mysteryIcon.Size = UDim2.new(0, 80, 0, 80)
+mysteryIcon.Position = UDim2.new(0, 20, 0, 20)
+mysteryIcon.BackgroundTransparency = 1
+mysteryIcon.Text = "🎁"
+mysteryIcon.TextColor3 = colors.warning
+mysteryIcon.TextSize = 50
+mysteryIcon.Font = Enum.Font.GothamBold
+mysteryIcon.Parent = randomBoxFrame
 
--- TAB 4: Favorites
-local favoritesTab = Instance.new("Frame")
-favoritesTab.Size = UDim2.new(1, 0, 1, 0)
-favoritesTab.BackgroundTransparency = 1
-favoritesTab.Visible = false
-favoritesTab.Parent = contentFrame
+-- Random box title and description
+local randomTitle = Instance.new("TextLabel")
+randomTitle.Size = UDim2.new(1, -120, 0, 30)
+randomTitle.Position = UDim2.new(0, 110, 0, 15)
+randomTitle.BackgroundTransparency = 1
+randomTitle.Text = "🎲 MYSTERY MUSIC BOX"
+randomTitle.TextColor3 = colors.text
+randomTitle.TextSize = 16
+randomTitle.Font = Enum.Font.GothamBold
+randomTitle.TextXAlignment = Enum.TextXAlignment.Left
+randomTitle.Parent = randomBoxFrame
 
-local favoritesScroll = Instance.new("ScrollingFrame")
-favoritesScroll.Size = UDim2.new(1, -10, 1, -10)
-favoritesScroll.Position = UDim2.new(0, 5, 0, 5)
-favoritesScroll.BackgroundColor3 = colors.secondary
-favoritesScroll.BorderSizePixel = 0
-favoritesScroll.ScrollBarThickness = 6
-favoritesScroll.ScrollBarImageColor3 = colors.accent
-favoritesScroll.Parent = favoritesTab
+local randomDesc = Instance.new("TextLabel")
+randomDesc.Size = UDim2.new(1, -120, 0, 40)
+randomDesc.Position = UDim2.new(0, 110, 0, 45)
+randomDesc.BackgroundTransparency = 1
+randomDesc.Text = "Mở hộp để nhận một bài hát\nngẫu nhiên bất ngờ!"
+randomDesc.TextColor3 = colors.textSecondary
+randomDesc.TextSize = 12
+randomDesc.Font = Enum.Font.Gotham
+randomDesc.TextXAlignment = Enum.TextXAlignment.Left
+randomDesc.TextWrapped = true
+randomDesc.Parent = randomBoxFrame
 
-local favoritesScrollCorner = Instance.new("UICorner")
-favoritesScrollCorner.CornerRadius = UDim.new(0, 8)
-favoritesScrollCorner.Parent = favoritesScroll
+-- Open box button
+local openBoxBtn = Instance.new("TextButton")
+openBoxBtn.Size = UDim2.new(1, -40, 0, 50)
+openBoxBtn.Position = UDim2.new(0, 20, 0, 150)
+openBoxBtn.BackgroundColor3 = colors.warning
+openBoxBtn.BorderSizePixel = 0
+openBoxBtn.Text = "🎁 MỞ HỘP NGẪU NHIÊN 🎁"
+openBoxBtn.TextColor3 = colors.text
+openBoxBtn.TextSize = 16
+openBoxBtn.Font = Enum.Font.GothamBold
+openBoxBtn.Parent = randomTab
 
-local favoritesLayout = Instance.new("UIListLayout")
-favoritesLayout.SortOrder = Enum.SortOrder.LayoutOrder
-favoritesLayout.Padding = UDim.new(0, 3)
-favoritesLayout.Parent = favoritesScroll
+local openBoxCorner = Instance.new("UICorner")
+openBoxCorner.CornerRadius = UDim.new(0, 8)
+openBoxCorner.Parent = openBoxBtn
 
--- TAB 5: History
+-- Result display
+local resultFrame = Instance.new("Frame")
+resultFrame.Size = UDim2.new(1, -20, 0, 80)
+resultFrame.Position = UDim2.new(0, 10, 0, 210)
+resultFrame.BackgroundColor3 = colors.primary
+resultFrame.BorderSizePixel = 1
+resultFrame.BorderColor3 = colors.accent
+resultFrame.Visible = false
+resultFrame.Parent = randomTab
+
+local resultCorner = Instance.new("UICorner")
+resultCorner.CornerRadius = UDim.new(0, 8)
+resultCorner.Parent = resultFrame
+
+local resultIcon = Instance.new("TextLabel")
+resultIcon.Size = UDim2.new(0, 60, 0, 60)
+resultIcon.Position = UDim2.new(0, 10, 0, 10)
+resultIcon.BackgroundColor3 = colors.accent
+resultIcon.BorderSizePixel = 0
+resultIcon.Text = "🎵"
+resultIcon.TextColor3 = colors.text
+resultIcon.TextSize = 30
+resultIcon.Font = Enum.Font.GothamBold
+resultIcon.Parent = resultFrame
+
+local resultIconCorner = Instance.new("UICorner")
+resultIconCorner.CornerRadius = UDim.new(0, 8)
+resultIconCorner.Parent = resultIcon
+
+local resultTitle = Instance.new("TextLabel")
+resultTitle.Size = UDim2.new(1, -160, 0, 25)
+resultTitle.Position = UDim2.new(0, 80, 0, 8)
+resultTitle.BackgroundTransparency = 1
+resultTitle.Text = "Kết quả sẽ hiện ở đây"
+resultTitle.TextColor3 = colors.text
+resultTitle.TextSize = 14
+resultTitle.Font = Enum.Font.GothamBold
+resultTitle.TextXAlignment = Enum.TextXAlignment.Left
+resultTitle.TextTruncate = Enum.TextTruncate.AtEnd
+resultTitle.Parent = resultFrame
+
+local resultId = Instance.new("TextLabel")
+resultId.Size = UDim2.new(1, -160, 0, 20)
+resultId.Position = UDim2.new(0, 80, 0, 30)
+resultId.BackgroundTransparency = 1
+resultId.Text = "ID: ..."
+resultId.TextColor3 = colors.textSecondary
+resultId.TextSize = 11
+resultId.Font = Enum.Font.Gotham
+resultId.TextXAlignment = Enum.TextXAlignment.Left
+resultId.Parent = resultFrame
+
+local playResultBtn = Instance.new("TextButton")
+playResultBtn.Size = UDim2.new(0, 80, 0, 30)
+playResultBtn.Position = UDim2.new(1, -90, 0, 25)
+playResultBtn.BackgroundColor3 = colors.accent
+playResultBtn.BorderSizePixel = 0
+playResultBtn.Text = "▶️ PLAY"
+playResultBtn.TextColor3 = colors.text
+playResultBtn.TextSize = 12
+playResultBtn.Font = Enum.Font.GothamBold
+playResultBtn.Parent = resultFrame
+
+local playResultCorner = Instance.new("UICorner")
+playResultCorner.CornerRadius = UDim.new(0, 6)
+playResultCorner.Parent = playResultBtn
+
+-- TAB 4: History
 local historyTab = Instance.new("Frame")
 historyTab.Size = UDim2.new(1, 0, 1, 0)
 historyTab.BackgroundTransparency = 1
@@ -488,7 +559,7 @@ minimizedCorner.Parent = minimizedFrame
 local restoreBtn = Instance.new("TextButton")
 restoreBtn.Size = UDim2.new(1, -35, 1, 0)
 restoreBtn.BackgroundTransparency = 1
-restoreBtn.Text = "🎵 Music Player V2"
+restoreBtn.Text = "🎵 Music Player 2.0+"
 restoreBtn.TextColor3 = colors.text
 restoreBtn.TextSize = 12
 restoreBtn.Font = Enum.Font.GothamBold
@@ -499,7 +570,7 @@ minCloseBtn.Size = UDim2.new(0, 30, 0, 30)
 minCloseBtn.Position = UDim2.new(1, -32, 0, 5)
 minCloseBtn.BackgroundColor3 = colors.danger
 minCloseBtn.BorderSizePixel = 0
-minCloseBtn.Text = "❌"
+minCloseBtn.Text = "✕"
 minCloseBtn.TextColor3 = colors.text
 minCloseBtn.TextSize = 12
 minCloseBtn.Font = Enum.Font.GothamBold
@@ -604,34 +675,11 @@ local function addToHistory(musicData)
 end
 
 local function addToPinned(musicData)
-    for _, item in ipairs(userData.pinned) do
-        if item.id == musicData.id then
-            showNotification("Đã được ghim rồi!", colors.danger, "📌")
-            return
-        end
-    end
-    
-    if #userData.pinned >= 30 then
-        showNotification("Tối đa 30 bài ghim! Xóa bài cũ trước.", colors.danger, "📌")
-        return
-    end
-    
-    table.insert(userData.pinned, musicData)
-    showNotification("Đã ghim: " .. musicData.name .. " (" .. #userData.pinned .. "/30)", colors.warning, "📌")
-    updatePinnedTab()
+    -- Removed - no longer used
 end
 
 local function addToFavorites(musicData)
-    for _, item in ipairs(userData.favorites) do
-        if item.id == musicData.id then
-            showNotification("Đã có trong yêu thích!", colors.danger, "❤️")
-            return
-        end
-    end
-    
-    table.insert(userData.favorites, musicData)
-    showNotification("Đã thêm vào yêu thích: " .. musicData.name, colors.accent, "❤️")
-    updateFavoritesTab()
+    -- Removed - no longer used
 end
 
 local function playMusic(musicData)
@@ -734,6 +782,58 @@ local function updateVolume(newVolume)
     
     showNotification("Volume: " .. newVolume .. "/10", colors.accent, volumeIcon.Text)
 end
+local function openRandomBox()
+    -- Show opening animation
+    mysteryIcon.Text = "🎁"
+    openBoxBtn.Text = "🎁 ĐANG MỞ... 🎁"
+    openBoxBtn.BackgroundColor3 = colors.textSecondary
+    
+    -- Animate mystery box
+    spawn(function()
+        for i = 1, 6 do
+            wait(0.2)
+            if i % 2 == 0 then
+                mysteryIcon.Text = "📦"
+                mysteryIcon.Rotation = 15
+            else
+                mysteryIcon.Text = "🎁"
+                mysteryIcon.Rotation = -15
+            end
+        end
+        
+        -- Reset rotation and show result
+        mysteryIcon.Rotation = 0
+        mysteryIcon.Text = "✨"
+        
+        -- Get random song
+        local randomSong = musicLibrary[math.random(1, #musicLibrary)]
+        
+        -- Show result
+        resultFrame.Visible = true
+        resultTitle.Text = randomSong.name
+        resultId.Text = "ID: " .. randomSong.id
+        
+        -- Store result for play button
+        resultFrame.Tag = randomSong
+        
+        -- Celebrate animation
+        spawn(function()
+            local celebrations = {"🎉", "✨", "🎊", "🌟", "💫"}
+            for i = 1, 10 do
+                mysteryIcon.Text = celebrations[math.random(1, #celebrations)]
+                wait(0.3)
+            end
+            mysteryIcon.Text = "🎁"
+        end)
+        
+        -- Reset button
+        wait(2)
+        openBoxBtn.Text = "🎁 MỞ HỘP NGẪU NHIÊN 🎁"
+        openBoxBtn.BackgroundColor3 = colors.warning
+        
+        showNotification("🎉 Bạn nhận được: " .. randomSong.name, colors.warning, "🎁")
+    end)
+end
 local function cycleRepeatMode()
     if userData.repeatMode == "off" then
         userData.repeatMode = "one"
@@ -760,7 +860,7 @@ end
 local function createMusicItem(musicData, parent, showRemove, isPinned)
     local itemFrame = Instance.new("Frame")
     itemFrame.Size = UDim2.new(1, -12, 0, 50)
-    itemFrame.BackgroundColor3 = isPinned and Color3.fromRGB(80, 60, 20) or colors.primary
+    itemFrame.BackgroundColor3 = colors.primary
     itemFrame.BorderSizePixel = 0
     itemFrame.Parent = parent
     
@@ -768,23 +868,10 @@ local function createMusicItem(musicData, parent, showRemove, isPinned)
     itemCorner.CornerRadius = UDim.new(0, 6)
     itemCorner.Parent = itemFrame
     
-    -- Pin indicator
-    if isPinned then
-        local pinIndicator = Instance.new("TextLabel")
-        pinIndicator.Size = UDim2.new(0, 25, 0, 25)
-        pinIndicator.Position = UDim2.new(0, 5, 0, 12)
-        pinIndicator.BackgroundTransparency = 1
-        pinIndicator.Text = "📌"
-        pinIndicator.TextColor3 = Color3.fromRGB(255, 200, 100)
-        pinIndicator.TextSize = 14
-        pinIndicator.Font = Enum.Font.GothamBold
-        pinIndicator.Parent = itemFrame
-    end
-    
     -- Song name
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, showRemove and -90 or -50, 0, 25)
-    nameLabel.Position = UDim2.new(0, isPinned and 35 or 10, 0, 5)
+    nameLabel.Size = UDim2.new(1, -50, 0, 25)
+    nameLabel.Position = UDim2.new(0, 10, 0, 5)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = musicData.name
     nameLabel.TextColor3 = colors.text
@@ -792,6 +879,58 @@ local function createMusicItem(musicData, parent, showRemove, isPinned)
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    nameLabel.Parent = itemFrame
+    
+    -- ID info
+    local idLabel = Instance.new("TextLabel")
+    idLabel.Size = UDim2.new(1, -50, 0, 15)
+    idLabel.Position = UDim2.new(0, 10, 0, 25)
+    idLabel.BackgroundTransparency = 1
+    idLabel.Text = "ID: " .. musicData.id
+    idLabel.TextColor3 = colors.textSecondary
+    idLabel.TextSize = 10
+    idLabel.Font = Enum.Font.Gotham
+    idLabel.TextXAlignment = Enum.TextXAlignment.Left
+    idLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    idLabel.Parent = itemFrame
+    
+    -- Play button
+    local playBtn = Instance.new("TextButton")
+    playBtn.Size = UDim2.new(0, 35, 0, 35)
+    playBtn.Position = UDim2.new(1, -40, 0, 7)
+    playBtn.BackgroundColor3 = colors.accent
+    playBtn.BorderSizePixel = 0
+    playBtn.Text = "▶️"
+    playBtn.TextColor3 = colors.text
+    playBtn.TextSize = 14
+    playBtn.Font = Enum.Font.GothamBold
+    playBtn.Parent = itemFrame
+    
+    local playBtnCorner = Instance.new("UICorner")
+    playBtnCorner.CornerRadius = UDim.new(0, 6)
+    playBtnCorner.Parent = playBtn
+    
+    playBtn.MouseButton1Click:Connect(function()
+        playMusic(musicData)
+    end)
+    
+    -- Hover effects
+    local originalColor = itemFrame.BackgroundColor3
+    itemFrame.MouseEnter:Connect(function()
+        local newColor = Color3.fromRGB(
+            math.min(255, originalColor.R * 255 * 1.3),
+            math.min(255, originalColor.G * 255 * 1.3),
+            math.min(255, originalColor.B * 255 * 1.3)
+        )
+        TweenService:Create(itemFrame, TweenInfo.new(0.2), {BackgroundColor3 = newColor}):Play()
+    end)
+    
+    itemFrame.MouseLeave:Connect(function()
+        TweenService:Create(itemFrame, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+    end)
+    
+    return itemFrame
+enduncate = Enum.TextTruncate.AtEnd
     nameLabel.Parent = itemFrame
     
     -- ID info
@@ -920,86 +1059,6 @@ function updateLibraryTab()
     libraryScroll.CanvasSize = UDim2.new(0, 0, 0, #filteredMusic * 53)
 end
 
-function updatePinnedTab()
-    for _, child in pairs(pinnedScroll:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
-    
-    if #userData.pinned == 0 then
-        local emptyFrame = Instance.new("Frame")
-        emptyFrame.Size = UDim2.new(1, 0, 0, 120)
-        emptyFrame.BackgroundTransparency = 1
-        emptyFrame.Parent = pinnedScroll
-        
-        local emptyLabel = Instance.new("TextLabel")
-        emptyLabel.Size = UDim2.new(1, 0, 1, 0)
-        emptyLabel.BackgroundTransparency = 1
-        emptyLabel.Text = "📌\n\nChưa có bài hát được ghim\n\nGhim tối đa 30 bài yêu thích!\nNhập ID → Bấm 📌 Pin\n\nHiện tại: 0/30"
-        emptyLabel.TextColor3 = colors.textSecondary
-        emptyLabel.TextSize = 14
-        emptyLabel.Font = Enum.Font.Gotham
-        emptyLabel.Parent = emptyFrame
-    else
-        -- Add counter label at top
-        local counterFrame = Instance.new("Frame")
-        counterFrame.Size = UDim2.new(1, 0, 0, 30)
-        counterFrame.BackgroundColor3 = colors.primary
-        counterFrame.BorderSizePixel = 0
-        counterFrame.Parent = pinnedScroll
-        
-        local counterCorner = Instance.new("UICorner")
-        counterCorner.CornerRadius = UDim.new(0, 6)
-        counterCorner.Parent = counterFrame
-        
-        local counterLabel = Instance.new("TextLabel")
-        counterLabel.Size = UDim2.new(1, 0, 1, 0)
-        counterLabel.BackgroundTransparency = 1
-        counterLabel.Text = "📌 Đã ghim: " .. #userData.pinned .. "/30 bài"
-        counterLabel.TextColor3 = colors.text
-        counterLabel.TextSize = 12
-        counterLabel.Font = Enum.Font.GothamBold
-        counterLabel.Parent = counterFrame
-        
-        for _, musicData in ipairs(userData.pinned) do
-            createMusicItem(musicData, pinnedScroll, true, true)
-        end
-    end
-    
-    pinnedScroll.CanvasSize = UDim2.new(0, 0, 0, math.max((#userData.pinned + 1) * 53, 120))
-end
-
-function updateFavoritesTab()
-    for _, child in pairs(favoritesScroll:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
-    
-    if #userData.favorites == 0 then
-        local emptyFrame = Instance.new("Frame")
-        emptyFrame.Size = UDim2.new(1, 0, 0, 120)
-        emptyFrame.BackgroundTransparency = 1
-        emptyFrame.Parent = favoritesScroll
-        
-        local emptyLabel = Instance.new("TextLabel")
-        emptyLabel.Size = UDim2.new(1, 0, 1, 0)
-        emptyLabel.BackgroundTransparency = 1
-        emptyLabel.Text = "❤️\n\nChưa có bài hát yêu thích\n\nBấm ❤️ ở Library hoặc History\nđể thêm vào yêu thích!"
-        emptyLabel.TextColor3 = colors.textSecondary
-        emptyLabel.TextSize = 14
-        emptyLabel.Font = Enum.Font.Gotham
-        emptyLabel.Parent = emptyFrame
-    else
-        for _, musicData in ipairs(userData.favorites) do
-            createMusicItem(musicData, favoritesScroll, true, false)
-        end
-    end
-    
-    favoritesScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(#userData.favorites * 53, 120))
-end
-
 function updateHistoryTab()
     for _, child in pairs(historyScroll:GetChildren()) do
         if child:IsA("Frame") then
@@ -1058,8 +1117,7 @@ local function switchTab(tabIndex)
     -- Hide all tabs
     manualTab.Visible = false
     libraryTab.Visible = false
-    pinnedTab.Visible = false
-    favoritesTab.Visible = false
+    randomTab.Visible = false
     historyTab.Visible = false
     
     -- Show selected tab
@@ -1068,12 +1126,8 @@ local function switchTab(tabIndex)
     elseif tabIndex == 2 then
         libraryTab.Visible = true
     elseif tabIndex == 3 then
-        pinnedTab.Visible = true
-        updatePinnedTab()
+        randomTab.Visible = true
     elseif tabIndex == 4 then
-        favoritesTab.Visible = true
-        updateFavoritesTab()
-    elseif tabIndex == 5 then
         historyTab.Visible = true
         updateHistoryTab()
     end
@@ -1110,8 +1164,6 @@ end
 -- Initialize
 filteredMusic = musicLibrary
 updateLibraryTab()
-updatePinnedTab()
-updateFavoritesTab()
 updateHistoryTab()
 
 -- EVENT CONNECTIONS
@@ -1137,12 +1189,14 @@ stopBtn.MouseButton1Click:Connect(function()
     stopMusic()
 end)
 
-pinBtn.MouseButton1Click:Connect(function()
-    local id = idInput.Text:gsub("%s+", "")
-    if id ~= "" then
-        addToPinned({name = "Custom ID: " .. id, id = id})
-    else
-        showNotification("Vui lòng nhập ID nhạc!", colors.danger, "⚠️")
+-- Random Box
+openBoxBtn.MouseButton1Click:Connect(function()
+    openRandomBox()
+end)
+
+playResultBtn.MouseButton1Click:Connect(function()
+    if resultFrame.Tag then
+        playMusic(resultFrame.Tag)
     end
 end)
 
@@ -1210,7 +1264,8 @@ end
 -- Apply hover effects
 addHoverEffect(playManualBtn)
 addHoverEffect(stopBtn)
-addHoverEffect(pinBtn)
+addHoverEffect(openBoxBtn)
+addHoverEffect(playResultBtn)
 addHoverEffect(repeatBtn)
 addHoverEffect(minimizeBtn)
 addHoverEffect(closeBtn)
@@ -1259,26 +1314,31 @@ spawn(function()
     showNotification("🎉 Music Player 2.0+ đã sẵn sàng!", colors.accent, "🎵")
 end)
 
-print("🎵 MUSIC PLAYER V2 - ENHANCED VERSION LOADED! 🎵")
-print("✅ ALL BUGS FIXED + NEW FEATURES!")
+print("🎵 MUSIC PLAYER 2.0+ - RANDOM BOX EDITION! 🎵")
+print("✅ COMPLETELY REDESIGNED!")
 print("")
-print("🆕 FEATURES:")
-print("   ✨ 5 tabs: Manual, Library, Pinned, Favorites, History")
-print("   📌 Pin up to 30 songs (upgraded from 3!)")
+print("🆕 NEW FEATURES:")
+print("   🎲 RANDOM BOX: Mystery music discovery!")
+print("   ✨ 4 tabs: Manual, Library, Random Box, History")
 print("   🔊 Volume Control (0-10) with shortcuts")
-print("   ❤️ Unlimited favorites")
 print("   📜 History of 20 recent songs")
 print("   🔄 Repeat modes: Off/One/All")
 print("   🔍 Search in library")
 print("   📱 Drag & drop, minimize")
-print("   🎉 Beautiful notifications")
+print("   🎉 Beautiful notifications & animations")
 print("")
 print("💡 HOW TO USE:")
-print("   🆔 Manual: Enter ID → Play/Pin")
-print("   📋 Library: Search & play songs")
-print("   📌 Pinned: Your top 30 songs")
-print("   ❤️ Favorites: Click ❤️ to add")
-print("   📜 History: Recently played")
+print("   🆔 Manual: Enter ID → Play")
+print("   📋 Library: Search & play 15 songs")
+print("   🎲 Random Box: Open mystery boxes for surprises!")
+print("   📜 History: Recently played songs")
+print("")
+print("🎲 RANDOM BOX FEATURE:")
+print("   • Click 'MỞ HỘP NGẪU NHIÊN' for surprise song")
+print("   • Beautiful opening animation with celebrations")
+print("   • Get random song from library")
+print("   • Play directly from result")
+print("   • Perfect for music discovery!")
 print("")
 print("🔊 VOLUME CONTROL:")
 print("   • Type number 0-10 in volume box")
@@ -1286,10 +1346,4 @@ print("   • Type + to increase, - to decrease")
 print("   • 🔇 Mute, 🔉 Low, 🔊 High icons")
 print("   • Real-time volume adjustment")
 print("")
-print("📌 PINNED SYSTEM:")
-print("   • Up to 30 songs (10x more than before!)")
-print("   • Counter shows current usage")
-print("   • Special golden background")
-print("   • Persistent across sessions")
-print("")
-print("🎵 Enjoy your enhanced music experience! 🎵")
+print("🎁 Discover new music with Random Box! 🎲🎵")
