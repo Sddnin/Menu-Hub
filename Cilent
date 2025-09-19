@@ -1,456 +1,585 @@
--- Roblox GUI Script với Tab System
+--  Client GUI v2.0
+-- Enhanced with modern design, animations, and improved functionality
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Tạo ScreenGui
+-- Tạo ScreenGui với backdrop blur
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ClientGui"
+screenGui.Name = "ClientGUI_v2"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Tạo Frame chính (tăng chiều cao để chứa nhiều nút hơn)
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 700, 0, 450)
-mainFrame.Position = UDim2.new(0.5, -350, 0.5, -225)
-mainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
+-- Tạo backdrop blur effect
+local blurFrame = Instance.new("Frame")
+blurFrame.Name = "BlurBackdrop"
+blurFrame.Size = UDim2.new(1, 0, 1, 0)
+blurFrame.Position = UDim2.new(0, 0, 0, 0)
+blurFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+blurFrame.BackgroundTransparency = 0.5
+blurFrame.BorderSizePixel = 0
+blurFrame.Parent = screenGui
 
--- Tạo UICorner cho mainFrame
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
-mainCorner.Parent = mainFrame
+-- Tạo main container với glass morphism effect
+local mainContainer = Instance.new("Frame")
+mainContainer.Name = "MainContainer"
+mainContainer.Size = UDim2.new(0, 800, 0, 500)
+mainContainer.Position = UDim2.new(0.5, -400, 0.5, -250)
+mainContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainContainer.BackgroundTransparency = 0.1
+mainContainer.BorderSizePixel = 0
+mainContainer.Parent = screenGui
 
--- Tạo header bar
-local headerBar = Instance.new("Frame")
-headerBar.Name = "HeaderBar"
-headerBar.Size = UDim2.new(1, 0, 0, 50)
-headerBar.Position = UDim2.new(0, 0, 0, 0)
-headerBar.BackgroundTransparency = 1
-headerBar.Parent = mainFrame
+-- Glass morphism effect
+local containerCorner = Instance.new("UICorner")
+containerCorner.CornerRadius = UDim.new(0, 20)
+containerCorner.Parent = mainContainer
 
--- Tạo header "Client"
-local clientLabel = Instance.new("TextLabel")
-clientLabel.Name = "ClientLabel"
-clientLabel.Size = UDim2.new(0, 200, 1, 0)
-clientLabel.Position = UDim2.new(0, 0, 0, 0)
-clientLabel.BackgroundTransparency = 1
-clientLabel.Text = "Client"
-clientLabel.TextColor3 = Color3.fromRGB(80, 80, 80)
-clientLabel.TextSize = 28
-clientLabel.Font = Enum.Font.SourceSansBold
-clientLabel.TextXAlignment = Enum.TextXAlignment.Left
-clientLabel.Parent = headerBar
+local containerStroke = Instance.new("UIStroke")
+containerStroke.Color = Color3.fromRGB(255, 255, 255)
+containerStroke.Transparency = 0.8
+containerStroke.Thickness = 2
+containerStroke.Parent = mainContainer
 
--- Tạo UIPadding cho clientLabel
-local clientPadding = Instance.new("UIPadding")
-clientPadding.PaddingLeft = UDim.new(0, 20)
-clientPadding.Parent = clientLabel
+-- Tạo gradient background
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.0, Color3.fromRGB(138, 43, 226)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(30, 144, 255)),
+    ColorSequenceKeypoint.new(1.0, Color3.fromRGB(50, 205, 50))
+}
+gradient.Rotation = 45
+gradient.Parent = mainContainer
 
--- Tạo nút đóng (X)
+-- Animated gradient effect
+spawn(function()
+    while mainContainer.Parent do
+        local tween = TweenService:Create(gradient, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+            Rotation = gradient.Rotation + 360
+        })
+        tween:Play()
+        wait(3)
+    end
+end)
+
+-- Header section
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 80)
+header.Position = UDim2.new(0, 0, 0, 0)
+header.BackgroundTransparency = 1
+header.Parent = mainContainer
+
+-- Logo/Title
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Size = UDim2.new(0, 300, 1, 0)
+titleLabel.Position = UDim2.new(0, 20, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "🚀 Client Hub v2.0"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 32
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = header
+
+-- Version badge
+local versionBadge = Instance.new("TextLabel")
+versionBadge.Name = "VersionBadge"
+versionBadge.Size = UDim2.new(0, 60, 0, 25)
+versionBadge.Position = UDim2.new(0, 320, 0, 15)
+versionBadge.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+versionBadge.Text = "NEW"
+versionBadge.TextColor3 = Color3.fromRGB(0, 0, 0)
+versionBadge.TextSize = 12
+versionBadge.Font = Enum.Font.GothamBold
+versionBadge.TextXAlignment = Enum.TextXAlignment.Center
+versionBadge.Parent = header
+
+local badgeCorner = Instance.new("UICorner")
+badgeCorner.CornerRadius = UDim.new(0, 12)
+badgeCorner.Parent = versionBadge
+
+-- Close button (modern design)
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 10)
-closeButton.BackgroundColor3 = Color3.fromRGB(220, 53, 69)
+closeButton.Size = UDim2.new(0, 40, 0, 40)
+closeButton.Position = UDim2.new(1, -60, 0, 20)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 59, 48)
 closeButton.BorderSizePixel = 0
-closeButton.Text = "×"
+closeButton.Text = "❌"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 18
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.Parent = headerBar
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = header
 
--- Tạo UICorner cho closeButton
 local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 15)
+closeCorner.CornerRadius = UDim.new(0, 20)
 closeCorner.Parent = closeButton
 
--- Tạo container cho các tab
+-- Minimize button
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 40, 0, 40)
+minimizeButton.Position = UDim2.new(1, -110, 0, 20)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 149, 0)
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Text = "➖"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextSize = 18
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Parent = header
+
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 20)
+minimizeCorner.Parent = minimizeButton
+
+-- Tab container with modern design
 local tabContainer = Instance.new("Frame")
 tabContainer.Name = "TabContainer"
-tabContainer.Size = UDim2.new(1, 0, 0, 40)
-tabContainer.Position = UDim2.new(0, 0, 0, 50)
-tabContainer.BackgroundTransparency = 1
-tabContainer.Parent = mainFrame
+tabContainer.Size = UDim2.new(1, -40, 0, 50)
+tabContainer.Position = UDim2.new(0, 20, 0, 90)
+tabContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+tabContainer.BackgroundTransparency = 0.9
+tabContainer.BorderSizePixel = 0
+tabContainer.Parent = mainContainer
 
--- Tạo UIPadding cho tabContainer
-local tabPadding = Instance.new("UIPadding")
-tabPadding.PaddingLeft = UDim.new(0, 20)
-tabPadding.PaddingRight = UDim.new(0, 20)
-tabPadding.Parent = tabContainer
+local tabCorner = Instance.new("UICorner")
+tabCorner.CornerRadius = UDim.new(0, 15)
+tabCorner.Parent = tabContainer
 
--- Tạo tab "Global"
+-- Global tab
 local globalTab = Instance.new("TextButton")
 globalTab.Name = "GlobalTab"
-globalTab.Size = UDim2.new(0, 120, 0, 35)
-globalTab.Position = UDim2.new(0, 0, 0, 0)
-globalTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
+globalTab.Size = UDim2.new(0, 150, 0, 40)
+globalTab.Position = UDim2.new(0, 10, 0, 5)
+globalTab.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
 globalTab.BorderSizePixel = 0
-globalTab.Text = "Global"
+globalTab.Text = "🌍 Global"
 globalTab.TextColor3 = Color3.fromRGB(255, 255, 255)
 globalTab.TextSize = 16
-globalTab.Font = Enum.Font.SourceSansBold
+globalTab.Font = Enum.Font.GothamSemibold
 globalTab.Parent = tabContainer
 
--- Tạo UICorner cho globalTab
 local globalTabCorner = Instance.new("UICorner")
-globalTabCorner.CornerRadius = UDim.new(0, 6)
+globalTabCorner.CornerRadius = UDim.new(0, 10)
 globalTabCorner.Parent = globalTab
 
--- Tạo tab "VNG"
+-- VNG tab
 local vngTab = Instance.new("TextButton")
 vngTab.Name = "VNGTab"
-vngTab.Size = UDim2.new(0, 80, 0, 35)
-vngTab.Position = UDim2.new(0, 130, 0, 0)
-vngTab.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+vngTab.Size = UDim2.new(0, 120, 0, 40)
+vngTab.Position = UDim2.new(0, 170, 0, 5)
+vngTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+vngTab.BackgroundTransparency = 0.3
 vngTab.BorderSizePixel = 0
-vngTab.Text = "VNG"
-vngTab.TextColor3 = Color3.fromRGB(80, 80, 80)
+vngTab.Text = "🇻🇳 VNG"
+vngTab.TextColor3 = Color3.fromRGB(100, 100, 100)
 vngTab.TextSize = 16
-vngTab.Font = Enum.Font.SourceSans
+vngTab.Font = Enum.Font.GothamSemibold
 vngTab.Parent = tabContainer
 
--- Tạo UICorner cho vngTab
 local vngTabCorner = Instance.new("UICorner")
-vngTabCorner.CornerRadius = UDim.new(0, 6)
+vngTabCorner.CornerRadius = UDim.new(0, 10)
 vngTabCorner.Parent = vngTab
 
--- Tạo content container
-local contentContainer = Instance.new("Frame")
-contentContainer.Name = "ContentContainer"
-contentContainer.Size = UDim2.new(1, 0, 0, 350)
-contentContainer.Position = UDim2.new(0, 0, 0, 90)
-contentContainer.BackgroundTransparency = 1
-contentContainer.Parent = mainFrame
+-- Content area with scroll
+local contentArea = Instance.new("ScrollingFrame")
+contentArea.Name = "ContentArea"
+contentArea.Size = UDim2.new(1, -40, 0, 320)
+contentArea.Position = UDim2.new(0, 20, 0, 150)
+contentArea.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+contentArea.BackgroundTransparency = 0.95
+contentArea.BorderSizePixel = 0
+contentArea.ScrollBarThickness = 6
+contentArea.CanvasSize = UDim2.new(0, 0, 0, 0)
+contentArea.Parent = mainContainer
 
--- Tạo UIPadding cho contentContainer
-local contentPadding = Instance.new("UIPadding")
-contentPadding.PaddingLeft = UDim.new(0, 20)
-contentPadding.PaddingRight = UDim.new(0, 20)
-contentPadding.PaddingTop = UDim.new(0, 10)
-contentPadding.Parent = contentContainer
+local contentCorner = Instance.new("UICorner")
+contentCorner.CornerRadius = UDim.new(0, 15)
+contentCorner.Parent = contentArea
 
--- Tạo Global Content
-local globalContent = Instance.new("Frame")
-globalContent.Name = "GlobalContent"
-globalContent.Size = UDim2.new(1, 0, 1, 0)
-globalContent.Position = UDim2.new(0, 0, 0, 0)
-globalContent.BackgroundTransparency = 1
-globalContent.Visible = true
-globalContent.Parent = contentContainer
+-- Modern executor data
+local executorData = {
+    Global = {
+        {name = "Delta X", link = "https://deltaexploits.gg/delta-executor-android", color = Color3.fromRGB(138, 43, 226), icon = "🚀"},
+        {name = "Arceus X", link = "https://www.mediafire.com/file/junxd0cfyumvk4x/Roblox_Arceus_X_NEO_1.8.2.apk/file", color = Color3.fromRGB(30, 144, 255), icon = "⚡"},
+        {name = "CodeX", link = "https://www.mediafire.com/file/8rt7pihmwkrflb6/Codex_v2.689.apk/file", color = Color3.fromRGB(255, 69, 0), icon = "💻"},
+        {name = "Vega X", link = "https://github.com/1f0yt/community/releases/download/Vegax/Vega.X.apk", color = Color3.fromRGB(50, 205, 50), icon = "🌟"},
+        {name = "Cryptic", link = "https://www.mediafire.com/file/epd1xj3gsc3vmkx/Cryptic+2.689.880+APK.apk/file", color = Color3.fromRGB(255, 20, 147), icon = "🔮"},
+        {name = "Evon", link = "https://evon.cc/android/dl-a/Evon.apk", color = Color3.fromRGB(75, 0, 130), icon = "👑"},
+        {name = "Klrn", link = "https://wrdcdn.net/r/54921/1757365485565/krnl_release_2.689.880_2025.9.7_47.apk", color = Color3.fromRGB(220, 20, 60), icon = "🔥"},
+        {name = "Trigon", link = "https://www.mediafire.com/file/8u7y5i55tz2m9s8/Trigon_2.689.880.apk/file", color = Color3.fromRGB(255, 165, 0), icon = "🎯"}
+    },
+    VNG = {
+        {name = "Arceus X VNG", link = "https://www.mediafire.com/file/n3xmh2d41nprj9u/Roblox_-_VNG_Arceus_X_NEO_1.8.1.apk/file", color = Color3.fromRGB(30, 144, 255), icon = "⚡"},
+        {name = "CodeX VNG", link = "https://www.mediafire.com/file/3piv87u6044r554/Codex_v2.689_VNG.apk/file", color = Color3.fromRGB(255, 69, 0), icon = "💻"},
+        {name = "Klrn VNG", link = "https://wrdcdn.net/r/54921/1757466914053/krnl_vng_release_2.688.861_2025.9.10_22.apk", color = Color3.fromRGB(220, 20, 60), icon = "🔥"},
+        {name = "Cryptic VNG", link = "https://www.mediafire.com/file/pf4k4kacl46v02b/Cryptic+2.689.880+VNG.apk/file", color = Color3.fromRGB(255, 20, 147), icon = "🔮"}
+    }
+}
 
--- Function để tạo executor button
-local function createExecutorButton(name, link, position, color, parent)
-    local button = Instance.new("TextButton")
-    button.Name = name .. "Button"
-    button.Size = UDim2.new(0, 120, 0, 35)
-    button.Position = position
-    button.BackgroundColor3 = color
-    button.BorderSizePixel = 0
-    button.Text = name
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.TextSize = 14
-    button.Font = Enum.Font.SourceSansBold
-    button.Parent = parent
+-- Status notification
+local statusNotification = Instance.new("Frame")
+statusNotification.Name = "StatusNotification"
+statusNotification.Size = UDim2.new(0, 400, 0, 60)
+statusNotification.Position = UDim2.new(0.5, -200, 0, -70)
+statusNotification.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+statusNotification.BorderSizePixel = 0
+statusNotification.Visible = false
+statusNotification.Parent = mainContainer
 
-    -- Tạo UICorner
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = button
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0, 15)
+statusCorner.Parent = statusNotification
 
-    -- Hiệu ứng hover
-    local originalColor = color
-    local hoverColor = Color3.fromRGB(
-        math.max(0, color.R * 255 - 20),
-        math.max(0, color.G * 255 - 20),
-        math.max(0, color.B * 255 - 20)
-    )
+local statusIcon = Instance.new("TextLabel")
+statusIcon.Size = UDim2.new(0, 40, 1, 0)
+statusIcon.Position = UDim2.new(0, 0, 0, 0)
+statusIcon.BackgroundTransparency = 1
+statusIcon.Text = "✅"
+statusIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusIcon.TextSize = 24
+statusIcon.Font = Enum.Font.Gotham
+statusIcon.Parent = statusNotification
+
+local statusText = Instance.new("TextLabel")
+statusText.Size = UDim2.new(1, -40, 1, 0)
+statusText.Position = UDim2.new(0, 40, 0, 0)
+statusText.BackgroundTransparency = 1
+statusText.Text = "Link copied successfully!"
+statusText.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusText.TextSize = 16
+statusText.Font = Enum.Font.GothamSemibold
+statusText.TextXAlignment = Enum.TextXAlignment.Left
+statusText.Parent = statusNotification
+
+-- Variables
+local currentTab = "Global"
+local isMinimized = false
+
+-- Functions
+local function showNotification(text, isSuccess)
+    statusText.Text = text
+    statusNotification.BackgroundColor3 = isSuccess and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(231, 76, 60)
+    statusIcon.Text = isSuccess and "✅" or "❌"
+    statusNotification.Visible = true
     
-    button.MouseEnter:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = hoverColor})
-        tween:Play()
+    local slideIn = TweenService:Create(statusNotification, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+        Position = UDim2.new(0.5, -200, 0, 20)
+    })
+    slideIn:Play()
+    
+    spawn(function()
+        wait(3)
+        local slideOut = TweenService:Create(statusNotification, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+            Position = UDim2.new(0.5, -200, 0, -70)
+        })
+        slideOut:Play()
+        slideOut.Completed:Connect(function()
+            statusNotification.Visible = false
+        end)
+    end)
+end
+
+local function createModernExecutorCard(executorInfo, index)
+    local card = Instance.new("Frame")
+    card.Name = executorInfo.name .. "Card"
+    card.Size = UDim2.new(0, 180, 0, 120)
+    card.Position = UDim2.new(0, (index % 4) * 190 + 10, 0, math.floor(index / 4) * 130 + 10)
+    card.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    card.BackgroundTransparency = 0.1
+    card.BorderSizePixel = 0
+    card.Parent = contentArea
+    
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 15)
+    cardCorner.Parent = card
+    
+    local cardStroke = Instance.new("UIStroke")
+    cardStroke.Color = executorInfo.color
+    cardStroke.Transparency = 0.5
+    cardStroke.Thickness = 2
+    cardStroke.Parent = card
+    
+    -- Card gradient
+    local cardGradient = Instance.new("UIGradient")
+    cardGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(1.0, executorInfo.color)
+    }
+    cardGradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0.0, 0.9),
+        NumberSequenceKeypoint.new(1.0, 0.95)
+    }
+    cardGradient.Rotation = 45
+    cardGradient.Parent = card
+    
+    -- Icon
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(0, 40, 0, 40)
+    icon.Position = UDim2.new(0, 15, 0, 15)
+    icon.BackgroundTransparency = 1
+    icon.Text = executorInfo.icon
+    icon.TextColor3 = executorInfo.color
+    icon.TextSize = 28
+    icon.Font = Enum.Font.Gotham
+    icon.Parent = card
+    
+    -- Name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, -70, 0, 25)
+    nameLabel.Position = UDim2.new(0, 60, 0, 15)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = executorInfo.name
+    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameLabel.TextSize = 16
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = card
+    
+    -- Status
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(1, -70, 0, 20)
+    statusLabel.Position = UDim2.new(0, 60, 0, 35)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Text = "Ready to download"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.TextSize = 12
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    statusLabel.Parent = card
+    
+    -- Download button
+    local downloadBtn = Instance.new("TextButton")
+    downloadBtn.Size = UDim2.new(1, -20, 0, 35)
+    downloadBtn.Position = UDim2.new(0, 10, 1, -45)
+    downloadBtn.BackgroundColor3 = executorInfo.color
+    downloadBtn.BorderSizePixel = 0
+    downloadBtn.Text = "📥 Copy Link"
+    downloadBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    downloadBtn.TextSize = 14
+    downloadBtn.Font = Enum.Font.GothamSemibold
+    downloadBtn.Parent = card
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = downloadBtn
+    
+    -- Hover effects
+    local hoverTween
+    card.MouseEnter:Connect(function()
+        if hoverTween then hoverTween:Cancel() end
+        hoverTween = TweenService:Create(card, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(0, 185, 0, 125)
+        })
+        hoverTween:Play()
+        
+        TweenService:Create(cardStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            Transparency = 0.2
+        }):Play()
     end)
     
-    button.MouseLeave:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = originalColor})
-        tween:Play()
+    card.MouseLeave:Connect(function()
+        if hoverTween then hoverTween:Cancel() end
+        hoverTween = TweenService:Create(card, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(0, 180, 0, 120)
+        })
+        hoverTween:Play()
+        
+        TweenService:Create(cardStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            Transparency = 0.5
+        }):Play()
     end)
-
-    -- Xử lý click
-    button.MouseButton1Click:Connect(function()
+    
+    -- Button click effect
+    downloadBtn.MouseButton1Click:Connect(function()
+        -- Click animation
+        local clickTween = TweenService:Create(downloadBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(1, -22, 0, 33)
+        })
+        clickTween:Play()
+        
+        clickTween.Completed:Connect(function()
+            TweenService:Create(downloadBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {
+                Size = UDim2.new(1, -20, 0, 35)
+            }):Play()
+        end)
+        
+        -- Copy link
         local success = pcall(function()
-            setclipboard(link)
+            setclipboard(executorInfo.link)
         end)
         
         if success then
-            updateStatusLabel("✓ " .. name .. " link đã được copy!")
+            showNotification(executorInfo.name .. " link copied to clipboard!", true)
+            statusLabel.Text = "✅ Link copied!"
+            statusLabel.TextColor3 = Color3.fromRGB(46, 204, 113)
         else
-            updateStatusLabel("Link " .. name .. ": " .. link)
+            showNotification("Failed to copy: " .. executorInfo.link, false)
+            statusLabel.Text = "❌ Copy failed"
+            statusLabel.TextColor3 = Color3.fromRGB(231, 76, 60)
         end
         
-        print(name .. " clicked! Link: " .. link)
+        spawn(function()
+            wait(2)
+            statusLabel.Text = "Ready to download"
+            statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        end)
+        
+        print(executorInfo.name .. " clicked! Link: " .. executorInfo.link)
     end)
     
-    return button
+    return card
 end
 
--- Function để cập nhật status label
-local function updateStatusLabel(text)
-    statusLabel.Text = text
-    statusLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
-    
-    spawn(function()
-        wait(3)
-        statusLabel.Text = ""
-    end)
-end
-
--- Tạo các executor buttons cho Global tab
-local deltaX = createExecutorButton("Delta X", "https://deltaexploits.gg/delta-executor-android", 
-    UDim2.new(0, 10, 0, 10), Color3.fromRGB(138, 43, 226), globalContent)
-
-local arceusX = createExecutorButton("Arceus X", "https://www.mediafire.com/file/junxd0cfyumvk4x/Roblox_Arceus_X_NEO_1.8.2.apk/file", 
-    UDim2.new(0, 130, 0, 10), Color3.fromRGB(30, 144, 255), globalContent)
-
-local codeX = createExecutorButton("CodeX", "https://www.mediafire.com/file/8rt7pihmwkrflb6/Codex_v2.689.apk/file", 
-    UDim2.new(0, 250, 0, 10), Color3.fromRGB(255, 69, 0), globalContent)
-
-local vegaX = createExecutorButton("Vega X", "https://github.com/1f0yt/community/releases/download/Vegax/Vega.X.apk", 
-    UDim2.new(0, 370, 0, 10), Color3.fromRGB(50, 205, 50), globalContent)
-
-local cryptic = createExecutorButton("Cryptic", "https://www.mediafire.com/file/epd1xj3gsc3vmkx/Cryptic+2.689.880+APK.apk/file", 
-    UDim2.new(0, 490, 0, 10), Color3.fromRGB(255, 20, 147), globalContent)
-
-local evon = createExecutorButton("Evon", "https://evon.cc/android/dl-a/Evon.apk", 
-    UDim2.new(0, 610, 0, 10), Color3.fromRGB(75, 0, 130), globalContent)
-
-local klrn = createExecutorButton("Klrn", "https://wrdcdn.net/r/54921/1757365485565/krnl_release_2.689.880_2025.9.7_47.apk", 
-    UDim2.new(0, 10, 0, 55), Color3.fromRGB(220, 20, 60), globalContent)
-
-local trigon = createExecutorButton("Trigon", "https://www.mediafire.com/file/8u7y5i55tz2m9s8/Trigon_2.689.880.apk/file", 
-    UDim2.new(0, 130, 0, 55), Color3.fromRGB(255, 165, 0), globalContent)
-
--- Tạo thông tin hướng dẫn
-local infoLabel = Instance.new("TextLabel")
-infoLabel.Size = UDim2.new(1, 0, 0, 20)
-infoLabel.Position = UDim2.new(0, 0, 0, 110)
-infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "Click vào bất kỳ executor nào để copy link download"
-infoLabel.TextColor3 = Color3.fromRGB(100, 100, 100)
-infoLabel.TextSize = 12
-infoLabel.Font = Enum.Font.SourceSans
-infoLabel.TextXAlignment = Enum.TextXAlignment.Center
-infoLabel.Parent = globalContent
-
--- Tạo status label để hiển thị thông báo
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, 0, 0, 20)
-statusLabel.Position = UDim2.new(0, 0, 0, 135)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = ""
-statusLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
-statusLabel.TextSize = 12
-statusLabel.Font = Enum.Font.SourceSansBold
-statusLabel.TextXAlignment = Enum.TextXAlignment.Center
-statusLabel.Parent = globalContent
-
--- Tạo VNG Content
-local vngContent = Instance.new("Frame")
-vngContent.Name = "VNGContent"
-vngContent.Size = UDim2.new(1, 0, 1, 0)
-vngContent.Position = UDim2.new(0, 0, 0, 0)
-vngContent.BackgroundTransparency = 1
-vngContent.Visible = false
-vngContent.Parent = contentContainer
-
--- Tạo các executor buttons cho VNG tab
-local arceusXVNG = createExecutorButton("Arceus X VNG", "https://www.mediafire.com/file/vjaet46gn7tfqzm/Roblox_-_VNG_Arceus_X_NEO_1.8.3.apk/file", 
-    UDim2.new(0, 10, 0, 10), Color3.fromRGB(30, 144, 255), vngContent)
-
-local codeXVNG = createExecutorButton("CodeX VNG", "https://www.mediafire.com/file/3piv87u6044r554/Codex_v2.689_VNG.apk/file", 
-    UDim2.new(0, 160, 0, 10), Color3.fromRGB(255, 69, 0), vngContent)
-
-local klrnVNG = createExecutorButton("Klrn VNG", "https://wrdcdn.net/r/54921/1757466914053/krnl_vng_release_2.688.861_2025.9.10_22.apk", 
-    UDim2.new(0, 310, 0, 10), Color3.fromRGB(220, 20, 60), vngContent)
-
-local crypticVNG = createExecutorButton("Cryptic VNG", "https://www.mediafire.com/file/pf4k4kacl46v02b/Cryptic+2.689.880+VNG.apk/file", 
-    UDim2.new(0, 460, 0, 10), Color3.fromRGB(255, 20, 147), vngContent)
-
--- Tạo thông tin hướng dẫn cho VNG
-local vngInfoLabel = Instance.new("TextLabel")
-vngInfoLabel.Size = UDim2.new(1, 0, 0, 20)
-vngInfoLabel.Position = UDim2.new(0, 0, 0, 60)
-vngInfoLabel.BackgroundTransparency = 1
-vngInfoLabel.Text = "Các executor dành riêng cho Roblox VNG"
-vngInfoLabel.TextColor3 = Color3.fromRGB(100, 100, 100)
-vngInfoLabel.TextSize = 12
-vngInfoLabel.Font = Enum.Font.SourceSans
-vngInfoLabel.TextXAlignment = Enum.TextXAlignment.Center
-vngInfoLabel.Parent = vngContent
-
--- Tạo status label cho VNG
-local vngStatusLabel = Instance.new("TextLabel")
-vngStatusLabel.Size = UDim2.new(1, 0, 0, 20)
-vngStatusLabel.Position = UDim2.new(0, 0, 0, 85)
-vngStatusLabel.BackgroundTransparency = 1
-vngStatusLabel.Text = ""
-vngStatusLabel.TextColor3 = Color3.fromRGB(34, 139, 34)
-vngStatusLabel.TextSize = 12
-vngStatusLabel.Font = Enum.Font.SourceSansBold
-vngStatusLabel.TextXAlignment = Enum.TextXAlignment.Center
-vngStatusLabel.Parent = vngContent
-
--- Cập nhật function updateStatusLabel để xử lý cả 2 tab
-updateStatusLabel = function(text)
-    if currentTab == "Global" then
-        statusLabel.Text = text
-    else
-        vngStatusLabel.Text = text
+local function switchTab(tabName)
+    -- Clear existing cards
+    for _, child in pairs(contentArea:GetChildren()) do
+        if child:IsA("Frame") and child.Name:find("Card") then
+            child:Destroy()
+        end
     end
     
-    spawn(function()
-        wait(3)
-        if currentTab == "Global" then
-            statusLabel.Text = ""
-        else
-            vngStatusLabel.Text = ""
-        end
-    end)
-end
-
--- Biến theo dõi tab hiện tại
-local currentTab = "Global"
-
--- Function để chuyển tab
-local function switchTab(tabName)
+    -- Update tab appearance with smooth animations
     if tabName == "Global" then
-        -- Cập nhật tab appearance
-        globalTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
-        globalTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-        globalTab.Font = Enum.Font.SourceSansBold
+        TweenService:Create(globalTab, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(138, 43, 226),
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        }):Play()
         
-        vngTab.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-        vngTab.TextColor3 = Color3.fromRGB(80, 80, 80)
-        vngTab.Font = Enum.Font.SourceSans
+        TweenService:Create(vngTab, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 0.3,
+            TextColor3 = Color3.fromRGB(100, 100, 100)
+        }):Play()
         
-        -- Hiển thị content
-        globalContent.Visible = true
-        vngContent.Visible = false
         currentTab = "Global"
         
     elseif tabName == "VNG" then
-        -- Cập nhật tab appearance
-        vngTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
-        vngTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-        vngTab.Font = Enum.Font.SourceSansBold
+        TweenService:Create(vngTab, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(255, 69, 0),
+            BackgroundTransparency = 0,
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        }):Play()
         
-        globalTab.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-        globalTab.TextColor3 = Color3.fromRGB(80, 80, 80)
-        globalTab.Font = Enum.Font.SourceSans
+        TweenService:Create(globalTab, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            BackgroundTransparency = 0.3,
+            TextColor3 = Color3.fromRGB(100, 100, 100)
+        }):Play()
         
-        -- Hiển thị content
-        globalContent.Visible = false
-        vngContent.Visible = true
         currentTab = "VNG"
     end
+    
+    -- Create cards for current tab
+    local data = executorData[currentTab]
+    for i, executor in ipairs(data) do
+        createModernExecutorCard(executor, i - 1)
+    end
+    
+    -- Update canvas size
+    local rows = math.ceil(#data / 4)
+    contentArea.CanvasSize = UDim2.new(0, 0, 0, rows * 130 + 20)
 end
 
--- Tạo hiệu ứng hover cho các nút
-local function createHoverEffect(button, hoverColor, originalColor)
-    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-    
-    button.MouseEnter:Connect(function()
-        if button == globalTab and currentTab ~= "Global" then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = hoverColor})
-            tween:Play()
-        elseif button == vngTab and currentTab ~= "VNG" then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = hoverColor})
-            tween:Play()
-        elseif button == closeButton then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = hoverColor})
-            tween:Play()
-        end
-    end)
-    
-    button.MouseLeave:Connect(function()
-        if button == globalTab and currentTab ~= "Global" then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = originalColor})
-            tween:Play()
-        elseif button == vngTab and currentTab ~= "VNG" then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = originalColor})
-            tween:Play()
-        elseif button == closeButton then
-            local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = originalColor})
-            tween:Play()
-        end
-    end)
-end
-
--- Áp dụng hiệu ứng hover
-createHoverEffect(globalTab, Color3.fromRGB(170, 170, 170), Color3.fromRGB(200, 200, 200))
-createHoverEffect(vngTab, Color3.fromRGB(170, 170, 170), Color3.fromRGB(200, 200, 200))
-createHoverEffect(closeButton, Color3.fromRGB(200, 35, 51), Color3.fromRGB(220, 53, 69))
-
--- Xử lý sự kiện click cho tabs
+-- Event handlers
 globalTab.MouseButton1Click:Connect(function()
     switchTab("Global")
-    print("Switched to Global tab")
 end)
 
 vngTab.MouseButton1Click:Connect(function()
     switchTab("VNG")
-    print("Switched to VNG tab")
 end)
 
--- Xử lý sự kiện đóng GUI
 closeButton.MouseButton1Click:Connect(function()
-    local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+    local closeTween = TweenService:Create(mainContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
         Size = UDim2.new(0, 0, 0, 0)
     })
     closeTween:Play()
     
+    TweenService:Create(blurFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+        BackgroundTransparency = 1
+    }):Play()
+    
     closeTween.Completed:Connect(function()
         screenGui:Destroy()
     end)
-    
-    print("GUI closed")
 end)
 
--- Tạo hiệu ứng mở GUI
-mainFrame.Size = UDim2.new(0, 0, 0, 0)
-local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-    Size = UDim2.new(0, 700, 0, 450)
-})
-openTween:Play()
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    
+    if isMinimized then
+        TweenService:Create(mainContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(0, 300, 0, 80),
+            Position = UDim2.new(0.5, -150, 0.5, -40)
+        }):Play()
+        
+        minimizeButton.Text = "+"
+        tabContainer.Visible = false
+        contentArea.Visible = false
+    else
+        TweenService:Create(mainContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(0, 800, 0, 500),
+            Position = UDim2.new(0.5, -400, 0.5, -250)
+        }):Play()
+        
+        minimizeButton.Text = "−"
+        tabContainer.Visible = true
+        contentArea.Visible = true
+    end
+end)
 
--- Drag functionality
+-- Dragging functionality
 local dragging = false
 local dragStart = nil
 local startPos = nil
 
-headerBar.InputBegan:Connect(function(input)
+header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
         dragStart = input.Position
-        startPos = mainFrame.Position
+        startPos = mainContainer.Position
     end
 end)
 
-headerBar.InputChanged:Connect(function(input)
+header.InputChanged:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
         local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        mainContainer.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
-headerBar.InputEnded:Connect(function(input)
+header.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
     end
 end)
 
-print("Client GUI with tabs loaded successfully!")
+-- Opening animation
+mainContainer.Size = UDim2.new(0, 0, 0, 0)
+blurFrame.BackgroundTransparency = 1
+
+local openTween = TweenService:Create(mainContainer, TweenInfo.new(0.6, Enum.EasingStyle.Back), {
+    Size = UDim2.new(0, 800, 0, 500)
+})
+
+local blurTween = TweenService:Create(blurFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+    BackgroundTransparency = 0.5
+})
+
+blurTween:Play()
+wait(0.2)
+openTween:Play()
+
+openTween.Completed:Connect(function()
+    switchTab("Global") -- Initialize with Global tab
+    showNotification("🎉 Welcome to Client Hub v2.0!", true)
+end)
+
+print("🚀 Client GUI v2.0 loaded successfully!")
