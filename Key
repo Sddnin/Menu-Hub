@@ -15,171 +15,12 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Variables
 local noclip = false
 local infiniteJump = false
+local antiAFK = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
 local jumpConnection
+local afkConnection
 local currentTab = "Home"
-local currentLanguage = "vi" -- "vi" or "en"
-local favoriteScripts = {} -- Max 3 favorites
-local antiAfkConnection
-
--- Persistent Storage System (using _G global storage)
-local storageKey = "MilaUI_Favorites_" .. tostring(player.UserId) .. "_" .. tostring(game.PlaceId)
-
-local function saveFavorites()
-    -- Convert favorites to simple format for storage
-    local saveData = {}
-    for _, script in ipairs(favoriteScripts) do
-        table.insert(saveData, {name = script.name, code = script.code})
-    end
-    
-    -- Save to global storage (_G persists across script reloads)
-    if not _G.MilaUI_Storage then
-        _G.MilaUI_Storage = {}
-    end
-    _G.MilaUI_Storage[storageKey] = saveData
-    
-    -- Also try to save in workspace for extra persistence
-    pcall(function()
-        local storage = workspace:FindFirstChild("MilaUI_Storage")
-        if not storage then
-            storage = Instance.new("Folder")
-            storage.Name = "MilaUI_Storage"
-            storage.Parent = workspace
-        end
-        
-        local playerData = storage:FindFirstChild("Player_" .. tostring(player.UserId))
-        if not playerData then
-            playerData = Instance.new("StringValue")
-            playerData.Name = "Player_" .. tostring(player.UserId)
-            playerData.Parent = storage
-        end
-        
-        playerData.Value = game:GetService("HttpService"):JSONEncode(saveData)
-    end)
-    
-    print("💾 Favorites saved successfully!")
-end
-
-local function loadFavorites()
-    favoriteScripts = {}
-    
-    -- Try to load from _G first
-    if _G.MilaUI_Storage and _G.MilaUI_Storage[storageKey] then
-        local savedData = _G.MilaUI_Storage[storageKey]
-        for _, scriptData in ipairs(savedData) do
-            -- Find the script in scriptsData to get complete info
-            for _, fullScript in ipairs(scriptsData) do
-                if fullScript.name == scriptData.name then
-                    table.insert(favoriteScripts, fullScript)
-                    break
-                end
-            end
-        end
-        print("✅ Loaded " .. #favoriteScripts .. " favorites from _G storage!")
-        return
-    end
-    
-    -- Fallback: Try to load from workspace
-    pcall(function()
-        local storage = workspace:FindFirstChild("MilaUI_Storage")
-        if storage then
-            local playerData = storage:FindFirstChild("Player_" .. tostring(player.UserId))
-            if playerData and playerData.Value ~= "" then
-                local savedData = game:GetService("HttpService"):JSONDecode(playerData.Value)
-                for _, scriptData in ipairs(savedData) do
-                    for _, fullScript in ipairs(scriptsData) do
-                        if fullScript.name == scriptData.name then
-                            table.insert(favoriteScripts, fullScript)
-                            break
-                        end
-                    end
-                end
-                
-                -- Also save to _G for faster access
-                if not _G.MilaUI_Storage then
-                    _G.MilaUI_Storage = {}
-                end
-                _G.MilaUI_Storage[storageKey] = savedData
-                
-                print("✅ Loaded " .. #favoriteScripts .. " favorites from workspace!")
-            end
-        end
-    end)
-end
-
--- Language System
-local translations = {
-    vi = {
-        home = "Home",
-        script = "Script", 
-        other = "Other",
-        speed = "🏃 Tốc độ",
-        jump = "🦘 Nhảy",
-        noclip = "👻 Xuyên tường",
-        fly = "🕊️ Bay",
-        infJump = "♾️ Vô hạn nhảy",
-        players = "📍 Người chơi",
-        resetCam = "📷 Reset Cam",
-        resetAll = "🔄 Reset tất cả",
-        searchScripts = "🔍 Tìm scripts...",
-        searchPlayers = "🔍 Tìm người chơi...",
-        execute = "▶ Thực thi",
-        favorite = "⭐ Yêu thích",
-        favoriteScripts = "⭐ Scripts yêu thích",
-        allScripts = "📜 Tất cả scripts",
-        musicPlayer = "Trình phát nhạc",
-        graphicsSettings = "Cài đặt đồ họa",
-        paintAlpha = "Paint-Alpha",
-        clientSettings = "Cài đặt Client",
-        otherFeatures = "🔧 Tính năng khác",
-        language = "🌐 Ngôn ngữ"
-    },
-    en = {
-        home = "Home",
-        script = "Script",
-        other = "Other", 
-        speed = "🏃 Speed",
-        jump = "🦘 Jump",
-        noclip = "👻 Noclip",
-        fly = "🕊️ Fly",
-        infJump = "♾️ Inf Jump",
-        players = "📍 Players",
-        resetCam = "📷 Reset Cam",
-        resetAll = "🔄 Reset All",
-        searchScripts = "🔍 Search scripts...",
-        searchPlayers = "🔍 Search players...",
-        execute = "▶ Execute",
-        favorite = "⭐ Favorite",
-        favoriteScripts = "⭐ Favorite Scripts",
-        allScripts = "📜 All Scripts",
-        musicPlayer = "Music Player",
-        graphicsSettings = "Graphics Settings", 
-        paintAlpha = "Paint-Alpha",
-        clientSettings = "Client Settings",
-        otherFeatures = "🔧 Other Features",
-        language = "🌐 Language"
-    }
-}
-
--- Anti-AFK System (Auto-start)
-local function startAntiAFK()
-    if antiAfkConnection then
-        antiAfkConnection:Disconnect()
-    end
-    
-    antiAfkConnection = RunService.Heartbeat:Connect(function()
-        pcall(function()
-            game:GetService("VirtualUser"):CaptureController()
-            game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-        end)
-    end)
-    
-    print("Anti-AFK activated! 🔄")
-end
-
--- Start Anti-AFK immediately
-startAntiAFK()
 
 -- UI Creation
 local screenGui = Instance.new("ScreenGui")
@@ -240,7 +81,7 @@ local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 20, 0, 20)
 closeBtn.Position = UDim2.new(1, -25, 0, 5)
 closeBtn.BackgroundColor3 = Color3.new(0.9, 0.4, 0.4)
-closeBtn.Text = "✕"
+closeBtn.Text = "❌"
 closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.TextSize = 12
 closeBtn.Font = Enum.Font.GothamBold
@@ -311,29 +152,22 @@ homeContent.ScrollBarThickness = 4
 homeContent.CanvasSize = UDim2.new(0, 0, 0, 250)
 homeContent.Parent = contentArea
 
--- Script Tab Content with Favorites
+-- Script Tab Content
 local scriptContent = Instance.new("ScrollingFrame")
 scriptContent.Name = "ScriptContent"
 scriptContent.Size = UDim2.new(1, 0, 1, 0)
 scriptContent.BackgroundTransparency = 1
 scriptContent.ScrollBarThickness = 6
-scriptContent.CanvasSize = UDim2.new(0, 0, 0, 700)
+scriptContent.CanvasSize = UDim2.new(0, 0, 0, 600)
 scriptContent.Visible = false
 scriptContent.Parent = contentArea
 
--- Script Tab Header
-local scriptHeader = Instance.new("Frame")
-scriptHeader.Size = UDim2.new(1, 0, 0, 60)
-scriptHeader.Position = UDim2.new(0, 0, 0, 0)
-scriptHeader.BackgroundTransparency = 1
-scriptHeader.Parent = scriptContent
-
 -- Search Bar for Scripts
 local searchFrame = Instance.new("Frame")
-searchFrame.Size = UDim2.new(1, 0, 0, 25)
+searchFrame.Size = UDim2.new(1, 0, 0, 30)
 searchFrame.Position = UDim2.new(0, 0, 0, 0)
 searchFrame.BackgroundTransparency = 1
-searchFrame.Parent = scriptHeader
+searchFrame.Parent = scriptContent
 
 local searchBox = Instance.new("TextBox")
 searchBox.Size = UDim2.new(1, -10, 1, 0)
@@ -350,49 +184,12 @@ local searchCorner = Instance.new("UICorner")
 searchCorner.CornerRadius = UDim.new(0, 5)
 searchCorner.Parent = searchBox
 
--- Category Buttons
-local categoryFrame = Instance.new("Frame")
-categoryFrame.Size = UDim2.new(1, 0, 0, 30)
-categoryFrame.Position = UDim2.new(0, 0, 0, 30)
-categoryFrame.BackgroundTransparency = 1
-categoryFrame.Parent = scriptHeader
-
-local allScriptsBtn = Instance.new("TextButton")
-allScriptsBtn.Size = UDim2.new(0, 120, 0, 25)
-allScriptsBtn.Position = UDim2.new(0, 5, 0, 2)
-allScriptsBtn.BackgroundColor3 = Color3.new(0.3, 0.6, 1)
-allScriptsBtn.Text = "📜 All Scripts"
-allScriptsBtn.TextColor3 = Color3.new(1, 1, 1)
-allScriptsBtn.TextSize = 10
-allScriptsBtn.Font = Enum.Font.Gotham
-allScriptsBtn.Parent = categoryFrame
-
-local allScriptsCorner = Instance.new("UICorner")
-allScriptsCorner.CornerRadius = UDim.new(0, 5)
-allScriptsCorner.Parent = allScriptsBtn
-
-local favScriptsBtn = Instance.new("TextButton")
-favScriptsBtn.Size = UDim2.new(0, 120, 0, 25)
-favScriptsBtn.Position = UDim2.new(0, 130, 0, 2)
-favScriptsBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-favScriptsBtn.Text = "⭐ Favorites"
-favScriptsBtn.TextColor3 = Color3.new(0.5, 0.5, 0.5)
-favScriptsBtn.TextSize = 10
-favScriptsBtn.Font = Enum.Font.Gotham
-favScriptsBtn.Parent = categoryFrame
-
-local favScriptsCorner = Instance.new("UICorner")
-favScriptsCorner.CornerRadius = UDim.new(0, 5)
-favScriptsCorner.Parent = favScriptsBtn
-
 -- Scripts Container
 local scriptsContainer = Instance.new("Frame")
-scriptsContainer.Size = UDim2.new(1, 0, 1, -70)
-scriptsContainer.Position = UDim2.new(0, 0, 0, 70)
+scriptsContainer.Size = UDim2.new(1, 0, 1, -40)
+scriptsContainer.Position = UDim2.new(0, 0, 0, 40)
 scriptsContainer.BackgroundTransparency = 1
 scriptsContainer.Parent = scriptContent
-
-local currentView = "all" -- "all" or "favorites"
 
 -- Loading Animation Frame
 local loadingFrame = Instance.new("Frame")
@@ -456,7 +253,7 @@ otherContent.Name = "OtherContent"
 otherContent.Size = UDim2.new(1, 0, 1, 0)
 otherContent.BackgroundTransparency = 1
 otherContent.ScrollBarThickness = 6
-otherContent.CanvasSize = UDim2.new(0, 0, 0, 560)
+otherContent.CanvasSize = UDim2.new(0, 0, 0, 480)
 otherContent.Visible = false
 otherContent.Parent = contentArea
 
@@ -471,72 +268,10 @@ otherHeader.TextSize = 14
 otherHeader.Font = Enum.Font.GothamBold
 otherHeader.Parent = otherContent
 
--- Language Feature
-local languageFrame = Instance.new("Frame")
-languageFrame.Size = UDim2.new(1, -10, 0, 60)
-languageFrame.Position = UDim2.new(0, 5, 0, 40)
-languageFrame.BackgroundColor3 = Color3.new(0.9, 0.95, 0.9)
-languageFrame.BorderSizePixel = 0
-languageFrame.Parent = otherContent
-
-local languageCorner = Instance.new("UICorner")
-languageCorner.CornerRadius = UDim.new(0, 8)
-languageCorner.Parent = languageFrame
-
-local languageIcon = Instance.new("TextLabel")
-languageIcon.Size = UDim2.new(0, 25, 0, 25)
-languageIcon.Position = UDim2.new(0, 10, 0, 8)
-languageIcon.BackgroundTransparency = 1
-languageIcon.Text = "🌐"
-languageIcon.TextColor3 = Color3.new(0.2, 0.6, 0.2)
-languageIcon.TextSize = 16
-languageIcon.Font = Enum.Font.Gotham
-languageIcon.Parent = languageFrame
-
-local languageTitle = Instance.new("TextLabel")
-languageTitle.Size = UDim2.new(1, -80, 0, 20)
-languageTitle.Position = UDim2.new(0, 40, 0, 5)
-languageTitle.BackgroundTransparency = 1
-languageTitle.Text = "Language / Ngôn ngữ"
-languageTitle.TextColor3 = Color3.new(0.1, 0.5, 0.1)
-languageTitle.TextSize = 11
-languageTitle.Font = Enum.Font.GothamBold
-languageTitle.TextXAlignment = Enum.TextXAlignment.Left
-languageTitle.Parent = languageFrame
-
--- Language Buttons
-local viBtn = Instance.new("TextButton")
-viBtn.Size = UDim2.new(0, 50, 0, 20)
-viBtn.Position = UDim2.new(0, 40, 0, 30)
-viBtn.BackgroundColor3 = currentLanguage == "vi" and Color3.new(0.3, 0.7, 0.3) or Color3.new(0.8, 0.8, 0.8)
-viBtn.Text = "🇻🇳 VI"
-viBtn.TextColor3 = Color3.new(1, 1, 1)
-viBtn.TextSize = 9
-viBtn.Font = Enum.Font.Gotham
-viBtn.Parent = languageFrame
-
-local viBtnCorner = Instance.new("UICorner")
-viBtnCorner.CornerRadius = UDim.new(0, 4)
-viBtnCorner.Parent = viBtn
-
-local enBtn = Instance.new("TextButton")
-enBtn.Size = UDim2.new(0, 50, 0, 20)
-enBtn.Position = UDim2.new(0, 95, 0, 30)
-enBtn.BackgroundColor3 = currentLanguage == "en" and Color3.new(0.3, 0.7, 0.3) or Color3.new(0.8, 0.8, 0.8)
-enBtn.Text = "🇺🇸 EN"
-enBtn.TextColor3 = Color3.new(1, 1, 1)
-enBtn.TextSize = 9
-enBtn.Font = Enum.Font.Gotham
-enBtn.Parent = languageFrame
-
-local enBtnCorner = Instance.new("UICorner")
-enBtnCorner.CornerRadius = UDim.new(0, 4)
-enBtnCorner.Parent = enBtn
-
 -- Music Feature
 local musicFrame = Instance.new("Frame")
 musicFrame.Size = UDim2.new(1, -10, 0, 80)
-musicFrame.Position = UDim2.new(0, 5, 0, 110)
+musicFrame.Position = UDim2.new(0, 5, 0, 40)
 musicFrame.BackgroundColor3 = Color3.new(0.95, 0.9, 1)
 musicFrame.BorderSizePixel = 0
 musicFrame.Parent = otherContent
@@ -594,7 +329,7 @@ musicBtnCorner.Parent = musicButton
 -- Graphics Feature
 local graphicsFrame = Instance.new("Frame")
 graphicsFrame.Size = UDim2.new(1, -10, 0, 80)
-graphicsFrame.Position = UDim2.new(0, 5, 0, 200)
+graphicsFrame.Position = UDim2.new(0, 5, 0, 130)
 graphicsFrame.BackgroundColor3 = Color3.new(0.9, 0.95, 1)
 graphicsFrame.BorderSizePixel = 0
 graphicsFrame.Parent = otherContent
@@ -639,7 +374,7 @@ local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
 graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
-graphicsButton.Text = "🎨 Open Graphics"
+graphicsButton.Text = "🎮 Open Graphics"
 graphicsButton.TextColor3 = Color3.new(1, 1, 1)
 graphicsButton.TextSize = 10
 graphicsButton.Font = Enum.Font.Gotham
@@ -652,7 +387,7 @@ graphicsBtnCorner.Parent = graphicsButton
 -- Paint-Alpha Feature
 local paintFrame = Instance.new("Frame")
 paintFrame.Size = UDim2.new(1, -10, 0, 80)
-paintFrame.Position = UDim2.new(0, 5, 0, 290)
+paintFrame.Position = UDim2.new(0, 5, 0, 220)
 paintFrame.BackgroundColor3 = Color3.new(1, 0.9, 0.95)
 paintFrame.BorderSizePixel = 0
 paintFrame.Parent = otherContent
@@ -710,7 +445,7 @@ paintBtnCorner.Parent = paintButton
 -- Client Feature
 local clientFrame = Instance.new("Frame")
 clientFrame.Size = UDim2.new(1, -10, 0, 80)
-clientFrame.Position = UDim2.new(0, 5, 0, 380)
+clientFrame.Position = UDim2.new(0, 5, 0, 310)
 clientFrame.BackgroundColor3 = Color3.new(0.9, 1, 0.9)
 clientFrame.BorderSizePixel = 0
 clientFrame.Parent = otherContent
@@ -924,12 +659,10 @@ local function showLoadingAnimation(scriptName)
     end
 end
 
-local function createScriptButton(scriptData, position, showFavButton)
-    showFavButton = showFavButton ~= false -- Default to true
-    
+local function createScriptButton(scriptData, position)
     local scriptFrame = Instance.new("Frame")
     scriptFrame.Name = scriptData.name:gsub("%s", "")
-    scriptFrame.Size = UDim2.new(0, 170, 0, showFavButton and 80 or 60)
+    scriptFrame.Size = UDim2.new(0, 180, 0, 60)
     scriptFrame.Position = position
     scriptFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
     scriptFrame.BorderSizePixel = 0
@@ -941,56 +674,30 @@ local function createScriptButton(scriptData, position, showFavButton)
     
     -- Script Name
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, -10, 0, 20)
+    nameLabel.Size = UDim2.new(1, -10, 0, 25)
     nameLabel.Position = UDim2.new(0, 5, 0, 5)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = scriptData.name
     nameLabel.TextColor3 = Color3.new(0.2, 0.2, 0.2)
-    nameLabel.TextSize = 11
+    nameLabel.TextSize = 12
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.Parent = scriptFrame
     
-    -- Execute Button
+    -- Execute Button (centered)
     local executeBtn = Instance.new("TextButton")
-    executeBtn.Size = UDim2.new(0, 100, 0, 25)
-    executeBtn.Position = UDim2.new(0, 5, 0, 30)
+    executeBtn.Size = UDim2.new(0, 120, 0, 25)
+    executeBtn.Position = UDim2.new(0, 30, 0, 30)
     executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
     executeBtn.Text = "▶ Execute"
     executeBtn.TextColor3 = Color3.new(1, 1, 1)
-    executeBtn.TextSize = 10
+    executeBtn.TextSize = 11
     executeBtn.Font = Enum.Font.Gotham
     executeBtn.Parent = scriptFrame
     
     local executeCorner = Instance.new("UICorner")
     executeCorner.CornerRadius = UDim.new(0, 5)
     executeCorner.Parent = executeBtn
-    
-    -- Favorite Button (only in "all" view)
-    local favBtn
-    if showFavButton then
-        local isFavorited = false
-        for _, favScript in ipairs(favoriteScripts) do
-            if favScript.name == scriptData.name then
-                isFavorited = true
-                break
-            end
-        end
-        
-        favBtn = Instance.new("TextButton")
-        favBtn.Size = UDim2.new(0, 60, 0, 25)
-        favBtn.Position = UDim2.new(0, 110, 0, 30)
-        favBtn.BackgroundColor3 = isFavorited and Color3.new(1, 0.8, 0.2) or Color3.new(0.8, 0.8, 0.8)
-        favBtn.Text = isFavorited and "⭐" or "☆"
-        favBtn.TextColor3 = Color3.new(1, 1, 1)
-        favBtn.TextSize = 12
-        favBtn.Font = Enum.Font.Gotham
-        favBtn.Parent = scriptFrame
-        
-        local favCorner = Instance.new("UICorner")
-        favCorner.CornerRadius = UDim.new(0, 5)
-        favCorner.Parent = favBtn
-    end
     
     -- Button Events
     executeBtn.MouseButton1Click:Connect(function()
@@ -1002,50 +709,6 @@ local function createScriptButton(scriptData, position, showFavButton)
             loadstring(scriptData.code)()
         end)
     end)
-    
-    if favBtn then
-        favBtn.MouseButton1Click:Connect(function()
-            local isFavorited = false
-            local favIndex = 0
-            
-            for i, favScript in ipairs(favoriteScripts) do
-                if favScript.name == scriptData.name then
-                    isFavorited = true
-                    favIndex = i
-                    break
-                end
-            end
-            
-            if isFavorited then
-                -- Remove from favorites
-                table.remove(favoriteScripts, favIndex)
-                favBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-                favBtn.Text = "☆"
-                saveFavorites() -- Save after removing
-                print("❌ Removed '" .. scriptData.name .. "' from favorites")
-            else
-                -- Add to favorites (max 3)
-                if #favoriteScripts < 3 then
-                    table.insert(favoriteScripts, scriptData)
-                    favBtn.BackgroundColor3 = Color3.new(1, 0.8, 0.2)
-                    favBtn.Text = "⭐"
-                    saveFavorites() -- Save after adding
-                    print("⭐ Added '" .. scriptData.name .. "' to favorites")
-                else
-                    -- Show message: Max 3 favorites
-                    loadingText.Text = "Max 3 favorites!"
-                    loadingFrame.Visible = true
-                    wait(1)
-                    loadingFrame.Visible = false
-                end
-            end
-            
-            -- Update favorites view if currently viewing it
-            if currentView == "favorites" then
-                updateScriptList("")
-            end
-        end)
-    end
     
     -- Hover effects
     executeBtn.MouseEnter:Connect(function()
@@ -1070,59 +733,23 @@ local function updateScriptList(searchTerm)
     searchTerm = searchTerm:lower()
     local row, col = 0, 0
     local totalHeight = 0
-    local scriptsToShow = {}
     
-    if currentView == "favorites" then
-        scriptsToShow = favoriteScripts
-    else
-        scriptsToShow = scriptsData
-    end
-    
-    for _, scriptData in ipairs(scriptsToShow) do
+    for _, scriptData in ipairs(scriptsData) do
         if searchTerm == "" or scriptData.name:lower():find(searchTerm) then
-            local position = UDim2.new(0, col * 180, 0, row * 90)
-            local showFavButton = currentView == "all"
-            createScriptButton(scriptData, position, showFavButton)
+            local position = UDim2.new(0, col * 190, 0, row * 70)
+            createScriptButton(scriptData, position)
             
             col = col + 1
             if col >= 2 then
                 col = 0
                 row = row + 1
             end
-            totalHeight = (row + 1) * 90
+            totalHeight = (row + 1) * 70
         end
     end
     
     scriptsContainer.Size = UDim2.new(1, 0, 0, math.max(totalHeight, 400))
-    scriptContent.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 80)
-end
-
-local function updateLanguage()
-    local lang = translations[currentLanguage]
-    
-    -- Update tab buttons
-    for name, tabData in pairs(tabButtons) do
-        if name == "Home" then
-            tabData.button.Text = lang.home
-        elseif name == "Script" then
-            tabData.button.Text = lang.script
-        elseif name == "Other" then
-            tabData.button.Text = lang.other
-        end
-    end
-    
-    -- Update search placeholders
-    searchBox.PlaceholderText = lang.searchScripts
-    playerSearchBox.PlaceholderText = lang.searchPlayers
-    
-    -- Update category buttons
-    allScriptsBtn.Text = lang.allScripts
-    favScriptsBtn.Text = lang.favoriteScripts
-    
-    -- Update other header
-    otherHeader.Text = lang.otherFeatures
-    
-    -- Note: Home buttons will be updated when created
+    scriptContent.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 50)
 end
 
 local function updatePlayerList(searchTerm)
@@ -1279,71 +906,114 @@ local function loadFlyScript()
     end)
 end
 
--- Create Home Tab Buttons (with language support)
-local function createHomeButtons()
-    local lang = translations[currentLanguage]
+local function toggleAntiAFK()
+    antiAFK = true
     
-    createButton("SpeedButton", lang.speed, UDim2.new(0, 8, 0, 60), function()
-        local speed = tonumber(speedSlider.Text) or 16
-        humanoid.WalkSpeed = speed
-        speedLabel.Text = "Speed: " .. speed
+    -- Anti-AFK system
+    afkConnection = game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end)
-
-    createButton("JumpButton", lang.jump, UDim2.new(0, 110, 0, 60), function()
-        local jump = tonumber(jumpSlider.Text) or 50
-        humanoid.JumpPower = jump
-        jumpLabel.Text = "Jump: " .. jump
-    end)
-
-    createButton("NoclipButton", lang.noclip, UDim2.new(0, 212, 0, 60), function()
-        toggleNoclip()
-    end)
-
-    createButton("FlyButton", lang.fly, UDim2.new(0, 8, 0, 95), function()
-        loadFlyScript()
-    end)
-
-    createButton("InfiniteJumpButton", lang.infJump, UDim2.new(0, 110, 0, 95), function()
-        toggleInfiniteJump()
-    end)
-
-    createButton("TeleportButton", lang.players, UDim2.new(0, 212, 0, 95), function()
-        playerFrame.Visible = not playerFrame.Visible
-        if playerFrame.Visible then
-            updatePlayerList("")
-        end
-    end)
-
-    createButton("CameraButton", lang.resetCam, UDim2.new(0, 8, 0, 130), function()
-        resetCamera()
-    end)
-
-    createButton("ResetButton", lang.resetAll, UDim2.new(0, 110, 0, 130), function()
-        humanoid.WalkSpeed = originalWalkSpeed
-        humanoid.JumpPower = originalJumpPower
-        noclip = false
-        infiniteJump = false
-        if jumpConnection then
-            jumpConnection:Disconnect()
-            jumpConnection = nil
-        end
-        speedSlider.Text = "16"
-        jumpSlider.Text = "50"
-        speedLabel.Text = "Speed: 16"
-        jumpLabel.Text = "Jump: 50"
-        playerFrame.Visible = false
-        resetCamera()
-        
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.CanCollide = true
+    
+    -- Additional anti-AFK measures
+    spawn(function()
+        while antiAFK do
+            wait(60) -- Every minute
+            if antiAFK then
+                -- Slight camera movement to prevent AFK detection
+                local camera = workspace.CurrentCamera
+                if camera then
+                    camera.CFrame = camera.CFrame * CFrame.Angles(0, math.rad(0.1), 0)
+                    wait(0.1)
+                    camera.CFrame = camera.CFrame * CFrame.Angles(0, math.rad(-0.1), 0)
+                end
             end
         end
     end)
 end
 
--- Initialize home buttons
-createHomeButtons()
+-- Create Home Tab Buttons
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 8, 0, 60), function()
+    local speed = tonumber(speedSlider.Text) or 16
+    humanoid.WalkSpeed = speed
+    speedLabel.Text = "Speed: " .. speed
+end)
+
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 110, 0, 60), function()
+    local jump = tonumber(jumpSlider.Text) or 50
+    humanoid.JumpPower = jump
+    jumpLabel.Text = "Jump: " .. jump
+end)
+
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 212, 0, 60), function()
+    toggleNoclip()
+end)
+
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 8, 0, 95), function()
+    loadFlyScript()
+end)
+
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 110, 0, 95), function()
+    toggleInfiniteJump()
+end)
+
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 212, 0, 95), function()
+    playerFrame.Visible = not playerFrame.Visible
+    if playerFrame.Visible then
+        updatePlayerList("")
+    end
+end)
+
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 8, 0, 130), function()
+    resetCamera()
+end)
+
+createButton("AntiAFKButton", "⚡ Anti-AFK", UDim2.new(0, 110, 0, 130), function()
+    toggleAntiAFK()
+    -- Visual feedback
+    local btn = homeContent:FindFirstChild("AntiAFKButton")
+    if btn then
+        btn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
+        btn.Text = "✅ Anti-AFK ON"
+        wait(1)
+        btn.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
+    end
+end)
+
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 212, 0, 130), function()
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+    noclip = false
+    infiniteJump = false
+    antiAFK = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    if afkConnection then
+        afkConnection:Disconnect()
+        afkConnection = nil
+    end
+    speedSlider.Text = "16"
+    jumpSlider.Text = "50"
+    speedLabel.Text = "Speed: 16"
+    jumpLabel.Text = "Jump: 50"
+    playerFrame.Visible = false
+    resetCamera()
+    
+    -- Reset Anti-AFK button
+    local btn = homeContent:FindFirstChild("AntiAFKButton")
+    if btn then
+        btn.Text = "⚡ Anti-AFK"
+        btn.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
+    end
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = true
+        end
+    end
+end)
 
 -- Other Tab Button Events
 musicButton.MouseButton1Click:Connect(function()
@@ -1418,66 +1088,6 @@ clientButton.MouseLeave:Connect(function()
     clientButton.BackgroundColor3 = Color3.new(0.3, 0.8, 0.3)
 end)
 
--- Language Button Events
-viBtn.MouseButton1Click:Connect(function()
-    if currentLanguage ~= "vi" then
-        currentLanguage = "vi"
-        viBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
-        enBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        
-        -- Clear and recreate home buttons
-        for _, child in pairs(homeContent:GetChildren()) do
-            if child:IsA("TextButton") then
-                child:Destroy()
-            end
-        end
-        createHomeButtons()
-        updateLanguage()
-    end
-end)
-
-enBtn.MouseButton1Click:Connect(function()
-    if currentLanguage ~= "en" then
-        currentLanguage = "en"
-        enBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
-        viBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        
-        -- Clear and recreate home buttons
-        for _, child in pairs(homeContent:GetChildren()) do
-            if child:IsA("TextButton") then
-                child:Destroy()
-            end
-        end
-        createHomeButtons()
-        updateLanguage()
-    end
-end)
-
--- Category Button Events
-allScriptsBtn.MouseButton1Click:Connect(function()
-    if currentView ~= "all" then
-        currentView = "all"
-        allScriptsBtn.BackgroundColor3 = Color3.new(0.3, 0.6, 1)
-        allScriptsBtn.TextColor3 = Color3.new(1, 1, 1)
-        favScriptsBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        favScriptsBtn.TextColor3 = Color3.new(0.5, 0.5, 0.5)
-        updateScriptList("")
-        searchBox.Text = ""
-    end
-end)
-
-favScriptsBtn.MouseButton1Click:Connect(function()
-    if currentView ~= "favorites" then
-        currentView = "favorites"
-        favScriptsBtn.BackgroundColor3 = Color3.new(1, 0.8, 0.2)
-        favScriptsBtn.TextColor3 = Color3.new(1, 1, 1)
-        allScriptsBtn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        allScriptsBtn.TextColor3 = Color3.new(0.5, 0.5, 0.5)
-        updateScriptList("")
-        searchBox.Text = ""
-    end
-end)
-
 -- Tab button events
 for tabName, tabData in pairs(tabButtons) do
     tabData.button.MouseButton1Click:Connect(function()
@@ -1543,35 +1153,15 @@ player.CharacterAdded:Connect(function(newCharacter)
     humanoid = character:WaitForChild("Humanoid")
     noclip = false
     infiniteJump = false
+    -- Keep anti-AFK running after respawn
     if jumpConnection then
         jumpConnection:Disconnect()
         jumpConnection = nil
     end
-    -- Restart Anti-AFK
-    startAntiAFK()
     wait(1)
     humanoid.WalkSpeed = originalWalkSpeed
     humanoid.JumpPower = originalJumpPower
 end)
 
--- Initialize everything
-wait(2) -- Wait for game to fully load and scripts data to be ready
-loadFavorites() -- Load saved favorites
-updateLanguage()
-
--- Auto-save favorites every 60 seconds (reduced frequency)
-spawn(function()
-    while true do
-        wait(60)
-        if #favoriteScripts > 0 then
-            saveFavorites()
-        end
-    end
-end)
-
-print("Mila UI (Full Version) đã được tải thành công! 💖")
-print("✅ Anti-AFK activated automatically!")
-print("✅ Language support: Vietnamese & English") 
-print("✅ Favorite system: Up to 3 scripts (Auto-saved)")
-print("✅ Persistent favorites: Saved across script reloads!")
+print("Mila UI (Tab Design) đã được tải thành công! 💖")
 print("Nhấn Right Shift để bật/tắt UI")
