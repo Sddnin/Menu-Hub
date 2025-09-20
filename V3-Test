@@ -1,18 +1,55 @@
--- Roblox Command UI - Compact Version
--- Hệ thống lệnh với ô nhập chat, UI nhỏ gọn
+-- Roblox Command UI - Ultimate Edition
+-- Hệ thống lệnh với nhiều tính năng nâng cao
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local TeleportService = game:GetService("TeleportService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Biến lưu trạng thái
 local isNoclip = false
+local isAntiAFK = false
+local isInfJump = false
+local isAntiKick = false
+local isFakeLag = false
+local isAutoClicker = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
 local isMinimized = false
+local currentTheme = "dark"
+local antiAFKConnection, infJumpConnection, noclipConnection, antiKickConnection, fakeLagConnection, autoClickConnection
+
+-- Themes
+local themes = {
+    dark = {
+        main = Color3.fromRGB(25, 25, 25),
+        secondary = Color3.fromRGB(40, 40, 40),
+        accent = Color3.fromRGB(60, 120, 220),
+        text = Color3.fromRGB(255, 255, 255),
+        output = Color3.fromRGB(15, 15, 15),
+        help = Color3.fromRGB(30, 30, 30)
+    },
+    light = {
+        main = Color3.fromRGB(240, 240, 240),
+        secondary = Color3.fromRGB(220, 220, 220),
+        accent = Color3.fromRGB(70, 130, 250),
+        text = Color3.fromRGB(0, 0, 0),
+        output = Color3.fromRGB(255, 255, 255),
+        help = Color3.fromRGB(230, 230, 230)
+    },
+    rgb = {
+        main = Color3.fromRGB(50, 0, 50),
+        secondary = Color3.fromRGB(80, 0, 80),
+        accent = Color3.fromRGB(255, 0, 255),
+        text = Color3.fromRGB(255, 255, 255),
+        output = Color3.fromRGB(20, 0, 20),
+        help = Color3.fromRGB(60, 0, 60)
+    }
+}
 
 -- Tạo ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -20,53 +57,69 @@ screenGui.Name = "CommandUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Frame chính (ngang và nhỏ hơn)
+-- Frame chính
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 280)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -140)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Size = UDim2.new(0, 600, 0, 380)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -190)
+mainFrame.BackgroundColor3 = themes[currentTheme].main
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
 local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.CornerRadius = UDim.new(0, 12)
 mainCorner.Parent = mainFrame
 
 -- Title bar
 local titleBar = Instance.new("Frame")
 titleBar.Name = "TitleBar"
-titleBar.Size = UDim2.new(1, 0, 0, 35)
-titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+titleBar.Size = UDim2.new(1, 0, 0, 45)
+titleBar.BackgroundColor3 = themes[currentTheme].secondary
 titleBar.BorderSizePixel = 0
 titleBar.Parent = mainFrame
 
 local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.CornerRadius = UDim.new(0, 12)
 titleCorner.Parent = titleBar
 
 local titleText = Instance.new("TextLabel")
-titleText.Size = UDim2.new(1, -100, 1, 0)
-titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.Size = UDim2.new(1, -140, 1, 0)
+titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "⚡ Command Console"
-titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleText.TextSize = 14
+titleText.Text = "🚀 Ultimate Command Hub V2"
+titleText.TextColor3 = themes[currentTheme].text
+titleText.TextSize = 16
 titleText.TextXAlignment = Enum.TextXAlignment.Left
 titleText.Font = Enum.Font.GothamBold
 titleText.Parent = titleBar
 
+-- Theme button
+local themeButton = Instance.new("TextButton")
+themeButton.Size = UDim2.new(0, 35, 0, 35)
+themeButton.Position = UDim2.new(1, -105, 0, 5)
+themeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+themeButton.BorderSizePixel = 0
+themeButton.Text = "🎨"
+themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+themeButton.TextSize = 16
+themeButton.Font = Enum.Font.GothamBold
+themeButton.Parent = titleBar
+
+local themeCorner = Instance.new("UICorner")
+themeCorner.CornerRadius = UDim.new(0, 8)
+themeCorner.Parent = themeButton
+
 -- Minimize button
 local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0, 25, 0, 25)
-minimizeButton.Position = UDim2.new(1, -60, 0, 5)
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -65, 0, 7)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Text = "−"
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.TextSize = 14
+minimizeButton.TextSize = 16
 minimizeButton.Font = Enum.Font.GothamBold
 minimizeButton.Parent = titleBar
 
@@ -76,13 +129,13 @@ minimizeCorner.Parent = minimizeButton
 
 -- Close button
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 25, 0, 25)
-closeButton.Position = UDim2.new(1, -30, 0, 5)
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -30, 0, 7)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
 closeButton.BorderSizePixel = 0
 closeButton.Text = "✕"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextSize = 12
+closeButton.TextSize = 14
 closeButton.Font = Enum.Font.GothamBold
 closeButton.Parent = titleBar
 
@@ -90,25 +143,25 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 6)
 closeCorner.Parent = closeButton
 
--- Content frame (có thể ẩn khi minimize)
+-- Content frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 1, -35)
-contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.Size = UDim2.new(1, 0, 1, -45)
+contentFrame.Position = UDim2.new(0, 0, 0, 45)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
--- Chat output frame (nhỏ hơn, ngang)
+-- Chat output frame
 local outputFrame = Instance.new("Frame")
 outputFrame.Name = "OutputFrame"
-outputFrame.Size = UDim2.new(0.6, -10, 1, -50)
+outputFrame.Size = UDim2.new(0.55, -10, 1, -50)
 outputFrame.Position = UDim2.new(0, 10, 0, 5)
-outputFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+outputFrame.BackgroundColor3 = themes[currentTheme].output
 outputFrame.BorderSizePixel = 0
 outputFrame.Parent = contentFrame
 
 local outputCorner = Instance.new("UICorner")
-outputCorner.CornerRadius = UDim.new(0, 6)
+outputCorner.CornerRadius = UDim.new(0, 8)
 outputCorner.Parent = outputFrame
 
 local outputScroll = Instance.new("ScrollingFrame")
@@ -124,17 +177,17 @@ outputLayout.SortOrder = Enum.SortOrder.LayoutOrder
 outputLayout.Padding = UDim.new(0, 2)
 outputLayout.Parent = outputScroll
 
--- Help frame bên phải
+-- Help frame
 local helpFrame = Instance.new("Frame")
 helpFrame.Name = "HelpFrame"
-helpFrame.Size = UDim2.new(0.4, -10, 1, -50)
-helpFrame.Position = UDim2.new(0.6, 0, 0, 5)
-helpFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+helpFrame.Size = UDim2.new(0.45, -10, 1, -50)
+helpFrame.Position = UDim2.new(0.55, 0, 0, 5)
+helpFrame.BackgroundColor3 = themes[currentTheme].help
 helpFrame.BorderSizePixel = 0
 helpFrame.Parent = contentFrame
 
 local helpCorner = Instance.new("UICorner")
-helpCorner.CornerRadius = UDim.new(0, 6)
+helpCorner.CornerRadius = UDim.new(0, 8)
 helpCorner.Parent = helpFrame
 
 local helpScroll = Instance.new("ScrollingFrame")
@@ -146,52 +199,75 @@ helpScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 70)
 helpScroll.Parent = helpFrame
 
 local helpText = Instance.new("TextLabel")
-helpText.Size = UDim2.new(1, -5, 0, 300)
+helpText.Size = UDim2.new(1, -5, 0, 1000)
 helpText.Position = UDim2.new(0, 2, 0, 0)
 helpText.BackgroundTransparency = 1
-helpText.Text = [[💡 LỆNH CƠ BẢN:
+helpText.Text = [[🚀 LỆNH CƠ BẢN:
+speed [số] | unspeed - Tốc độ
+jump [số] | unjump - Sức nhảy  
+fly - Vehicle Fly GUI
+noclip | unnoclip - Xuyên tường
+antiafk | unantiafk - Chống AFK
+infjump | uninfjump - Nhảy vô hạn
+reset - Làm mới nhân vật
+clear - Xóa chat
 
-🏃 speed [số] - Tăng tốc độ
-   unspeed - Tắt tốc độ
+🆕 TÍNH NĂNG MỚI:
+tp [tên] - Teleport đến người chơi
+antikick | unantikick - Chống kick/ban
+fakelag | unfakelag - Fake lag
+autoclick | unautoclick - Auto clicker
+serverinfo - Thông tin server
+rejoin - Vào lại server
+serverhop - Đổi server
+theme - Đổi theme UI
 
-🦘 jump [số] - Tăng sức nhảy  
-   unjump - Tắt sức nhảy
+⚡ SCRIPT HUB:
+iy - Infinite Yield
+airflow - AirFlow Hub
+h4x - H4X Scripts  
+r15 - FE Emotes GUI
+skull - Skull Hub
+nameless - Nameless Admin
+nathub - NatHub
+arceus - Arceus X V3
+shader - PShade Ultimate
+native - Native Script
+nolag - No Lag Hub
+micup - I Wanna Run Away
+speedhub - Speed Hub X
+lunor - Lunor Hub
+thunderz - ThunderZ
 
-✈️ fly - Bật Vehicle Fly GUI
-   (Script từ GitHub)
-
-👻 noclip - Đi xuyên tường
-   unnoclip - Tắt xuyên tường
-
-🔄 reset - Làm mới nhân vật
-   clear - Xóa chat
+🎨 THEMES: dark, light, rgb
 
 VÍ DỤ:
-> speed 150
-> fly
-> noclip
-> reset]]
-helpText.TextColor3 = Color3.fromRGB(180, 180, 180)
-helpText.TextSize = 10
+> speed 200
+> tp Player1
+> antikick
+> serverinfo
+> theme rgb]]
+helpText.TextColor3 = themes[currentTheme].text
+helpText.TextSize = 9
 helpText.TextXAlignment = Enum.TextXAlignment.Left
 helpText.TextYAlignment = Enum.TextYAlignment.Top
 helpText.Font = Enum.Font.Gotham
 helpText.TextWrapped = true
 helpText.Parent = helpScroll
 
-helpScroll.CanvasSize = UDim2.new(0, 0, 0, 300)
+helpScroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
 
 -- Chat input frame
 local inputFrame = Instance.new("Frame")
 inputFrame.Name = "InputFrame"
 inputFrame.Size = UDim2.new(1, -20, 0, 35)
 inputFrame.Position = UDim2.new(0, 10, 1, -40)
-inputFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+inputFrame.BackgroundColor3 = themes[currentTheme].secondary
 inputFrame.BorderSizePixel = 0
 inputFrame.Parent = contentFrame
 
 local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 6)
+inputCorner.CornerRadius = UDim.new(0, 8)
 inputCorner.Parent = inputFrame
 
 local chatInput = Instance.new("TextBox")
@@ -200,9 +276,9 @@ chatInput.Size = UDim2.new(1, -60, 1, -8)
 chatInput.Position = UDim2.new(0, 8, 0, 4)
 chatInput.BackgroundTransparency = 1
 chatInput.Text = ""
-chatInput.PlaceholderText = "Nhập lệnh..."
+chatInput.PlaceholderText = "Nhập lệnh hoặc script..."
 chatInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-chatInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+chatInput.TextColor3 = themes[currentTheme].text
 chatInput.TextSize = 12
 chatInput.TextXAlignment = Enum.TextXAlignment.Left
 chatInput.Font = Enum.Font.Gotham
@@ -213,7 +289,7 @@ local sendButton = Instance.new("TextButton")
 sendButton.Name = "SendButton"
 sendButton.Size = UDim2.new(0, 45, 0, 27)
 sendButton.Position = UDim2.new(1, -49, 0, 4)
-sendButton.BackgroundColor3 = Color3.fromRGB(60, 120, 220)
+sendButton.BackgroundColor3 = themes[currentTheme].accent
 sendButton.BorderSizePixel = 0
 sendButton.Text = "Gửi"
 sendButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -225,7 +301,38 @@ local sendCorner = Instance.new("UICorner")
 sendCorner.CornerRadius = UDim.new(0, 4)
 sendCorner.Parent = sendButton
 
--- Hàm thêm tin nhắn vào output
+-- Hàm cập nhật theme
+local function updateTheme()
+    mainFrame.BackgroundColor3 = themes[currentTheme].main
+    titleBar.BackgroundColor3 = themes[currentTheme].secondary
+    titleText.TextColor3 = themes[currentTheme].text
+    outputFrame.BackgroundColor3 = themes[currentTheme].output
+    helpFrame.BackgroundColor3 = themes[currentTheme].help
+    helpText.TextColor3 = themes[currentTheme].text
+    inputFrame.BackgroundColor3 = themes[currentTheme].secondary
+    chatInput.TextColor3 = themes[currentTheme].text
+    sendButton.BackgroundColor3 = themes[currentTheme].accent
+    
+    -- RGB animation
+    if currentTheme == "rgb" then
+        spawn(function()
+            while currentTheme == "rgb" do
+                for i = 0, 1, 0.01 do
+                    if currentTheme ~= "rgb" then break end
+                    local r = math.sin(i * math.pi * 2) * 0.5 + 0.5
+                    local g = math.sin((i + 0.33) * math.pi * 2) * 0.5 + 0.5
+                    local b = math.sin((i + 0.66) * math.pi * 2) * 0.5 + 0.5
+                    
+                    titleBar.BackgroundColor3 = Color3.fromRGB(r * 100 + 50, g * 100 + 50, b * 100 + 50)
+                    sendButton.BackgroundColor3 = Color3.fromRGB(r * 255, g * 255, b * 255)
+                    wait(0.1)
+                end
+            end
+        end)
+    end
+end
+
+-- Hàm thêm tin nhắn
 local function addMessage(message, color)
     local msgFrame = Instance.new("Frame")
     msgFrame.Size = UDim2.new(1, -5, 0, 16)
@@ -236,23 +343,23 @@ local function addMessage(message, color)
     msgText.Size = UDim2.new(1, 0, 1, 0)
     msgText.BackgroundTransparency = 1
     msgText.Text = message
-    msgText.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+    msgText.TextColor3 = color or themes[currentTheme].text
     msgText.TextSize = 10
     msgText.TextXAlignment = Enum.TextXAlignment.Left
     msgText.Font = Enum.Font.Gotham
+    msgText.TextWrapped = true
     msgText.Parent = msgFrame
     
-    -- Auto scroll to bottom
     outputScroll.CanvasSize = UDim2.new(0, 0, 0, outputLayout.AbsoluteContentSize.Y + 5)
     outputScroll.CanvasPosition = Vector2.new(0, outputScroll.CanvasSize.Y.Offset)
 end
 
--- Các hàm xử lý lệnh
+-- Các hàm xử lý lệnh cơ bản (giữ nguyên)
 local function setSpeed(speed)
     local num = tonumber(speed)
     if num and player.Character and player.Character:FindFirstChild("Humanoid") then
         player.Character.Humanoid.WalkSpeed = num
-        addMessage("✅ Tốc độ: " .. num, Color3.fromRGB(100, 255, 100))
+        addMessage("🏃 Tốc độ: " .. num, Color3.fromRGB(100, 255, 100))
     else
         addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
     end
@@ -269,7 +376,7 @@ local function setJump(power)
     local num = tonumber(power)
     if num and player.Character and player.Character:FindFirstChild("Humanoid") then
         player.Character.Humanoid.JumpPower = num
-        addMessage("✅ Sức nhảy: " .. num, Color3.fromRGB(100, 255, 100))
+        addMessage("🦘 Sức nhảy: " .. num, Color3.fromRGB(100, 255, 100))
     else
         addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
     end
@@ -282,53 +389,217 @@ local function resetJump()
     end
 end
 
-local function loadVehicleFly()
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
-        addMessage("✈️ Đã tải Vehicle Fly GUI", Color3.fromRGB(100, 255, 100))
-    end)
+-- Teleport to player
+local function teleportToPlayer(targetName)
+    local targetPlayer = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
+            targetPlayer = p
+            break
+        end
+    end
+    
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            addMessage("📍 Đã teleport đến " .. targetPlayer.Name, Color3.fromRGB(100, 255, 100))
+        end
+    else
+        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
+    end
 end
 
-local noclipConnection
-local function startNoclip()
-    if isNoclip then 
-        addMessage("⚠️ Noclip đã bật!", Color3.fromRGB(255, 200, 100))
+-- Anti Kick/Ban
+local function startAntiKick()
+    if isAntiKick then 
+        addMessage("⚠️ Anti Kick đã bật!", Color3.fromRGB(255, 200, 100))
         return 
     end
     
+    isAntiKick = true
+    addMessage("🛡️ Bật Anti Kick/Ban", Color3.fromRGB(100, 255, 100))
+    
+    local oldNamecall = nil
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        if isAntiKick and getnamecallmethod() == "Kick" then
+            return
+        end
+        return oldNamecall(self, ...)
+    end)
+end
+
+local function stopAntiKick()
+    isAntiKick = false
+    addMessage("✅ Tắt Anti Kick", Color3.fromRGB(100, 255, 100))
+end
+
+-- Fake Lag
+local function startFakeLag()
+    if isFakeLag then 
+        addMessage("⚠️ Fake Lag đã bật!", Color3.fromRGB(255, 200, 100))
+        return 
+    end
+    
+    isFakeLag = true
+    addMessage("⚡ Bật Fake Lag", Color3.fromRGB(100, 255, 100))
+    
+    fakeLagConnection = RunService.Heartbeat:Connect(function()
+        if isFakeLag and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0.01)
+            wait(0.1)
+            player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -0.01)
+        end
+    end)
+end
+
+local function stopFakeLag()
+    isFakeLag = false
+    if fakeLagConnection then
+        fakeLagConnection:Disconnect()
+    end
+    addMessage("✅ Tắt Fake Lag", Color3.fromRGB(100, 255, 100))
+end
+
+-- Auto Clicker
+local function startAutoClicker()
+    if isAutoClicker then 
+        addMessage("⚠️ Auto Clicker đã bật!", Color3.fromRGB(255, 200, 100))
+        return 
+    end
+    
+    isAutoClicker = true
+    addMessage("🖱️ Bật Auto Clicker", Color3.fromRGB(100, 255, 100))
+    
+    autoClickConnection = RunService.Heartbeat:Connect(function()
+        if isAutoClicker then
+            mouse1click()
+            wait(0.01)
+        end
+    end)
+end
+
+local function stopAutoClicker()
+    isAutoClicker = false
+    if autoClickConnection then
+        autoClickConnection:Disconnect()
+    end
+    addMessage("✅ Tắt Auto Clicker", Color3.fromRGB(100, 255, 100))
+end
+
+-- Server Info
+local function showServerInfo()
+    local playerCount = #Players:GetPlayers()
+    local gameId = game.GameId
+    local placeId = game.PlaceId
+    local jobId = game.JobId
+    
+    addMessage("🌐 === THÔNG TIN SERVER ===", Color3.fromRGB(100, 200, 255))
+    addMessage("👥 Người chơi: " .. playerCount .. "/" .. Players.MaxPlayers, Color3.fromRGB(255, 255, 100))
+    addMessage("🎮 Game ID: " .. gameId, Color3.fromRGB(255, 255, 100))
+    addMessage("📍 Place ID: " .. placeId, Color3.fromRGB(255, 255, 100))
+    addMessage("🔗 Job ID: " .. jobId:sub(1, 8) .. "...", Color3.fromRGB(255, 255, 100))
+end
+
+-- Rejoin
+local function rejoinServer()
+    addMessage("🔄 Đang vào lại server...", Color3.fromRGB(100, 255, 100))
+    TeleportService:Teleport(game.PlaceId, player)
+end
+
+-- Server Hop
+local function serverHop()
+    addMessage("🌐 Đang tìm server mới...", Color3.fromRGB(100, 255, 100))
+    
+    local servers = {}
+    pcall(function()
+        local req = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
+        local data = game:GetService("HttpService"):JSONDecode(req)
+        
+        if data.data then
+            for _, server in pairs(data.data) do
+                if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                    table.insert(servers, server.id)
+                end
+            end
+        end
+    end)
+    
+    if #servers > 0 then
+        local randomServer = servers[math.random(1, #servers)]
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
+    else
+        addMessage("❌ Không tìm thấy server khác!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+-- Các hàm khác (Anti AFK, Inf Jump, Noclip) - giữ nguyên
+local function startAntiAFK()
+    if isAntiAFK then return end
+    isAntiAFK = true
+    addMessage("🛡️ Bật Anti AFK", Color3.fromRGB(100, 255, 100))
+    antiAFKConnection = RunService.Heartbeat:Connect(function()
+        if isAntiAFK then
+            pcall(function()
+                game:GetService('VirtualUser'):CaptureController()
+                game:GetService('VirtualUser'):ClickButton2(Vector2.new())
+            end)
+        end
+    end)
+end
+
+local function stopAntiAFK()
+    isAntiAFK = false
+    if antiAFKConnection then antiAFKConnection:Disconnect() end
+    addMessage("✅ Tắt Anti AFK", Color3.fromRGB(100, 255, 100))
+end
+
+local function startInfJump()
+    if isInfJump then return end
+    isInfJump = true
+    addMessage("🚀 Bật Infinite Jump", Color3.fromRGB(100, 255, 100))
+    infJumpConnection = UserInputService.JumpRequest:Connect(function()
+        if isInfJump and player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid:ChangeState("Jumping")
+        end
+    end)
+end
+
+local function stopInfJump()
+    isInfJump = false
+    if infJumpConnection then infJumpConnection:Disconnect() end
+    addMessage("✅ Tắt Infinite Jump", Color3.fromRGB(100, 255, 100))
+end
+
+local function startNoclip()
+    if isNoclip then return end
     isNoclip = true
     addMessage("👻 Bật noclip", Color3.fromRGB(100, 255, 100))
-    
-    noclipConnection = game:GetService('RunService').Stepped:Connect(function()
+    noclipConnection = RunService.Stepped:Connect(function()
         if isNoclip and player.Character then
             for _,v in pairs(player.Character:GetChildren()) do
-                if v:IsA('BasePart') then
-                    v.CanCollide = false
-                end
+                if v:IsA('BasePart') then v.CanCollide = false end
             end
         end
     end)
 end
 
 local function stopNoclip()
-    if not isNoclip then
-        addMessage("⚠️ Noclip chưa bật!", Color3.fromRGB(255, 200, 100))
-        return
-    end
-    
     isNoclip = false
-    if noclipConnection then
-        noclipConnection:Disconnect()
-    end
-    
+    if noclipConnection then noclipConnection:Disconnect() end
     if player.Character then
         for _,v in pairs(player.Character:GetChildren()) do
-            if v:IsA('BasePart') then
-                v.CanCollide = true
-            end
+            if v:IsA('BasePart') then v.CanCollide = true end
         end
     end
     addMessage("✅ Tắt noclip", Color3.fromRGB(100, 255, 100))
+end
+
+-- Script loaders
+local function loadScript(scriptName, url)
+    pcall(function()
+        loadstring(game:HttpGet(url))()
+        addMessage("⚡ Đã tải " .. scriptName, Color3.fromRGB(100, 255, 100))
+    end)
 end
 
 -- Xử lý lệnh
@@ -338,33 +609,78 @@ local function processCommand(input)
     
     addMessage("> " .. input, Color3.fromRGB(150, 150, 255))
     
-    if command == "speed" and args[2] then
-        setSpeed(args[2])
-    elseif command == "unspeed" then
-        resetSpeed()
-    elseif command == "jump" and args[2] then
-        setJump(args[2])
-    elseif command == "unjump" then
-        resetJump()
-    elseif command == "fly" then
-        loadVehicleFly()
-    elseif command == "noclip" then
-        startNoclip()
-    elseif command == "unnoclip" then
-        stopNoclip()
+    -- Basic commands
+    if command == "speed" and args[2] then setSpeed(args[2])
+    elseif command == "unspeed" then resetSpeed()
+    elseif command == "jump" and args[2] then setJump(args[2])
+    elseif command == "unjump" then resetJump()
+    elseif command == "fly" then loadScript("Vehicle Fly GUI", "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui")
+    elseif command == "noclip" then startNoclip()
+    elseif command == "unnoclip" then stopNoclip()
+    elseif command == "antiafk" then startAntiAFK()
+    elseif command == "unantiafk" then stopAntiAFK()
+    elseif command == "infjump" then startInfJump()
+    elseif command == "uninfjump" then stopInfJump()
     elseif command == "reset" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.Health = 0
             addMessage("🔄 Reset nhân vật", Color3.fromRGB(100, 255, 100))
         end
     elseif command == "clear" then
-        -- Clear chat
         for _,child in pairs(outputScroll:GetChildren()) do
-            if child:IsA("Frame") then
-                child:Destroy()
-            end
+            if child:IsA("Frame") then child:Destroy() end
         end
         outputScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    -- New commands
+    elseif command == "tp" and args[2] then teleportToPlayer(args[2])
+    elseif command == "antikick" then startAntiKick()
+    elseif command == "unantikick" then stopAntiKick()
+    elseif command == "fakelag" then startFakeLag()
+    elseif command == "unfakelag" then stopFakeLag()
+    elseif command == "autoclick" then startAutoClicker()
+    elseif command == "unautoclick" then stopAutoClicker()
+    elseif command == "serverinfo" then showServerInfo()
+    elseif command == "rejoin" then rejoinServer()
+    elseif command == "serverhop" then serverHop()
+    elseif command == "theme" then
+        if args[2] and themes[args[2]] then
+            currentTheme = args[2]
+            updateTheme()
+            addMessage("🎨 Đã đổi theme: " .. args[2], Color3.fromRGB(100, 255, 100))
+        else
+            addMessage("🎨 Themes có sẵn: dark, light, rgb", Color3.fromRGB(255, 255, 100))
+        end
+    -- Script Hub Commands
+    elseif command == "iy" then
+        loadScript("Infinite Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+    elseif command == "airflow" then
+        loadScript("AirFlow", "https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua")
+    elseif command == "h4x" then
+        loadScript("H4X Scripts", "https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua")
+    elseif command == "r15" then
+        loadScript("FE Emotes GUI", "https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui")
+    elseif command == "skull" then
+        loadScript("Skull Hub", "https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua")
+    elseif command == "nameless" then
+        loadScript("Nameless Admin", "https://rawscripts.net/raw/Universal-Script-nameless-admin-15646")
+    elseif command == "nathub" then
+        loadScript("NatHub", "https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua")
+    elseif command == "arceus" then
+        loadScript("Arceus X V3", "https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3")
+    elseif command == "shader" then
+        loadScript("PShade Ultimate", "https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua")
+    elseif command == "native" then
+        loadScript("Native Script", "https://getnative.cc/script/loader")
+    elseif command == "nolag" then
+        loadScript("No Lag Hub", "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
+    elseif command == "micup" then
+        loadScript("I Wanna Run Away", "https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua")
+    elseif command == "speedhub" then
+        loadScript("Speed Hub X", "https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062")
+    elseif command == "lunor" then
+        loadScript("Lunor Hub", "https://lunor.dev/loader")
+    elseif command == "thunderz" then
+        loadScript("ThunderZ", "https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua")
     else
         addMessage("❌ Lệnh không tồn tại!", Color3.fromRGB(255, 100, 100))
     end
@@ -386,18 +702,34 @@ chatInput.FocusLost:Connect(function(enterPressed)
     end
 end)
 
+-- Sự kiện theme button
+themeButton.MouseButton1Click:Connect(function()
+    local themeOrder = {"dark", "light", "rgb"}
+    local currentIndex = 1
+    
+    for i, theme in ipairs(themeOrder) do
+        if theme == currentTheme then
+            currentIndex = i
+            break
+        end
+    end
+    
+    local nextIndex = (currentIndex % #themeOrder) + 1
+    currentTheme = themeOrder[nextIndex]
+    updateTheme()
+    addMessage("🎨 Theme: " .. currentTheme, Color3.fromRGB(100, 255, 100))
+end)
+
 -- Sự kiện minimize/maximize
 minimizeButton.MouseButton1Click:Connect(function()
     if isMinimized then
-        -- Mở rộng
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 500, 0, 280)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 600, 0, 380)})
         tween:Play()
         contentFrame.Visible = true
         minimizeButton.Text = "−"
         isMinimized = false
     else
-        -- Thu gọn
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 500, 0, 35)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 600, 0, 45)})
         tween:Play()
         contentFrame.Visible = false
         minimizeButton.Text = "+"
@@ -407,6 +739,13 @@ end)
 
 -- Sự kiện đóng
 closeButton.MouseButton1Click:Connect(function()
+    -- Cleanup connections
+    if noclipConnection then noclipConnection:Disconnect() end
+    if antiAFKConnection then antiAFKConnection:Disconnect() end
+    if infJumpConnection then infJumpConnection:Disconnect() end
+    if fakeLagConnection then fakeLagConnection:Disconnect() end
+    if autoClickConnection then autoClickConnection:Disconnect() end
+    
     screenGui:Destroy()
 end)
 
@@ -417,7 +756,27 @@ UserInputService.InputBegan:Connect(function(input)
     end
 end)
 
--- Welcome message
-addMessage("⚡ Console sẵn sàng!", Color3.fromRGB(100, 255, 100))
+-- Dọn dẹp khi character respawn
+player.CharacterAdded:Connect(function()
+    isNoclip = false
+    isAntiAFK = false
+    isInfJump = false
+    isFakeLag = false
+    isAutoClicker = false
+    
+    if noclipConnection then noclipConnection:Disconnect() end
+    if antiAFKConnection then antiAFKConnection:Disconnect() end
+    if infJumpConnection then infJumpConnection:Disconnect() end
+    if fakeLagConnection then fakeLagConnection:Disconnect() end
+    if autoClickConnection then autoClickConnection:Disconnect() end
+end)
 
-print("Compact Command Console loaded! Press F1 to toggle.")
+-- Khởi tạo theme
+updateTheme()
+
+-- Welcome messages
+addMessage("🚀 Ultimate Command Hub V2 sẵn sàng!", Color3.fromRGB(100, 255, 100))
+addMessage("🆕 Các tính năng mới: tp, antikick, fakelag, autoclick", Color3.fromRGB(200, 200, 255))
+addMessage("🎨 Đổi theme: theme dark/light/rgb hoặc nút 🎨", Color3.fromRGB(255, 255, 100))
+
+print("Ultimate Command Hub V2 loaded! Press F1 to toggle.")
