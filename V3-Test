@@ -1,5 +1,5 @@
 -- Advanced Player Functions
-local followTarget = nil-- Ultimate Command Hub V8 - Fixed Version
+local followTarget = nil-- Ultimate Command Hub V1 - Fixed Version
 -- Chỉ giữ lại các lệnh hoạt động 100%
 
 local Players = game:GetService("Players")
@@ -97,7 +97,7 @@ local titleText = Instance.new("TextLabel")
 titleText.Size = UDim2.new(1, -100, 1, 0)
 titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "🚀 Command Hub V1 - Fixed"
+titleText.Text = "🚀 Command Hub V1"
 titleText.TextColor3 = themes[currentTheme].text
 titleText.TextSize = 16
 titleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -215,6 +215,7 @@ helpText.Text = [[🚀 LỆNH CƠ BẢN (100% hoạt động):
 speed [số] | unspeed - Tốc độ di chuyển
 jump [số] | unjump - Sức nhảy
 fly - Vehicle Fly GUI  
+rtx - RTX Shader (đồ họa đẹp)
 noclip | unnoclip - Xuyên tường
 antiafk | unantiafk - Chống AFK
 infjump | uninfjump - Nhảy vô hạn
@@ -1030,12 +1031,13 @@ local function processCommand(input)
     
     addMessage("> " .. input, Color3.fromRGB(150, 150, 255))
     
-    -- Basic commands
+    -- Basic commands (with RTX added)
     if command == "speed" and args[2] then setSpeed(args[2])
     elseif command == "unspeed" then resetSpeed()
     elseif command == "jump" and args[2] then setJump(args[2])
     elseif command == "unjump" then resetJump()
     elseif command == "fly" then loadScript("Vehicle Fly GUI", "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui")
+    elseif command == "rtx" then loadRTX()
     elseif command == "noclip" then startNoclip()
     elseif command == "unnoclip" then stopNoclip()
     elseif command == "antiafk" then startAntiAFK()
@@ -1282,8 +1284,8 @@ end)
 updateTheme()
 
 -- Welcome messages
-addMessage("🚀 Command Hub V11 - Cleaned!", Color3.fromRGB(100, 255, 100))
-addMessage("🗑️ Xóa 16 lệnh không cần thiết", Color3.fromRGB(255, 200, 100))
-addMessage("🔧 Sửa: leave (thoát game), hop (server hop)", Color3.fromRGB(100, 255, 255))
+addMessage("🚀 Command Hub V1", Color3.fromRGB(100, 255, 100))
+addMessage("✨ Thêm: RTX Shader (đồ họa siêu đẹp)", Color3.fromRGB(255, 100, 255))
+addMessage("🔧 Sửa: leave và hop giờ hoạt động", Color3.fromRGB(100, 255, 255))
 
-print("Command Hub V11 - Cleaned loaded! Press F1 to toggle.")
+print("Command Hub V12 - RTX + Fixed loaded! Press F1 to toggle.")
