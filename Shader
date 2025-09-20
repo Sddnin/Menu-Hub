@@ -1,0 +1,391 @@
+-- Simple Weather GUI - 6 Seasons Only
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Backup lighting gốc
+local originalLighting = {
+    Brightness = Lighting.Brightness,
+    ColorShift_Bottom = Lighting.ColorShift_Bottom,
+    ColorShift_Top = Lighting.ColorShift_Top,
+    OutdoorAmbient = Lighting.OutdoorAmbient,
+    ClockTime = Lighting.ClockTime,
+    FogColor = Lighting.FogColor,
+    FogEnd = Lighting.FogEnd,
+    FogStart = Lighting.FogStart
+}
+
+local currentSky = nil
+local currentAtmosphere = nil
+
+-- Tạo UI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SimpleWeatherGUI"
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
+
+-- Main Frame (ngang)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 80)
+mainFrame.Position = UDim2.new(0.5, -250, 0, 20)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Bo góc
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+-- Title và Close button
+local headerFrame = Instance.new("Frame")
+headerFrame.Size = UDim2.new(1, 0, 0, 25)
+headerFrame.Position = UDim2.new(0, 0, 0, 0)
+headerFrame.BackgroundTransparency = 1
+headerFrame.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0, 150, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "🌤️ Weather"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = headerFrame
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -30, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+closeButton.Text = "❌"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextScaled = true
+closeButton.BorderSizePixel = 0
+closeButton.Parent = headerFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0.5, 0)
+closeCorner.Parent = closeButton
+
+-- Button container
+local buttonFrame = Instance.new("Frame")
+buttonFrame.Size = UDim2.new(1, -20, 0, 45)
+buttonFrame.Position = UDim2.new(0, 10, 0, 30)
+buttonFrame.BackgroundTransparency = 1
+buttonFrame.Parent = mainFrame
+
+-- Layout cho buttons
+local listLayout = Instance.new("UIListLayout")
+listLayout.FillDirection = Enum.FillDirection.Horizontal
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Padding = UDim.new(0, 8)
+listLayout.Parent = buttonFrame
+
+-- 6 Weather presets
+local weatherPresets = {
+    {name = "🌸", fullName = "Mùa Xuân", id = "spring"},
+    {name = "☀️", fullName = "Mùa Hạ", id = "summer"}, 
+    {name = "🍃", fullName = "Mùa Thu", id = "autumn"},
+    {name = "❄️", fullName = "Mùa Đông", id = "winter"},
+    {name = "🌅", fullName = "Hoàng Hôn", id = "sunset"},
+    {name = "🌄", fullName = "Bình Minh", id = "dawn"},
+    {name = "🌨️", fullName = "Tuyết Rơi", id = "snow"}
+}
+
+-- Function áp dụng weather
+local function applyWeather(weatherId)
+    -- Xóa sky cũ
+    if currentSky then currentSky:Destroy() end
+    if currentAtmosphere then currentAtmosphere:Destroy() end
+    
+    -- Tạo sky mới
+    currentSky = Instance.new("Sky")
+    currentSky.Parent = Lighting
+    
+    currentAtmosphere = Instance.new("Atmosphere")
+    currentAtmosphere.Parent = Lighting
+    
+    -- Default sky textures
+    currentSky.SkyboxBk = "rbxasset://textures/sky/sky512_bk.tex"
+    currentSky.SkyboxDn = "rbxasset://textures/sky/sky512_dn.tex" 
+    currentSky.SkyboxFt = "rbxasset://textures/sky/sky512_ft.tex"
+    currentSky.SkyboxLf = "rbxasset://textures/sky/sky512_lf.tex"
+    currentSky.SkyboxRt = "rbxasset://textures/sky/sky512_rt.tex"
+    currentSky.SkyboxUp = "rbxasset://textures/sky/sky512_up.tex"
+    
+    if weatherId == "spring" then
+        -- Mùa xuân - tươi mát
+        Lighting.ClockTime = 10
+        Lighting.Brightness = 2.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(200, 255, 200)
+        Lighting.ColorShift_Top = Color3.fromRGB(150, 255, 150)
+        Lighting.OutdoorAmbient = Color3.fromRGB(130, 150, 120)
+        Lighting.FogColor = Color3.fromRGB(200, 255, 200)
+        Lighting.FogEnd = 2000
+        Lighting.FogStart = 100
+        
+        currentAtmosphere.Density = 0.3
+        currentAtmosphere.Offset = 0.3
+        currentAtmosphere.Color = Color3.fromRGB(200, 255, 200)
+        currentAtmosphere.Glare = 0.4
+        currentAtmosphere.Haze = 0.4
+        
+    elseif weatherId == "summer" then
+        -- Mùa hạ - nắng nóng
+        Lighting.ClockTime = 14
+        Lighting.Brightness = 3.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(255, 255, 200)
+        Lighting.ColorShift_Top = Color3.fromRGB(255, 255, 150)
+        Lighting.OutdoorAmbient = Color3.fromRGB(180, 180, 140)
+        Lighting.FogColor = Color3.fromRGB(255, 255, 200)
+        Lighting.FogEnd = 5000
+        Lighting.FogStart = 200
+        
+        currentAtmosphere.Density = 0.2
+        currentAtmosphere.Offset = 0.4
+        currentAtmosphere.Color = Color3.fromRGB(255, 255, 180)
+        currentAtmosphere.Glare = 0.6
+        currentAtmosphere.Haze = 0.3
+        
+    elseif weatherId == "autumn" then
+        -- Mùa thu - vàng cam
+        Lighting.ClockTime = 16
+        Lighting.Brightness = 2
+        Lighting.ColorShift_Bottom = Color3.fromRGB(255, 180, 100)
+        Lighting.ColorShift_Top = Color3.fromRGB(255, 200, 120)
+        Lighting.OutdoorAmbient = Color3.fromRGB(160, 120, 80)
+        Lighting.FogColor = Color3.fromRGB(255, 200, 150)
+        Lighting.FogEnd = 1500
+        Lighting.FogStart = 150
+        
+        currentAtmosphere.Density = 0.35
+        currentAtmosphere.Offset = 0.25
+        currentAtmosphere.Color = Color3.fromRGB(255, 200, 150)
+        currentAtmosphere.Glare = 0.4
+        currentAtmosphere.Haze = 0.5
+        
+    elseif weatherId == "winter" then
+        -- Mùa đông - lạnh lẽo
+        Lighting.ClockTime = 8
+        Lighting.Brightness = 1.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(180, 200, 255)
+        Lighting.ColorShift_Top = Color3.fromRGB(200, 220, 255)
+        Lighting.OutdoorAmbient = Color3.fromRGB(120, 140, 180)
+        Lighting.FogColor = Color3.fromRGB(200, 220, 255)
+        Lighting.FogEnd = 800
+        Lighting.FogStart = 50
+        
+        currentAtmosphere.Density = 0.4
+        currentAtmosphere.Offset = 0.2
+        currentAtmosphere.Color = Color3.fromRGB(220, 230, 255)
+        currentAtmosphere.Glare = 0.3
+        currentAtmosphere.Haze = 0.6
+        
+    elseif weatherId == "sunset" then
+        -- Hoàng hôn
+        Lighting.ClockTime = 18.5
+        Lighting.Brightness = 1.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(255, 150, 80)
+        Lighting.ColorShift_Top = Color3.fromRGB(255, 200, 120)
+        Lighting.OutdoorAmbient = Color3.fromRGB(140, 100, 70)
+        Lighting.FogColor = Color3.fromRGB(255, 180, 100)
+        Lighting.FogEnd = 1000
+        Lighting.FogStart = 100
+        
+        currentAtmosphere.Density = 0.4
+        currentAtmosphere.Offset = 0.3
+        currentAtmosphere.Color = Color3.fromRGB(255, 200, 150)
+        currentAtmosphere.Glare = 0.5
+        currentAtmosphere.Haze = 0.7
+        
+    elseif weatherId == "dawn" then
+        -- Bình minh
+        Lighting.ClockTime = 6
+        Lighting.Brightness = 2
+        Lighting.ColorShift_Bottom = Color3.fromRGB(255, 200, 150)
+        Lighting.ColorShift_Top = Color3.fromRGB(200, 150, 255)
+        Lighting.OutdoorAmbient = Color3.fromRGB(140, 120, 140)
+        Lighting.FogColor = Color3.fromRGB(220, 180, 200)
+        Lighting.FogEnd = 1200
+        Lighting.FogStart = 80
+        
+        currentAtmosphere.Density = 0.35
+        currentAtmosphere.Offset = 0.25
+        currentAtmosphere.Color = Color3.fromRGB(255, 220, 200)
+        currentAtmosphere.Glare = 0.3
+        currentAtmosphere.Haze = 0.6
+        
+    elseif weatherId == "snow" then
+        -- Tuyết rơi
+        Lighting.ClockTime = 12
+        Lighting.Brightness = 2.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(230, 240, 255)
+        Lighting.ColorShift_Top = Color3.fromRGB(245, 250, 255)
+        Lighting.OutdoorAmbient = Color3.fromRGB(200, 210, 230)
+        Lighting.FogColor = Color3.fromRGB(240, 245, 255)
+        Lighting.FogEnd = 600
+        Lighting.FogStart = 50
+        
+        currentAtmosphere.Density = 0.5
+        currentAtmosphere.Offset = 0.3
+        currentAtmosphere.Color = Color3.fromRGB(255, 255, 255)
+        currentAtmosphere.Glare = 0.2
+        currentAtmosphere.Haze = 0.7
+    end
+end
+
+-- Function reset
+local function resetLighting()
+    for property, value in pairs(originalLighting) do
+        Lighting[property] = value
+    end
+    
+    if currentSky then currentSky:Destroy() end
+    if currentAtmosphere then currentAtmosphere:Destroy() end
+end
+
+-- Tạo buttons
+for i, preset in ipairs(weatherPresets) do
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 60, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    button.Text = ""
+    button.BorderSizePixel = 0
+    button.LayoutOrder = i
+    button.Parent = buttonFrame
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+    
+    -- Icon
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(1, 0, 0, 25)
+    icon.Position = UDim2.new(0, 0, 0, 0)
+    icon.BackgroundTransparency = 1
+    icon.Text = preset.name
+    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+    icon.TextScaled = true
+    icon.Parent = button
+    
+    -- Name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, 0, 0, 15)
+    nameLabel.Position = UDim2.new(0, 0, 0, 25)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = preset.fullName
+    nameLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    nameLabel.TextScaled = true
+    nameLabel.Font = Enum.Font.Gotham
+    nameLabel.Parent = button
+    
+    -- Hover effect
+    button.MouseEnter:Connect(function()
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 70)})
+        tween:Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)})
+        tween:Play()
+    end)
+    
+    -- Click
+    button.MouseButton1Click:Connect(function()
+        applyWeather(preset.id)
+    end)
+end
+
+-- Reset button
+local resetButton = Instance.new("TextButton")
+resetButton.Size = UDim2.new(0, 60, 0, 40)
+resetButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+resetButton.Text = ""
+resetButton.BorderSizePixel = 0
+resetButton.LayoutOrder = 999
+resetButton.Parent = buttonFrame
+
+local resetCorner = Instance.new("UICorner")
+resetCorner.CornerRadius = UDim.new(0, 8)
+resetCorner.Parent = resetButton
+
+local resetIcon = Instance.new("TextLabel")
+resetIcon.Size = UDim2.new(1, 0, 0, 25)
+resetIcon.BackgroundTransparency = 1
+resetIcon.Text = "🔄"
+resetIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+resetIcon.TextScaled = true
+resetIcon.Parent = resetButton
+
+local resetLabel = Instance.new("TextLabel")
+resetLabel.Size = UDim2.new(1, 0, 0, 15)
+resetLabel.Position = UDim2.new(0, 0, 0, 25)
+resetLabel.BackgroundTransparency = 1
+resetLabel.Text = "Reset"
+resetLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+resetLabel.TextScaled = true
+resetLabel.Font = Enum.Font.Gotham
+resetLabel.Parent = resetButton
+
+resetButton.MouseEnter:Connect(function()
+    local tween = TweenService:Create(resetButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(200, 70, 70)})
+    tween:Play()
+end)
+
+resetButton.MouseLeave:Connect(function()
+    local tween = TweenService:Create(resetButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 50, 50)})
+    tween:Play()
+end)
+
+resetButton.MouseButton1Click:Connect(function()
+    resetLighting()
+end)
+
+-- Close button
+closeButton.MouseButton1Click:Connect(function()
+    resetLighting()
+    screenGui:Destroy()
+end)
+
+-- Drag functionality
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+headerFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+headerFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+headerFrame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Cleanup
+Players.PlayerRemoving:Connect(function(leavingPlayer)
+    if leavingPlayer == player then
+        resetLighting()
+    end
+end)
+
+print("🌤️ Simple Weather GUI loaded! 7 weather types available.")
