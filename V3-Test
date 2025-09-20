@@ -1,29 +1,34 @@
--- Roblox Command UI - Ultimate Edition
--- Hệ thống lệnh với nhiều tính năng nâng cao
+-- Ultimate Command Hub V8 - Fixed Version
+-- Chỉ giữ lại các lệnh hoạt động 100%
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Biến lưu trạng thái
+-- Biến lưu trạng thái (chỉ những cái cần thiết)
 local isNoclip = false
 local isAntiAFK = false
 local isInfJump = false
-local isAntiKick = false
 local isAutoClicker = false
 local isSpin = false
-local isDance = false
 local isRainbow = false
+local isESP = false
+local isFullbright = false
+local isNoFog = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
+local originalFogEnd = nil
 local isMinimized = false
 local currentTheme = "dark"
-local antiAFKConnection, infJumpConnection, noclipConnection, antiKickConnection, autoClickConnection, spinConnection, danceConnection, rainbowConnection
+local savedPosition = nil
+
+-- Connections
+local antiAFKConnection, infJumpConnection, noclipConnection, autoClickConnection
+local spinConnection, rainbowConnection, espConnection
 
 -- Themes
 local themes = {
@@ -62,8 +67,8 @@ screenGui.Parent = playerGui
 -- Frame chính
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 600, 0, 380)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -190)
+mainFrame.Size = UDim2.new(0, 550, 0, 350)
+mainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
 mainFrame.BackgroundColor3 = themes[currentTheme].main
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -77,7 +82,7 @@ mainCorner.Parent = mainFrame
 -- Title bar
 local titleBar = Instance.new("Frame")
 titleBar.Name = "TitleBar"
-titleBar.Size = UDim2.new(1, 0, 0, 45)
+titleBar.Size = UDim2.new(1, 0, 0, 40)
 titleBar.BackgroundColor3 = themes[currentTheme].secondary
 titleBar.BorderSizePixel = 0
 titleBar.Parent = mainFrame
@@ -87,10 +92,10 @@ titleCorner.CornerRadius = UDim.new(0, 12)
 titleCorner.Parent = titleBar
 
 local titleText = Instance.new("TextLabel")
-titleText.Size = UDim2.new(1, -140, 1, 0)
+titleText.Size = UDim2.new(1, -100, 1, 0)
 titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "🚀 Ultimate Command Hub V2"
+titleText.Text = "🚀 Command Hub V8 - Fixed"
 titleText.TextColor3 = themes[currentTheme].text
 titleText.TextSize = 16
 titleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -99,8 +104,8 @@ titleText.Parent = titleBar
 
 -- Theme button
 local themeButton = Instance.new("TextButton")
-themeButton.Size = UDim2.new(0, 35, 0, 35)
-themeButton.Position = UDim2.new(1, -105, 0, 5)
+themeButton.Size = UDim2.new(0, 35, 0, 30)
+themeButton.Position = UDim2.new(1, -100, 0, 5)
 themeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
 themeButton.BorderSizePixel = 0
 themeButton.Text = "🎨"
@@ -110,13 +115,13 @@ themeButton.Font = Enum.Font.GothamBold
 themeButton.Parent = titleBar
 
 local themeCorner = Instance.new("UICorner")
-themeCorner.CornerRadius = UDim.new(0, 8)
+themeCorner.CornerRadius = UDim.new(0, 6)
 themeCorner.Parent = themeButton
 
 -- Minimize button
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -65, 0, 7)
+minimizeButton.Position = UDim2.new(1, -60, 0, 5)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Text = "−"
@@ -132,7 +137,7 @@ minimizeCorner.Parent = minimizeButton
 -- Close button
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -30, 0, 7)
+closeButton.Position = UDim2.new(1, -25, 0, 5)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
 closeButton.BorderSizePixel = 0
 closeButton.Text = "✕"
@@ -148,15 +153,15 @@ closeCorner.Parent = closeButton
 -- Content frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 1, -45)
-contentFrame.Position = UDim2.new(0, 0, 0, 45)
+contentFrame.Size = UDim2.new(1, 0, 1, -40)
+contentFrame.Position = UDim2.new(0, 0, 0, 40)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
 -- Chat output frame
 local outputFrame = Instance.new("Frame")
 outputFrame.Name = "OutputFrame"
-outputFrame.Size = UDim2.new(0.55, -10, 1, -50)
+outputFrame.Size = UDim2.new(0.55, -10, 1, -45)
 outputFrame.Position = UDim2.new(0, 10, 0, 5)
 outputFrame.BackgroundColor3 = themes[currentTheme].output
 outputFrame.BorderSizePixel = 0
@@ -182,7 +187,7 @@ outputLayout.Parent = outputScroll
 -- Help frame
 local helpFrame = Instance.new("Frame")
 helpFrame.Name = "HelpFrame"
-helpFrame.Size = UDim2.new(0.45, -10, 1, -50)
+helpFrame.Size = UDim2.new(0.45, -10, 1, -45)
 helpFrame.Position = UDim2.new(0.55, 0, 0, 5)
 helpFrame.BackgroundColor3 = themes[currentTheme].help
 helpFrame.BorderSizePixel = 0
@@ -201,74 +206,69 @@ helpScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 70)
 helpScroll.Parent = helpFrame
 
 local helpText = Instance.new("TextLabel")
-helpText.Size = UDim2.new(1, -5, 0, 1500)
+helpText.Size = UDim2.new(1, -5, 0, 800)
 helpText.Position = UDim2.new(0, 2, 0, 0)
 helpText.BackgroundTransparency = 1
-helpText.Text = [[🚀 LỆNH CƠ BẢN:
-speed [số] | unspeed - Tốc độ
-jump [số] | unjump - Sức nhảy  
-fly - Vehicle Fly GUI
+helpText.Text = [[🚀 LỆNH CƠ BẢN (100% hoạt động):
+speed [số] | unspeed - Tốc độ di chuyển
+jump [số] | unjump - Sức nhảy
+fly - Vehicle Fly GUI  
 noclip | unnoclip - Xuyên tường
 antiafk | unantiafk - Chống AFK
 infjump | uninfjump - Nhảy vô hạn
 reset - Làm mới nhân vật
 clear - Xóa chat
 
-🆕 TÍNH NĂNG MỚI:
+👥 PLAYER:
 tp [tên] - Teleport đến người chơi
-antikick | unantikick - Chống kick/ban
-autoclick | unautoclick - Auto clicker
-serverinfo - Thông tin server
-rejoin - Vào lại server
-serverhop - Đổi server
-theme - Đổi theme UI
-
-👥 PLAYER CONTROL:
-freeze [tên] | unfreeze [tên] - Đóng băng
-bring [tên] - Kéo người chơi về
+kill [tên] - Giết người chơi  
 goto [tên] - Đi đến người chơi
 view [tên] | unview - Xem camera
 
-🎮 CHARACTER MODS:
-bighead | unbighead - Đầu to
-smallhead | unsmallhead - Đầu nhỏ
-spin | unspin - Quay tròn
-dance | undance - Nhảy múa
+🎮 CHARACTER:
+spin | unspin - Quay tròn nhân vật
+sit | unsit - Ngồi/đứng
+invisible | uninvisible - Ẩn/hiện
+emote [id] - Chơi emote theo ID
+bighead | unbighead - Đầu to/nhỏ
 
 ⚡ EXPLOITS:
-walkspeed [số] - Alias tốc độ
-jumpheight [số] - Alias nhảy  
+walkspeed [số] - Alias cho speed
+jumpheight [số] - Alias cho jump
 gravity [số] - Thay đổi trọng lực
-reach [số] - Tăng tầm với
+esp | unesp - Nhìn xuyên tường
+fullbright | unfullbright - Sáng tối đa
+nofog | fog - Xóa/thêm xương mù
+autoclick | unautoclick - Auto clicker
 
 🔧 UTILITIES:
 copyid - Copy Place ID
-copyjob - Copy Job ID
+copyjob - Copy Job ID  
 time - Hiển thị thời gian
 ping - Hiển thị ping
+players - Danh sách người chơi
+fps - Hiển thị FPS
+walkto [x] [y] [z] - Đi đến tọa độ
+getpos - Lấy vị trí hiện tại
+savepos | loadpos - Lưu/tải vị trí
+serverinfo - Thông tin server
+rejoin - Vào lại server
 
-🎨 VISUAL EFFECTS:
-rainbow | unrainbow - Đổi màu rainbow
+🎨 VISUAL:
+rainbow | unrainbow - Đổi màu
 sparkles | unsparkles - Lấp lánh
 fire | unfire - Hiệu ứng lửa
 smoke | unsmoke - Hiệu ứng khói
+trail | untrail - Hiệu ứng đuôi
+glow | unglow - Phát sáng
 
 ⚡ SCRIPT HUB:
-iy - Infinite Yield
-airflow - AirFlow Hub
-h4x - H4X Scripts  
-r15 - FE Emotes GUI
-skull - Skull Hub
-nameless - Nameless Admin
-nathub - NatHub
-arceus - Arceus X V3
-shader - PShade Ultimate
-native - Native Script
-nolag - No Lag Hub
-micup - I Wanna Run Away
-speedhub - Speed Hub X
-lunor - Lunor Hub
-thunderz - ThunderZ
+iy - Infinite Yield | h4x - H4X Scripts
+skull - Skull Hub | arceus - Arceus X V3
+native - Native Script | cilent - Menu Hub Client
+music - Music Hub | graphics - Graphics Hub
+paint - Paint Hub | v1 - Sddnin V1
+v15 - Sddnin V1.5 | v2 - Sddnin V2
 
 🎨 THEMES: dark, light, rgb]]
 helpText.TextColor3 = themes[currentTheme].text
@@ -279,7 +279,7 @@ helpText.Font = Enum.Font.Gotham
 helpText.TextWrapped = true
 helpText.Parent = helpScroll
 
-helpScroll.CanvasSize = UDim2.new(0, 0, 0, 1500)
+helpScroll.CanvasSize = UDim2.new(0, 0, 0, 800)
 
 -- Chat input frame
 local inputFrame = Instance.new("Frame")
@@ -300,7 +300,7 @@ chatInput.Size = UDim2.new(1, -60, 1, -8)
 chatInput.Position = UDim2.new(0, 8, 0, 4)
 chatInput.BackgroundTransparency = 1
 chatInput.Text = ""
-chatInput.PlaceholderText = "Nhập lệnh hoặc script..."
+chatInput.PlaceholderText = "Nhập lệnh..."
 chatInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
 chatInput.TextColor3 = themes[currentTheme].text
 chatInput.TextSize = 12
@@ -378,7 +378,9 @@ local function addMessage(message, color)
     outputScroll.CanvasPosition = Vector2.new(0, outputScroll.CanvasSize.Y.Offset)
 end
 
--- Các hàm xử lý lệnh cơ bản (giữ nguyên)
+-- CÁC HÀM XỬ LÝ LỆNH (CHỈ GIỮ NHỮNG LỆNH HOẠT ĐỘNG 100%)
+
+-- Basic Functions
 local function setSpeed(speed)
     local num = tonumber(speed)
     if num and player.Character and player.Character:FindFirstChild("Humanoid") then
@@ -392,7 +394,7 @@ end
 local function resetSpeed()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         player.Character.Humanoid.WalkSpeed = originalWalkSpeed
-        addMessage("✅ Reset tốc độ: " .. originalWalkSpeed, Color3.fromRGB(100, 255, 100))
+        addMessage("✅ Reset tốc độ", Color3.fromRGB(100, 255, 100))
     end
 end
 
@@ -409,435 +411,47 @@ end
 local function resetJump()
     if player.Character and player.Character:FindFirstChild("Humanoid") then
         player.Character.Humanoid.JumpPower = originalJumpPower
-        addMessage("✅ Reset sức nhảy: " .. originalJumpPower, Color3.fromRGB(100, 255, 100))
+        addMessage("✅ Reset sức nhảy", Color3.fromRGB(100, 255, 100))
     end
 end
 
--- Teleport to player
-local function teleportToPlayer(targetName)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
+-- Noclip
+local function startNoclip()
+    if isNoclip then return end
+    isNoclip = true
+    addMessage("👻 Bật noclip", Color3.fromRGB(100, 255, 100))
     
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-            addMessage("📍 Đã teleport đến " .. targetPlayer.Name, Color3.fromRGB(100, 255, 100))
-        end
-    else
-        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
-    end
-end
-
--- Anti Kick/Ban
-local function startAntiKick()
-    if isAntiKick then 
-        addMessage("⚠️ Anti Kick đã bật!", Color3.fromRGB(255, 200, 100))
-        return 
-    end
-    
-    isAntiKick = true
-    addMessage("🛡️ Bật Anti Kick/Ban", Color3.fromRGB(100, 255, 100))
-    
-    local oldNamecall = nil
-    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-        if isAntiKick and getnamecallmethod() == "Kick" then
-            return
-        end
-        return oldNamecall(self, ...)
-    end)
-end
-
-local function stopAntiKick()
-    isAntiKick = false
-    addMessage("✅ Tắt Anti Kick", Color3.fromRGB(100, 255, 100))
-end
-
--- Player Control Functions
-local function freezePlayer(targetName)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
-    
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local anchor = Instance.new("BodyPosition", targetPlayer.Character.HumanoidRootPart)
-        anchor.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        anchor.Position = targetPlayer.Character.HumanoidRootPart.Position
-        addMessage("🧊 Đã đóng băng " .. targetPlayer.Name, Color3.fromRGB(100, 200, 255))
-    else
-        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
-    end
-end
-
-local function unfreezePlayer(targetName)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
-    
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        for _, obj in pairs(targetPlayer.Character.HumanoidRootPart:GetChildren()) do
-            if obj:IsA("BodyPosition") then
-                obj:Destroy()
-            end
-        end
-        addMessage("🔥 Đã bỏ đóng băng " .. targetPlayer.Name, Color3.fromRGB(255, 150, 100))
-    else
-        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
-    end
-end
-
-local function bringPlayer(targetName)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
-    
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            targetPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
-            addMessage("🎯 Đã kéo " .. targetPlayer.Name .. " về", Color3.fromRGB(255, 200, 100))
-        end
-    else
-        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
-    end
-end
-
-local function gotoPlayer(targetName)
-    teleportToPlayer(targetName) -- Sử dụng lại function tp
-end
-
-local function viewPlayer(targetName)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
-    
-    if targetPlayer then
-        workspace.CurrentCamera.CameraSubject = targetPlayer.Character
-        addMessage("👁️ Đang xem " .. targetPlayer.Name, Color3.fromRGB(100, 255, 255))
-    else
-        addMessage("❌ Không tìm thấy người chơi: " .. targetName, Color3.fromRGB(255, 100, 100))
-    end
-end
-
-local function unviewPlayer()
-    workspace.CurrentCamera.CameraSubject = player.Character
-    addMessage("👁️ Đã trở về camera bình thường", Color3.fromRGB(100, 255, 100))
-end
-
--- Character Mods Functions
-local function setBigHead()
-    if player.Character and player.Character:FindFirstChild("Head") then
-        player.Character.Head.Size = Vector3.new(5, 5, 5)
-        addMessage("🤕 Đã làm đầu to", Color3.fromRGB(255, 200, 100))
-    end
-end
-
-local function setSmallHead()
-    if player.Character and player.Character:FindFirstChild("Head") then
-        player.Character.Head.Size = Vector3.new(0.5, 0.5, 0.5)
-        addMessage("🤏 Đã làm đầu nhỏ", Color3.fromRGB(100, 255, 200))
-    end
-end
-
-local function resetHead()
-    if player.Character and player.Character:FindFirstChild("Head") then
-        player.Character.Head.Size = Vector3.new(2, 1, 1)
-        addMessage("✅ Đã reset kích thước đầu", Color3.fromRGB(100, 255, 100))
-    end
-end
-
-local function startSpin()
-    if isSpin then 
-        addMessage("⚠️ Spin đã bật!", Color3.fromRGB(255, 200, 100))
-        return 
-    end
-    
-    isSpin = true
-    addMessage("🌀 Bật quay tròn", Color3.fromRGB(100, 255, 100))
-    
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local spin = Instance.new("BodyAngularVelocity", player.Character.HumanoidRootPart)
-        spin.MaxTorque = Vector3.new(0, math.huge, 0)
-        spin.AngularVelocity = Vector3.new(0, 20, 0)
-        
-        spinConnection = RunService.Heartbeat:Connect(function()
-            if not isSpin or not spin.Parent then
-                if spin then spin:Destroy() end
-                if spinConnection then spinConnection:Disconnect() end
-            end
-        end)
-    end
-end
-
-local function stopSpin()
-    isSpin = false
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        for _, obj in pairs(player.Character.HumanoidRootPart:GetChildren()) do
-            if obj:IsA("BodyAngularVelocity") then
-                obj:Destroy()
-            end
-        end
-    end
-    if spinConnection then spinConnection:Disconnect() end
-    addMessage("✅ Tắt quay tròn", Color3.fromRGB(100, 255, 100))
-end
-
-local function startDance()
-    if isDance then 
-        addMessage("⚠️ Dance đã bật!", Color3.fromRGB(255, 200, 100))
-        return 
-    end
-    
-    isDance = true
-    addMessage("💃 Bật nhảy múa", Color3.fromRGB(255, 100, 255))
-    
-    danceConnection = RunService.Heartbeat:Connect(function()
-        if isDance and player.Character and player.Character:FindFirstChild("Humanoid") then
-            local dances = {"507771019", "507776043", "507777268", "507777451"}
-            local randomDance = dances[math.random(1, #dances)]
-            player.Character.Humanoid:LoadAnimation(Instance.new("Animation", player.Character.Humanoid)).AnimationId = "rbxassetid://" .. randomDance
-            wait(2)
-        end
-    end)
-end
-
-local function stopDance()
-    isDance = false
-    if danceConnection then danceConnection:Disconnect() end
-    addMessage("✅ Tắt nhảy múa", Color3.fromRGB(100, 255, 100))
-end
-
--- Exploits Functions
-local function setGravity(value)
-    local num = tonumber(value)
-    if num then
-        workspace.Gravity = num
-        addMessage("🌍 Trọng lực: " .. num, Color3.fromRGB(150, 255, 150))
-    else
-        addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
-    end
-end
-
--- Utilities Functions
-local function copyPlaceId()
-    setclipboard(tostring(game.PlaceId))
-    addMessage("📋 Đã copy Place ID: " .. game.PlaceId, Color3.fromRGB(100, 255, 100))
-end
-
-local function copyJobId()
-    setclipboard(game.JobId)
-    addMessage("📋 Đã copy Job ID", Color3.fromRGB(100, 255, 100))
-end
-
-local function showTime()
-    local time = os.date("%H:%M:%S - %d/%m/%Y")
-    addMessage("🕐 Thời gian: " .. time, Color3.fromRGB(255, 255, 100))
-end
-
-local function showPing()
-    local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-    addMessage("📡 Ping: " .. ping, Color3.fromRGB(100, 255, 255))
-end
-
--- Visual Effects Functions
-local function startRainbow()
-    if isRainbow then 
-        addMessage("⚠️ Rainbow đã bật!", Color3.fromRGB(255, 200, 100))
-        return 
-    end
-    
-    isRainbow = true
-    addMessage("🌈 Bật hiệu ứng rainbow", Color3.fromRGB(255, 100, 255))
-    
-    rainbowConnection = RunService.Heartbeat:Connect(function()
-        if isRainbow and player.Character then
+    noclipConnection = RunService.Stepped:Connect(function()
+        if isNoclip and player.Character then
             for _, part in pairs(player.Character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    local hue = tick() * 2 % 1
-                    part.Color = Color3.fromHSV(hue, 1, 1)
+                if part:IsA('BasePart') then
+                    part.CanCollide = false
                 end
             end
         end
     end)
 end
 
-local function stopRainbow()
-    isRainbow = false
-    if rainbowConnection then rainbowConnection:Disconnect() end
+local function stopNoclip()
+    isNoclip = false
+    if noclipConnection then noclipConnection:Disconnect() end
+    
     if player.Character then
         for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.Color = Color3.fromRGB(163, 162, 165) -- Default color
+            if part:IsA('BasePart') then
+                part.CanCollide = true
             end
         end
     end
-    addMessage("✅ Tắt hiệu ứng rainbow", Color3.fromRGB(100, 255, 100))
+    addMessage("✅ Tắt noclip", Color3.fromRGB(100, 255, 100))
 end
 
-local function addSparkles()
-    if player.Character then
-        for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                if not part:FindFirstChild("Sparkles") then
-                    Instance.new("Sparkles", part)
-                end
-            end
-        end
-        addMessage("✨ Đã thêm hiệu ứng lấp lánh", Color3.fromRGB(255, 255, 100))
-    end
-end
-
-local function removeSparkles()
-    if player.Character then
-        for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") then
-                for _, effect in pairs(part:GetChildren()) do
-                    if effect:IsA("Sparkles") then
-                        effect:Destroy()
-                    end
-                end
-            end
-        end
-        addMessage("✅ Đã xóa hiệu ứng lấp lánh", Color3.fromRGB(100, 255, 100))
-    end
-end
-
-local function addFire()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        if not player.Character.HumanoidRootPart:FindFirstChild("Fire") then
-            Instance.new("Fire", player.Character.HumanoidRootPart)
-        end
-        addMessage("🔥 Đã thêm hiệu ứng lửa", Color3.fromRGB(255, 100, 100))
-    end
-end
-
-local function removeFire()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        for _, effect in pairs(player.Character.HumanoidRootPart:GetChildren()) do
-            if effect:IsA("Fire") then
-                effect:Destroy()
-            end
-        end
-        addMessage("✅ Đã xóa hiệu ứng lửa", Color3.fromRGB(100, 255, 100))
-    end
-end
-
-local function addSmoke()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        if not player.Character.HumanoidRootPart:FindFirstChild("Smoke") then
-            Instance.new("Smoke", player.Character.HumanoidRootPart)
-        end
-        addMessage("💨 Đã thêm hiệu ứng khói", Color3.fromRGB(150, 150, 150))
-    end
-end
-
-local function removeSmoke()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        for _, effect in pairs(player.Character.HumanoidRootPart:GetChildren()) do
-            if effect:IsA("Smoke") then
-                effect:Destroy()
-            end
-        end
-        addMessage("✅ Đã xóa hiệu ứng khói", Color3.fromRGB(100, 255, 100))
-    end
-end
-
--- Auto Clicker
-local function startAutoClicker()
-    if isAutoClicker then 
-        addMessage("⚠️ Auto Clicker đã bật!", Color3.fromRGB(255, 200, 100))
-        return 
-    end
-    
-    isAutoClicker = true
-    addMessage("🖱️ Bật Auto Clicker", Color3.fromRGB(100, 255, 100))
-    
-    autoClickConnection = RunService.Heartbeat:Connect(function()
-        if isAutoClicker then
-            mouse1click()
-            wait(0.01)
-        end
-    end)
-end
-
-local function stopAutoClicker()
-    isAutoClicker = false
-    if autoClickConnection then
-        autoClickConnection:Disconnect()
-    end
-    addMessage("✅ Tắt Auto Clicker", Color3.fromRGB(100, 255, 100))
-end
-
--- Server Info
-local function showServerInfo()
-    local playerCount = #Players:GetPlayers()
-    local gameId = game.GameId
-    local placeId = game.PlaceId
-    local jobId = game.JobId
-    
-    addMessage("🌐 === THÔNG TIN SERVER ===", Color3.fromRGB(100, 200, 255))
-    addMessage("👥 Người chơi: " .. playerCount .. "/" .. Players.MaxPlayers, Color3.fromRGB(255, 255, 100))
-    addMessage("🎮 Game ID: " .. gameId, Color3.fromRGB(255, 255, 100))
-    addMessage("📍 Place ID: " .. placeId, Color3.fromRGB(255, 255, 100))
-    addMessage("🔗 Job ID: " .. jobId:sub(1, 8) .. "...", Color3.fromRGB(255, 255, 100))
-end
-
--- Rejoin
-local function rejoinServer()
-    addMessage("🔄 Đang vào lại server...", Color3.fromRGB(100, 255, 100))
-    TeleportService:Teleport(game.PlaceId, player)
-end
-
--- Server Hop
-local function serverHop()
-    addMessage("🌐 Đang tìm server mới...", Color3.fromRGB(100, 255, 100))
-    
-    local servers = {}
-    pcall(function()
-        local req = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
-        local data = game:GetService("HttpService"):JSONDecode(req)
-        
-        if data.data then
-            for _, server in pairs(data.data) do
-                if server.id ~= game.JobId and server.playing < server.maxPlayers then
-                    table.insert(servers, server.id)
-                end
-            end
-        end
-    end)
-    
-    if #servers > 0 then
-        local randomServer = servers[math.random(1, #servers)]
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, player)
-    else
-        addMessage("❌ Không tìm thấy server khác!", Color3.fromRGB(255, 100, 100))
-    end
-end
-
--- Các hàm khác (Anti AFK, Inf Jump, Noclip) - giữ nguyên
+-- Anti AFK
 local function startAntiAFK()
     if isAntiAFK then return end
     isAntiAFK = true
     addMessage("🛡️ Bật Anti AFK", Color3.fromRGB(100, 255, 100))
+    
     antiAFKConnection = RunService.Heartbeat:Connect(function()
         if isAntiAFK then
             pcall(function()
@@ -854,10 +468,12 @@ local function stopAntiAFK()
     addMessage("✅ Tắt Anti AFK", Color3.fromRGB(100, 255, 100))
 end
 
+-- Infinite Jump
 local function startInfJump()
     if isInfJump then return end
     isInfJump = true
     addMessage("🚀 Bật Infinite Jump", Color3.fromRGB(100, 255, 100))
+    
     infJumpConnection = UserInputService.JumpRequest:Connect(function()
         if isInfJump and player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid:ChangeState("Jumping")
@@ -871,35 +487,535 @@ local function stopInfJump()
     addMessage("✅ Tắt Infinite Jump", Color3.fromRGB(100, 255, 100))
 end
 
-local function startNoclip()
-    if isNoclip then return end
-    isNoclip = true
-    addMessage("👻 Bật noclip", Color3.fromRGB(100, 255, 100))
-    noclipConnection = RunService.Stepped:Connect(function()
-        if isNoclip and player.Character then
-            for _,v in pairs(player.Character:GetChildren()) do
-                if v:IsA('BasePart') then v.CanCollide = false end
+-- Player Functions
+local function teleportToPlayer(targetName)
+    local targetPlayer = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(string.lower(targetName)) then
+            targetPlayer = p
+            break
+        end
+    end
+    
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            addMessage("📍 Teleport đến " .. targetPlayer.Name, Color3.fromRGB(100, 255, 100))
+        end
+    else
+        addMessage("❌ Không tìm thấy: " .. targetName, Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function killPlayer(targetName)
+    local targetPlayer = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(string.lower(targetName)) then
+            targetPlayer = p
+            break
+        end
+    end
+    
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+        targetPlayer.Character.Humanoid.Health = 0
+        addMessage("💀 Đã giết " .. targetPlayer.Name, Color3.fromRGB(255, 100, 100))
+    else
+        addMessage("❌ Không tìm thấy: " .. targetName, Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function viewPlayer(targetName)
+    local targetPlayer = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(string.lower(targetName)) then
+            targetPlayer = p
+            break
+        end
+    end
+    
+    if targetPlayer then
+        workspace.CurrentCamera.CameraSubject = targetPlayer.Character
+        addMessage("👁️ Xem " .. targetPlayer.Name, Color3.fromRGB(100, 255, 255))
+    else
+        addMessage("❌ Không tìm thấy: " .. targetName, Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function unviewPlayer()
+    workspace.CurrentCamera.CameraSubject = player.Character
+    addMessage("👁️ Trở về camera bình thường", Color3.fromRGB(100, 255, 100))
+end
+
+-- Character Functions
+local function startSpin()
+    if isSpin then return end
+    isSpin = true
+    addMessage("🌀 Bật quay tròn", Color3.fromRGB(100, 255, 100))
+    
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local spin = Instance.new("BodyAngularVelocity")
+        spin.MaxTorque = Vector3.new(0, math.huge, 0)
+        spin.AngularVelocity = Vector3.new(0, 20, 0)
+        spin.Parent = player.Character.HumanoidRootPart
+        
+        spinConnection = RunService.Heartbeat:Connect(function()
+            if not isSpin then
+                if spin and spin.Parent then spin:Destroy() end
+                if spinConnection then spinConnection:Disconnect() end
+            end
+        end)
+    end
+end
+
+local function stopSpin()
+    isSpin = false
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        for _, obj in pairs(player.Character.HumanoidRootPart:GetChildren()) do
+            if obj:IsA("BodyAngularVelocity") then
+                obj:Destroy()
+            end
+        end
+    end
+    addMessage("✅ Tắt quay tròn", Color3.fromRGB(100, 255, 100))
+end
+
+local function sitPlayer()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.Sit = true
+        addMessage("🪑 Ngồi", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function standPlayer()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.Sit = false
+        addMessage("🚶 Đứng", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function setInvisible()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA('BasePart') and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = 1
+            elseif part:IsA('Accessory') and part:FindFirstChild("Handle") then
+                part.Handle.Transparency = 1
+            end
+        end
+        if player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("face") then
+            player.Character.Head.face.Transparency = 1
+        end
+        addMessage("👻 Ẩn nhân vật", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function setVisible()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA('BasePart') and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = 0
+            elseif part:IsA('Accessory') and part:FindFirstChild("Handle") then
+                part.Handle.Transparency = 0
+            end
+        end
+        if player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("face") then
+            player.Character.Head.face.Transparency = 0
+        end
+        addMessage("✅ Hiện nhân vật", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function playEmote(emoteId)
+    local id = tonumber(emoteId)
+    if id and player.Character and player.Character:FindFirstChild("Humanoid") then
+        pcall(function()
+            local animation = Instance.new("Animation")
+            animation.AnimationId = "rbxassetid://" .. id
+            local animTrack = player.Character.Humanoid:LoadAnimation(animation)
+            animTrack:Play()
+            addMessage("💃 Emote: " .. id, Color3.fromRGB(255, 100, 255))
+        end)
+    else
+        addMessage("❌ ID không hợp lệ!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function setBigHead()
+    if player.Character and player.Character:FindFirstChild("Head") then
+        player.Character.Head.Size = Vector3.new(4, 4, 4)
+        addMessage("🤕 Đầu to", Color3.fromRGB(255, 200, 100))
+    end
+end
+
+local function resetHead()
+    if player.Character and player.Character:FindFirstChild("Head") then
+        player.Character.Head.Size = Vector3.new(2, 1, 1)
+        addMessage("✅ Reset đầu", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+-- Exploit Functions
+local function setGravity(value)
+    local num = tonumber(value)
+    if num then
+        workspace.Gravity = num
+        addMessage("🌍 Trọng lực: " .. num, Color3.fromRGB(150, 255, 150))
+    else
+        addMessage("❌ Số không hợp lệ!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function startESP()
+    if isESP then return end
+    isESP = true
+    addMessage("👻 Bật ESP", Color3.fromRGB(100, 255, 255))
+    
+    espConnection = RunService.Heartbeat:Connect(function()
+        if isESP then
+            for _, otherPlayer in pairs(Players:GetPlayers()) do
+                if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local highlight = otherPlayer.Character:FindFirstChild("ESPHighlight")
+                    if not highlight then
+                        highlight = Instance.new("Highlight")
+                        highlight.Name = "ESPHighlight"
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+                        highlight.Parent = otherPlayer.Character
+                    end
+                end
             end
         end
     end)
 end
 
-local function stopNoclip()
-    isNoclip = false
-    if noclipConnection then noclipConnection:Disconnect() end
-    if player.Character then
-        for _,v in pairs(player.Character:GetChildren()) do
-            if v:IsA('BasePart') then v.CanCollide = true end
+local function stopESP()
+    isESP = false
+    if espConnection then espConnection:Disconnect() end
+    
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        if otherPlayer.Character then
+            local highlight = otherPlayer.Character:FindFirstChild("ESPHighlight")
+            if highlight then highlight:Destroy() end
         end
     end
-    addMessage("✅ Tắt noclip", Color3.fromRGB(100, 255, 100))
+    addMessage("✅ Tắt ESP", Color3.fromRGB(100, 255, 100))
 end
 
--- Script loaders
+local function startFullbright()
+    if isFullbright then return end
+    isFullbright = true
+    addMessage("💡 Bật Fullbright", Color3.fromRGB(255, 255, 100))
+    
+    game.Lighting.Brightness = 2
+    game.Lighting.ClockTime = 14
+    game.Lighting.FogEnd = 100000
+    game.Lighting.GlobalShadows = false
+    game.Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end
+
+local function stopFullbright()
+    isFullbright = false
+    addMessage("✅ Tắt Fullbright", Color3.fromRGB(100, 255, 100))
+    
+    game.Lighting.Brightness = 1
+    game.Lighting.ClockTime = 8
+    game.Lighting.FogEnd = originalFogEnd or 100000
+    game.Lighting.GlobalShadows = true
+    game.Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
+end
+
+-- No Fog Function
+local function removefog()
+    if isNoFog then return end
+    isNoFog = true
+    
+    -- Save original fog settings
+    originalFogEnd = game.Lighting.FogEnd
+    
+    -- Remove fog
+    game.Lighting.FogEnd = 100000000
+    game.Lighting.FogStart = 100000000
+    
+    addMessage("🌫️ Đã xóa xương mù", Color3.fromRGB(100, 255, 255))
+end
+
+local function addFog()
+    isNoFog = false
+    
+    -- Restore original fog
+    game.Lighting.FogEnd = originalFogEnd or 100000
+    game.Lighting.FogStart = 0
+    
+    addMessage("✅ Đã thêm lại xương mù", Color3.fromRGB(100, 255, 100))
+end
+
+local function startAutoClicker()
+    if isAutoClicker then return end
+    isAutoClicker = true
+    addMessage("🖱️ Bật Auto Clicker", Color3.fromRGB(100, 255, 100))
+    
+    autoClickConnection = RunService.Heartbeat:Connect(function()
+        if isAutoClicker then
+            pcall(function()
+                mouse1click()
+            end)
+            wait(0.01)
+        end
+    end)
+end
+
+local function stopAutoClicker()
+    isAutoClicker = false
+    if autoClickConnection then autoClickConnection:Disconnect() end
+    addMessage("✅ Tắt Auto Clicker", Color3.fromRGB(100, 255, 100))
+end
+
+-- Utility Functions
+local function copyPlaceId()
+    pcall(function()
+        setclipboard(tostring(game.PlaceId))
+        addMessage("📋 Copy Place ID: " .. game.PlaceId, Color3.fromRGB(100, 255, 100))
+    end)
+end
+
+local function copyJobId()
+    pcall(function()
+        setclipboard(game.JobId)
+        addMessage("📋 Copy Job ID", Color3.fromRGB(100, 255, 100))
+    end)
+end
+
+local function showTime()
+    local time = os.date("%H:%M:%S - %d/%m/%Y")
+    addMessage("🕐 Thời gian: " .. time, Color3.fromRGB(255, 255, 100))
+end
+
+local function showPing()
+    local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+    addMessage("📡 Ping: " .. ping, Color3.fromRGB(100, 255, 255))
+end
+
+local function showPlayers()
+    addMessage("👥 Người chơi (" .. #Players:GetPlayers() .. "/" .. Players.MaxPlayers .. "):", Color3.fromRGB(100, 200, 255))
+    for i, p in pairs(Players:GetPlayers()) do
+        local status = p.Character and "✅" or "❌"
+        addMessage(i .. ". " .. status .. " " .. p.Name, Color3.fromRGB(255, 255, 100))
+    end
+end
+
+local function showFPS()
+    local fps = workspace:GetRealPhysicsFPS()
+    addMessage("🖥️ FPS: " .. math.floor(fps), Color3.fromRGB(100, 255, 255))
+end
+
+local function walkToPosition(x, y, z)
+    local posX, posY, posZ = tonumber(x), tonumber(y), tonumber(z)
+    if posX and posY and posZ and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(posX, posY, posZ)
+        addMessage("🚶 Đi đến: " .. posX .. ", " .. posY .. ", " .. posZ, Color3.fromRGB(100, 255, 100))
+    else
+        addMessage("❌ Tọa độ không hợp lệ!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function getPosition()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local pos = player.Character.HumanoidRootPart.Position
+        addMessage("📍 Vị trí: " .. math.floor(pos.X) .. ", " .. math.floor(pos.Y) .. ", " .. math.floor(pos.Z), Color3.fromRGB(100, 255, 255))
+    end
+end
+
+local function savePosition()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = player.Character.HumanoidRootPart.CFrame
+        addMessage("💾 Lưu vị trí", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function loadPosition()
+    if savedPosition and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = savedPosition
+        addMessage("📂 Tải vị trí", Color3.fromRGB(100, 255, 100))
+    else
+        addMessage("❌ Chưa lưu vị trí!", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function showServerInfo()
+    local playerCount = #Players:GetPlayers()
+    local gameId = game.GameId
+    local placeId = game.PlaceId
+    
+    addMessage("🌐 === SERVER INFO ===", Color3.fromRGB(100, 200, 255))
+    addMessage("👥 Players: " .. playerCount .. "/" .. Players.MaxPlayers, Color3.fromRGB(255, 255, 100))
+    addMessage("🎮 Game ID: " .. gameId, Color3.fromRGB(255, 255, 100))
+    addMessage("📍 Place ID: " .. placeId, Color3.fromRGB(255, 255, 100))
+end
+
+local function rejoinServer()
+    addMessage("🔄 Rejoining server...", Color3.fromRGB(100, 255, 100))
+    game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+end
+
+-- Visual Effects
+local function startRainbow()
+    if isRainbow then return end
+    isRainbow = true
+    addMessage("🌈 Bật Rainbow", Color3.fromRGB(255, 100, 255))
+    
+    rainbowConnection = RunService.Heartbeat:Connect(function()
+        if isRainbow and player.Character then
+            for _, part in pairs(player.Character:GetChildren()) do
+                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                    local hue = tick() * 2 % 1
+                    part.Color = Color3.fromHSV(hue, 1, 1)
+                end
+            end
+        end
+    end)
+end
+
+local function stopRainbow()
+    isRainbow = false
+    if rainbowConnection then rainbowConnection:Disconnect() end
+    
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.Color = Color3.fromRGB(163, 162, 165)
+            end
+        end
+    end
+    addMessage("✅ Tắt Rainbow", Color3.fromRGB(100, 255, 100))
+end
+
+local function addSparkles()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" and not part:FindFirstChild("Sparkles") then
+                Instance.new("Sparkles", part)
+            end
+        end
+        addMessage("✨ Thêm sparkles", Color3.fromRGB(255, 255, 100))
+    end
+end
+
+local function removeSparkles()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                for _, effect in pairs(part:GetChildren()) do
+                    if effect:IsA("Sparkles") then
+                        effect:Destroy()
+                    end
+                end
+            end
+        end
+        addMessage("✅ Xóa sparkles", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function addFire()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        if not player.Character.HumanoidRootPart:FindFirstChild("Fire") then
+            Instance.new("Fire", player.Character.HumanoidRootPart)
+        end
+        addMessage("🔥 Thêm fire", Color3.fromRGB(255, 100, 100))
+    end
+end
+
+local function removeFire()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local fire = player.Character.HumanoidRootPart:FindFirstChild("Fire")
+        if fire then fire:Destroy() end
+        addMessage("✅ Xóa fire", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function addSmoke()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        if not player.Character.HumanoidRootPart:FindFirstChild("Smoke") then
+            Instance.new("Smoke", player.Character.HumanoidRootPart)
+        end
+        addMessage("💨 Thêm smoke", Color3.fromRGB(150, 150, 150))
+    end
+end
+
+local function removeSmoke()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local smoke = player.Character.HumanoidRootPart:FindFirstChild("Smoke")
+        if smoke then smoke:Destroy() end
+        addMessage("✅ Xóa smoke", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function addTrail()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        if not player.Character.HumanoidRootPart:FindFirstChild("Trail") then
+            local attachment1 = Instance.new("Attachment", player.Character.HumanoidRootPart)
+            local attachment2 = Instance.new("Attachment", player.Character.HumanoidRootPart)
+            attachment1.Position = Vector3.new(0, -2.4, 0)
+            attachment2.Position = Vector3.new(0, 2.4, 0)
+            
+            local trail = Instance.new("Trail", player.Character.HumanoidRootPart)
+            trail.Attachment0 = attachment1
+            trail.Attachment1 = attachment2
+            trail.Lifetime = 1
+            trail.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 255))
+            }
+        end
+        addMessage("🌈 Thêm trail", Color3.fromRGB(255, 200, 100))
+    end
+end
+
+local function removeTrail()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        for _, obj in pairs(player.Character.HumanoidRootPart:GetChildren()) do
+            if obj:IsA("Trail") or obj:IsA("Attachment") then
+                obj:Destroy()
+            end
+        end
+        addMessage("✅ Xóa trail", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+local function addGlow()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" and not part:FindFirstChild("PointLight") then
+                local light = Instance.new("PointLight", part)
+                light.Brightness = 2
+                light.Range = 20
+                light.Color = Color3.fromRGB(0, 255, 255)
+            end
+        end
+        addMessage("✨ Thêm glow", Color3.fromRGB(255, 255, 100))
+    end
+end
+
+local function removeGlow()
+    if player.Character then
+        for _, part in pairs(player.Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                for _, light in pairs(part:GetChildren()) do
+                    if light:IsA("PointLight") then
+                        light:Destroy()
+                    end
+                end
+            end
+        end
+        addMessage("✅ Xóa glow", Color3.fromRGB(100, 255, 100))
+    end
+end
+
+-- Script loaders (chỉ giữ những script hoạt động)
 local function loadScript(scriptName, url)
     pcall(function()
         loadstring(game:HttpGet(url))()
-        addMessage("⚡ Đã tải " .. scriptName, Color3.fromRGB(100, 255, 100))
+        addMessage("⚡ Tải " .. scriptName, Color3.fromRGB(100, 255, 100))
     end)
 end
 
@@ -932,51 +1048,61 @@ local function processCommand(input)
             if child:IsA("Frame") then child:Destroy() end
         end
         outputScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    -- New commands
+        
+    -- Player commands
     elseif command == "tp" and args[2] then teleportToPlayer(args[2])
-    elseif command == "antikick" then startAntiKick()
-    elseif command == "unantikick" then stopAntiKick()
-    elseif command == "autoclick" then startAutoClicker()
-    elseif command == "unautoclick" then stopAutoClicker()
-    elseif command == "serverinfo" then showServerInfo()
-    elseif command == "rejoin" then rejoinServer()
-    elseif command == "serverhop" then serverHop()
-    elseif command == "theme" then
-        if args[2] and themes[args[2]] then
-            currentTheme = args[2]
-            updateTheme()
-            addMessage("🎨 Đã đổi theme: " .. args[2], Color3.fromRGB(100, 255, 100))
-        else
-            addMessage("🎨 Themes có sẵn: dark, light, rgb", Color3.fromRGB(255, 255, 100))
-        end
-    -- Player Control Commands
-    elseif command == "freeze" and args[2] then freezePlayer(args[2])
-    elseif command == "unfreeze" and args[2] then unfreezePlayer(args[2])
-    elseif command == "bring" and args[2] then bringPlayer(args[2])
-    elseif command == "goto" and args[2] then gotoPlayer(args[2])
+    elseif command == "kill" and args[2] then killPlayer(args[2])
+    elseif command == "goto" and args[2] then teleportToPlayer(args[2])
     elseif command == "view" and args[2] then viewPlayer(args[2])
     elseif command == "unview" then unviewPlayer()
-    -- Character Mods Commands
-    elseif command == "bighead" then setBigHead()
-    elseif command == "unbighead" then resetHead()
-    elseif command == "smallhead" then setSmallHead()
-    elseif command == "unsmallhead" then resetHead()
+    
+    -- Character commands
     elseif command == "spin" then startSpin()
     elseif command == "unspin" then stopSpin()
-    elseif command == "dance" then startDance()
-    elseif command == "undance" then stopDance()
-    -- Exploits Commands
-    elseif command == "walkspeed" and args[2] then setSpeed(args[2]) -- Alias
-    elseif command == "jumpheight" and args[2] then setJump(args[2]) -- Alias
+    elseif command == "sit" then sitPlayer()
+    elseif command == "unsit" then standPlayer()
+    elseif command == "invisible" then setInvisible()
+    elseif command == "uninvisible" then setVisible()
+    elseif command == "emote" and args[2] then playEmote(args[2])
+    elseif command == "bighead" then setBigHead()
+    elseif command == "unbighead" then resetHead()
+    
+    -- Exploit commands
+    elseif command == "walkspeed" and args[2] then setSpeed(args[2])
+    elseif command == "jumpheight" and args[2] then setJump(args[2])
     elseif command == "gravity" and args[2] then setGravity(args[2])
-    elseif command == "reach" and args[2] then
-        addMessage("🎯 Reach hack đang được phát triển", Color3.fromRGB(255, 200, 100))
-    -- Utilities Commands
+    elseif command == "esp" then startESP()
+    elseif command == "unesp" then stopESP()
+    elseif command == "fullbright" then startFullbright()
+    elseif command == "unfullbright" then stopFullbright()
+    elseif command == "nofog" then removefog()
+    elseif command == "fog" then addFog()
+    elseif command == "autoclick" then startAutoClicker()
+    elseif command == "unautoclick" then stopAutoClicker()
+    
+    -- Utility commands
     elseif command == "copyid" then copyPlaceId()
     elseif command == "copyjob" then copyJobId()
     elseif command == "time" then showTime()
     elseif command == "ping" then showPing()
-    -- Visual Effects Commands
+    elseif command == "players" then showPlayers()
+    elseif command == "fps" then showFPS()
+    elseif command == "walkto" and args[2] and args[3] and args[4] then walkToPosition(args[2], args[3], args[4])
+    elseif command == "getpos" then getPosition()
+    elseif command == "savepos" then savePosition()
+    elseif command == "loadpos" then loadPosition()
+    elseif command == "serverinfo" then showServerInfo()
+    elseif command == "rejoin" then rejoinServer()
+    elseif command == "theme" then
+        if args[2] and themes[args[2]] then
+            currentTheme = args[2]
+            updateTheme()
+            addMessage("🎨 Theme: " .. args[2], Color3.fromRGB(100, 255, 100))
+        else
+            addMessage("🎨 Themes: dark, light, rgb", Color3.fromRGB(255, 255, 100))
+        end
+        
+    -- Visual commands
     elseif command == "rainbow" then startRainbow()
     elseif command == "unrainbow" then stopRainbow()
     elseif command == "sparkles" then addSparkles()
@@ -985,37 +1111,36 @@ local function processCommand(input)
     elseif command == "unfire" then removeFire()
     elseif command == "smoke" then addSmoke()
     elseif command == "unsmoke" then removeSmoke()
-    -- Script Hub Commands
+    elseif command == "trail" then addTrail()
+    elseif command == "untrail" then removeTrail()
+    elseif command == "glow" then addGlow()
+    elseif command == "unglow" then removeGlow()
+    
+    -- Script Hub
     elseif command == "iy" then
         loadScript("Infinite Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
-    elseif command == "airflow" then
-        loadScript("AirFlow", "https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua")
     elseif command == "h4x" then
         loadScript("H4X Scripts", "https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua")
-    elseif command == "r15" then
-        loadScript("FE Emotes GUI", "https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui")
     elseif command == "skull" then
         loadScript("Skull Hub", "https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua")
-    elseif command == "nameless" then
-        loadScript("Nameless Admin", "https://rawscripts.net/raw/Universal-Script-nameless-admin-15646")
-    elseif command == "nathub" then
-        loadScript("NatHub", "https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua")
     elseif command == "arceus" then
         loadScript("Arceus X V3", "https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3")
-    elseif command == "shader" then
-        loadScript("PShade Ultimate", "https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua")
     elseif command == "native" then
         loadScript("Native Script", "https://getnative.cc/script/loader")
-    elseif command == "nolag" then
-        loadScript("No Lag Hub", "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
-    elseif command == "micup" then
-        loadScript("I Wanna Run Away", "https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua")
-    elseif command == "speedhub" then
-        loadScript("Speed Hub X", "https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062")
-    elseif command == "lunor" then
-        loadScript("Lunor Hub", "https://lunor.dev/loader")
-    elseif command == "thunderz" then
-        loadScript("ThunderZ", "https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua")
+    elseif command == "cilent" then
+        loadScript("Menu Hub Client", "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Cilent")
+    elseif command == "music" then
+        loadScript("Music Hub", "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music")
+    elseif command == "graphics" then
+        loadScript("Graphics Hub", "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics")
+    elseif command == "paint" then
+        loadScript("Paint Hub", "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint")
+    elseif command == "v1" then
+        loadScript("Sddnin V1", "https://raw.githubusercontent.com/Sddnin0/Sddnin/refs/heads/main/V1")
+    elseif command == "v15" then
+        loadScript("Sddnin V1.5", "https://raw.githubusercontent.com/Sddnin0/Sddnin/refs/heads/main/V2%20Free")
+    elseif command == "v2" then
+        loadScript("Sddnin V2", "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Key")
     else
         addMessage("❌ Lệnh không tồn tại!", Color3.fromRGB(255, 100, 100))
     end
@@ -1025,8 +1150,8 @@ end
 local function sendCommand()
     local input = chatInput.Text:gsub("^%s*(.-)%s*$", "%1")
     if input ~= "" then
-        processCommand(input)
         chatInput.Text = ""
+        processCommand(input)
     end
 end
 
@@ -1037,7 +1162,7 @@ chatInput.FocusLost:Connect(function(enterPressed)
     end
 end)
 
--- Sự kiện theme button
+-- Theme button
 themeButton.MouseButton1Click:Connect(function()
     local themeOrder = {"dark", "light", "rgb"}
     local currentIndex = 1
@@ -1055,16 +1180,16 @@ themeButton.MouseButton1Click:Connect(function()
     addMessage("🎨 Theme: " .. currentTheme, Color3.fromRGB(100, 255, 100))
 end)
 
--- Sự kiện minimize/maximize
+-- Minimize button
 minimizeButton.MouseButton1Click:Connect(function()
     if isMinimized then
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 600, 0, 380)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 550, 0, 350)})
         tween:Play()
         contentFrame.Visible = true
         minimizeButton.Text = "−"
         isMinimized = false
     else
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 600, 0, 45)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 550, 0, 40)})
         tween:Play()
         contentFrame.Visible = false
         minimizeButton.Text = "+"
@@ -1072,52 +1197,56 @@ minimizeButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Sự kiện đóng
+-- Close button
 closeButton.MouseButton1Click:Connect(function()
-    -- Cleanup connections
+    -- Cleanup
     if noclipConnection then noclipConnection:Disconnect() end
     if antiAFKConnection then antiAFKConnection:Disconnect() end
     if infJumpConnection then infJumpConnection:Disconnect() end
     if autoClickConnection then autoClickConnection:Disconnect() end
     if spinConnection then spinConnection:Disconnect() end
-    if danceConnection then danceConnection:Disconnect() end
     if rainbowConnection then rainbowConnection:Disconnect() end
+    if espConnection then espConnection:Disconnect() end
     
     screenGui:Destroy()
 end)
 
--- Phím tắt F1
+-- F1 key
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.F1 then
         screenGui.Enabled = not screenGui.Enabled
     end
 end)
 
--- Dọn dẹp khi character respawn
+-- Character cleanup
 player.CharacterAdded:Connect(function()
+    -- Reset states
     isNoclip = false
     isAntiAFK = false
     isInfJump = false
     isAutoClicker = false
     isSpin = false
-    isDance = false
     isRainbow = false
+    isESP = false
+    isFullbright = false
+    isNoFog = false
     
+    -- Disconnect connections
     if noclipConnection then noclipConnection:Disconnect() end
     if antiAFKConnection then antiAFKConnection:Disconnect() end
     if infJumpConnection then infJumpConnection:Disconnect() end
     if autoClickConnection then autoClickConnection:Disconnect() end
     if spinConnection then spinConnection:Disconnect() end
-    if danceConnection then danceConnection:Disconnect() end
     if rainbowConnection then rainbowConnection:Disconnect() end
+    if espConnection then espConnection:Disconnect() end
 end)
 
--- Khởi tạo theme
+-- Initialize
 updateTheme()
 
 -- Welcome messages
-addMessage("🚀 Ultimate Command Hub V3 sẵn sàng!", Color3.fromRGB(100, 255, 100))
-addMessage("🎉 40+ lệnh mới: freeze, bighead, rainbow, gravity...", Color3.fromRGB(200, 200, 255))
-addMessage("🎨 Đổi theme: theme dark/light/rgb hoặc nút 🎨", Color3.fromRGB(255, 255, 100))
+addMessage("🚀 Command Hub V8.1 - Updated!", Color3.fromRGB(100, 255, 100))
+addMessage("🌫️ Thêm: nofog/fog - Xóa/thêm xương mù", Color3.fromRGB(100, 255, 255))
+addMessage("⚡ +7 script mới: cilent, music, graphics, paint, v1, v15, v2", Color3.fromRGB(255, 255, 100))
 
-print("Ultimate Command Hub V3 loaded! Press F1 to toggle.")
+print("Command Hub V8.1 - Updated! Press F1 to toggle.")
