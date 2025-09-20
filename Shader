@@ -7,7 +7,7 @@
 
 -- RTX ULTRA - PHIÊN BẢN SIÊU ỔN ĐỊNH
 -- Fix mọi lỗi, tối ưu performance, chạy mượt
--- Made by Claude AI - 2025 Edition
+-- Made by Mila - 2025 Edition
 
 print("🚀 KHỞI ĐỘNG RTX ULTRA - PHIÊN BẢN ỔN ĐỊNH...")
 print("🔧 Fixed all bugs, optimized for stability!")
