@@ -1,4 +1,5 @@
--- Ultimate Command Hub V8 - Fixed Version
+-- Advanced Player Functions
+local followTarget = nil-- Ultimate Command Hub V8 - Fixed Version
 -- Chỉ giữ lại các lệnh hoạt động 100%
 
 local Players = game:GetService("Players")
@@ -9,7 +10,7 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Biến lưu trạng thái (chỉ những cái cần thiết)
+-- Biến lưu trạng thái (đã giảm)
 local isNoclip = false
 local isAntiAFK = false
 local isInfJump = false
@@ -22,11 +23,12 @@ local isNoFog = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
 local originalFogEnd = nil
+local originalGravity = 196.2
 local isMinimized = false
 local currentTheme = "dark"
 local savedPosition = nil
 
--- Connections
+-- Connections (đã giảm)
 local antiAFKConnection, infJumpConnection, noclipConnection, autoClickConnection
 local spinConnection, rainbowConnection, espConnection
 
@@ -95,7 +97,7 @@ local titleText = Instance.new("TextLabel")
 titleText.Size = UDim2.new(1, -100, 1, 0)
 titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "🚀 Command Hub V8 - Fixed"
+titleText.Text = "🚀 Command Hub V1 - Fixed"
 titleText.TextColor3 = themes[currentTheme].text
 titleText.TextSize = 16
 titleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -221,7 +223,6 @@ clear - Xóa chat
 
 👥 PLAYER:
 tp [tên] - Teleport đến người chơi
-kill [tên] - Giết người chơi  
 goto [tên] - Đi đến người chơi
 view [tên] | unview - Xem camera
 
@@ -231,11 +232,12 @@ sit | unsit - Ngồi/đứng
 invisible | uninvisible - Ẩn/hiện
 emote [id] - Chơi emote theo ID
 bighead | unbighead - Đầu to/nhỏ
+size [số] - Thay đổi kích thước
 
 ⚡ EXPLOITS:
 walkspeed [số] - Alias cho speed
 jumpheight [số] - Alias cho jump
-gravity [số] - Thay đổi trọng lực
+gravity [số] | ungravity - Thay đổi/reset trọng lực
 esp | unesp - Nhìn xuyên tường
 fullbright | unfullbright - Sáng tối đa
 nofog | fog - Xóa/thêm xương mù
@@ -247,12 +249,14 @@ copyjob - Copy Job ID
 time - Hiển thị thời gian
 ping - Hiển thị ping
 players - Danh sách người chơi
-fps - Hiển thị FPS
+memory - Hiển thị RAM
 walkto [x] [y] [z] - Đi đến tọa độ
 getpos - Lấy vị trí hiện tại
 savepos | loadpos - Lưu/tải vị trí
 serverinfo - Thông tin server
 rejoin - Vào lại server
+hop - Đổi server khác (fixed)
+leave - Thoát khỏi game (fixed)
 
 🎨 VISUAL:
 rainbow | unrainbow - Đổi màu
@@ -1049,14 +1053,15 @@ local function processCommand(input)
         end
         outputScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
         
-    -- Player commands
+    -- Player commands (updated - removed kill, bring, freeze, fling)
     elseif command == "tp" and args[2] then teleportToPlayer(args[2])
-    elseif command == "kill" and args[2] then killPlayer(args[2])
     elseif command == "goto" and args[2] then teleportToPlayer(args[2])
     elseif command == "view" and args[2] then viewPlayer(args[2])
     elseif command == "unview" then unviewPlayer()
+    elseif command == "follow" and args[2] then followPlayer(args[2])
+    elseif command == "unfollow" then unfollowPlayer()
     
-    -- Character commands
+    -- Character commands (updated with new commands)
     elseif command == "spin" then startSpin()
     elseif command == "unspin" then stopSpin()
     elseif command == "sit" then sitPlayer()
@@ -1066,11 +1071,19 @@ local function processCommand(input)
     elseif command == "emote" and args[2] then playEmote(args[2])
     elseif command == "bighead" then setBigHead()
     elseif command == "unbighead" then resetHead()
+    elseif command == "smallhead" then setSmallHead()
+    elseif command == "unsmallhead" then resetHead()
+    elseif command == "size" and args[2] then changeSize(args[2])
+    elseif command == "float" then startFloat()
+    elseif command == "unfloat" then stopFloat()
+    elseif command == "platform" then createPlatform()
+    elseif command == "unplatform" then destroyPlatform()
     
-    -- Exploit commands
+    -- Exploit commands (updated with new commands)
     elseif command == "walkspeed" and args[2] then setSpeed(args[2])
     elseif command == "jumpheight" and args[2] then setJump(args[2])
     elseif command == "gravity" and args[2] then setGravity(args[2])
+    elseif command == "ungravity" then resetGravity()
     elseif command == "esp" then startESP()
     elseif command == "unesp" then stopESP()
     elseif command == "fullbright" then startFullbright()
@@ -1079,20 +1092,40 @@ local function processCommand(input)
     elseif command == "fog" then addFog()
     elseif command == "autoclick" then startAutoClicker()
     elseif command == "unautoclick" then stopAutoClicker()
+    elseif command == "walkonwater" then startWalkOnWater()
+    elseif command == "unwalkonwater" then stopWalkOnWater()
+    elseif command == "autorespawn" then startAutoRespawn()
+    elseif command == "unautorespawn" then stopAutoRespawn()
+    elseif command == "bighitbox" then startBigHitbox()
+    elseif command == "unbighitbox" then stopBigHitbox()
+    elseif command == "clicktp" then startClickTeleport()
+    elseif command == "unclicktp" then stopClickTeleport()
+    elseif command == "reach" and args[2] then setReach(args[2])
+    elseif command == "unreach" then resetReach()
     
-    -- Utility commands
+    -- Utility commands (updated with new commands)
     elseif command == "copyid" then copyPlaceId()
     elseif command == "copyjob" then copyJobId()
     elseif command == "time" then showTime()
     elseif command == "ping" then showPing()
     elseif command == "players" then showPlayers()
     elseif command == "fps" then showFPS()
+    elseif command == "memory" then showMemory()
+    elseif command == "age" then showAge()
+    elseif command == "userid" then showUserID()
     elseif command == "walkto" and args[2] and args[3] and args[4] then walkToPosition(args[2], args[3], args[4])
     elseif command == "getpos" then getPosition()
     elseif command == "savepos" then savePosition()
     elseif command == "loadpos" then loadPosition()
     elseif command == "serverinfo" then showServerInfo()
     elseif command == "rejoin" then rejoinServer()
+    elseif command == "serverhop" then serverHop()
+    elseif command == "shutdown" then shutdownGame()
+    
+    -- Tools commands (new)
+    elseif command == "btools" then giveBtools()
+    elseif command == "tptool" then giveTpTool()
+    
     elseif command == "theme" then
         if args[2] and themes[args[2]] then
             currentTheme = args[2]
@@ -1102,7 +1135,7 @@ local function processCommand(input)
             addMessage("🎨 Themes: dark, light, rgb", Color3.fromRGB(255, 255, 100))
         end
         
-    -- Visual commands
+    -- Visual commands (updated with new commands)
     elseif command == "rainbow" then startRainbow()
     elseif command == "unrainbow" then stopRainbow()
     elseif command == "sparkles" then addSparkles()
@@ -1115,6 +1148,10 @@ local function processCommand(input)
     elseif command == "untrail" then removeTrail()
     elseif command == "glow" then addGlow()
     elseif command == "unglow" then removeGlow()
+    elseif command == "bubble" then addBubble()
+    elseif command == "unbubble" then removeBubble()
+    elseif command == "ghost" then makeGhost()
+    elseif command == "unghost" then unmakeGhost()
     
     -- Script Hub
     elseif command == "iy" then
@@ -1199,7 +1236,7 @@ end)
 
 -- Close button
 closeButton.MouseButton1Click:Connect(function()
-    -- Cleanup
+    -- Cleanup essential connections only
     if noclipConnection then noclipConnection:Disconnect() end
     if antiAFKConnection then antiAFKConnection:Disconnect() end
     if infJumpConnection then infJumpConnection:Disconnect() end
@@ -1220,7 +1257,7 @@ end)
 
 -- Character cleanup
 player.CharacterAdded:Connect(function()
-    -- Reset states
+    -- Reset essential states only
     isNoclip = false
     isAntiAFK = false
     isInfJump = false
@@ -1231,7 +1268,7 @@ player.CharacterAdded:Connect(function()
     isFullbright = false
     isNoFog = false
     
-    -- Disconnect connections
+    -- Disconnect essential connections
     if noclipConnection then noclipConnection:Disconnect() end
     if antiAFKConnection then antiAFKConnection:Disconnect() end
     if infJumpConnection then infJumpConnection:Disconnect() end
@@ -1245,8 +1282,8 @@ end)
 updateTheme()
 
 -- Welcome messages
-addMessage("🚀 Command Hub V8.1 - Updated!", Color3.fromRGB(100, 255, 100))
-addMessage("🌫️ Thêm: nofog/fog - Xóa/thêm xương mù", Color3.fromRGB(100, 255, 255))
-addMessage("⚡ +7 script mới: cilent, music, graphics, paint, v1, v15, v2", Color3.fromRGB(255, 255, 100))
+addMessage("🚀 Command Hub V11 - Cleaned!", Color3.fromRGB(100, 255, 100))
+addMessage("🗑️ Xóa 16 lệnh không cần thiết", Color3.fromRGB(255, 200, 100))
+addMessage("🔧 Sửa: leave (thoát game), hop (server hop)", Color3.fromRGB(100, 255, 255))
 
-print("Command Hub V8.1 - Updated! Press F1 to toggle.")
+print("Command Hub V11 - Cleaned loaded! Press F1 to toggle.")
