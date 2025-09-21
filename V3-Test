@@ -1,6 +1,5 @@
 -- Advanced Player Functions
 local followTarget = nil-- Ultimate Command Hub
--- Chỉ giữ lại các lệnh hoạt động 100%
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -97,7 +96,7 @@ local titleText = Instance.new("TextLabel")
 titleText.Size = UDim2.new(1, -100, 1, 0)
 titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "🚀 Command Hub V8 - Fixed"
+titleText.Text = "🚀 Command Hub "
 titleText.TextColor3 = themes[currentTheme].text
 titleText.TextSize = 16
 titleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -1269,7 +1268,7 @@ end)
 updateTheme()
 
 -- Welcome messages
-addMessage("🚀 Command Hub V12 - Essential!", Color3.fromRGB(100, 255, 100))
+addMessage("🚀 Command Hub!", Color3.fromRGB(100, 255, 100))
 addMessage("🗑️ Xóa: leave, hop, memory, size", Color3.fromRGB(255, 200, 100))
 addMessage("⚡ Script Hub: Chỉ giữ 7 script cần thiết", Color3.fromRGB(100, 255, 255))
 
