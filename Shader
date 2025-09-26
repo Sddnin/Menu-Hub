@@ -1,724 +1,117 @@
--- ██████╗ ████████╗██╗  ██╗    ██╗   ██╗██╗  ████████╗██████╗  █████╗ 
--- ██╔══██╗╚══██╔══╝╚██╗██╔╝    ██║   ██║██║  ╚══██╔══╝██╔══██╗██╔══██╗
--- ███████║   ██║    ╚███╔╝     ██║   ██║██║     ██║   ██████╔╝███████║
--- ██╔══██║   ██║    ██╔██╗     ██║   ██║██║     ██║   ██╔══██╗██╔══██║
--- ██║  ██║   ██║   ██╔╝ ██╗    ╚██████╔╝███████╗██║   ██║  ██║██║  ██║
--- ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝     ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
 
--- RTX ULTRA - PHIÊN BẢN SIÊU ỔN ĐỊNH
--- Fix mọi lỗi, tối ưu performance, chạy mượt
--- Made by Mila - 2025 Edition
+local Window = MakeWindow({
+    Hub = {Title = "Free version | 🔍 Search: Type script name", Animation = "Sddnin Hub"},
+    Key = {KeySystem = True, Title = "Key System", Description = "", KeyLink = "", Keys = {"Sddnin"},
+        Notifi = {Notifications = true, CorrectKey = "Running the Script...", Incorrectkey = "The key is incorrect", CopyKeyLink = "Copied to Clipboard"}}
+})
 
-print("🚀 KHỞI ĐỘNG RTX ULTRA - PHIÊN BẢN ỔN ĐỊNH...")
-print("🔧 Fixed all bugs, optimized for stability!")
+MinimizeButton({Image = "http://www.roblox.com/asset/?id=73608909933636", Size = {60, 60}, Color = Color3.fromRGB(10, 10, 10), Corner = true, Stroke = false, StrokeColor = Color3.fromRGB(255, 0, 0)})
 
--- Wait for game to load
-if not game:IsLoaded() then
-    game.Loaded:Wait()
+-- Tabs
+local Tab1o = MakeTab({Name = "Blox fruits"})
+local Tab2o = MakeTab({Name = "Misc"})
+local Tab3o = MakeTab({Name = "99 night in the forest"})
+local Tab4o = MakeTab({Name = "Dead rails"})
+local Tab5o = MakeTab({Name = "Grow a garden"})
+
+-- Script Database
+local Scripts = {
+    {n="Blue X Hub", g="BF", u="https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
+    {n="Redz", g="BF", u="https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau", s=true},
+    {n="Hop fruit", g="BF", u="https://scripts.alchemyhub.xyz", f=true},
+    {n="Min gaming", g="BF", u="https://raw.githubusercontent.com/MinGamingHubNew/RealMinGaming/refs/heads/main/MinGaminvHubBloxFruits.lua"},
+    {n="Rolls Rocye", g="BF", u="https://raw.githubusercontent.com/RealMatsune/Rolls-Rocye/refs/heads/main/Loading.lua"},
+    {n="Hiru Hub", g="BF", u="https://raw.githubusercontent.com/LuaStupid/Source/main/HiruHubVeriV2.lua"},
+    {n="Maru Hub", g="BF", u="https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
+    {n="Trau Roblox", g="BF", u="https://raw.githubusercontent.com/stuckez999/main/refs/heads/main/traurobloxpremium.lua"},
+    {n="Hop All", g="BF", u="https://raw.githubusercontent.com/Iamkhnah/noguchihyuga/refs/heads/main/ScriptHop.lua"},
+    {n="Teddy Hub", g="BF", u="https://raw.githubusercontent.com/skibiditoiletgojo/Haidepzai/refs/heads/main/Teddy-FREMIUM"},
+    {n="Infinite Yield", g="U", u="https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {n="Fly v3", g="U", u="fly_v3", e=true},
+    {n="Emote", g="U", u="https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui"},
+    {n="Nameless Admin", g="U", u="https://rawscripts.net/raw/Universal-Script-nameless-admin-15646"},
+    {n="Arceus X", g="U", u="https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"},
+    {n="Shader", g="U", u="https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua"},
+    {n="Fix lag", g="U", u="https://rawscripts.net/raw/Universal-Script-OP-Anti-Lah-24771"},
+    {n="Fly", g="U", u="https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"},
+    {n="I wanna run away", g="U", u="https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"},
+    {n="AirFlow", g="99N", u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"},
+    {n="H4x", g="99N", u="https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"},
+    {n="NPC lock", g="99N", u="https://rawscripts.net/raw/Dead-Rails-NPC-LOCK-32544"},
+    {n="TN Roblox", g="DR", u="https://raw.githubusercontent.com/thiennrb7/Script/refs/heads/main/Bringall"},
+    {n="Skull Hub", g="DR", u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"},
+    {n="NatHub", g="DR", u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"},
+    {n="Nebula Hub", g="DR", u="https://raw.githubusercontent.com/NebulaHubOfc/Public/refs/heads/main/Loader.lua"},
+    {n="Tp All", g="DR", u="https://raw.githubusercontent.com/ringtaa/deadrailsui.github.io/refs/heads/main/RINGTA.LUA"},
+    {n="Native", g="DR", u="https://getnative.cc/script/loader"},
+    {n="KiciaHook-V2", g="DR", u="https://rawscripts.net/raw/Dead-Rails-Alpha-OP-KiciaHook-V2-Dead-Rails-Auto-Farm-And-More-38614"},
+    {n="No lag", g="GAG", u="https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"},
+    {n="Limit Hub", g="GAG", u="https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua"},
+    {n="Speed Hub X", g="GAG", u="https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062"},
+    {n="Lunor", g="GAG", u="https://lunor.dev/loader"},
+    {n="ThunderZ", g="GAG", u="https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"}
+}
+
+-- Execute function
+local function Run(s)
+    local Settings = {JoinTeam = "Pirates", Translator = true}
+    if s.e then loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\40\39\104\116\116\112\115\58\47\47\103\105\115\116\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\101\111\122\111\110\101\89\84\47\98\102\48\51\55\100\102\102\57\102\48\97\55\48\48\49\55\51\48\52\100\100\100\54\55\102\100\99\100\51\55\48\47\114\97\119\47\101\49\52\101\55\52\102\52\50\53\98\48\54\48\100\102\53\50\51\51\52\51\99\102\51\48\98\55\56\55\48\55\52\101\98\51\99\53\100\50\47\97\114\99\101\117\115\37\50\53\50\48\120\37\50\53\50\48\102\108\121\37\50\53\50\48\50\37\50\53\50\48\111\98\102\108\117\99\97\116\111\114\39\41\44\116\114\117\101\41\41\40\41\10\10")()
+    elseif s.f then _G.FruitFinder = true; loadstring(game:HttpGet(s.u))()
+    elseif s.s then loadstring(game:HttpGet(s.u))(Settings)
+    else loadstring(game:HttpGet(s.u))() end
 end
-wait(2)
 
--- Services
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
-local TweenService = game:GetService("TweenService")
-local Debris = game:GetService("Debris")
-
-local player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
-
--- ════════════════════════════════════════
---           🎨 RTX LIGHTING SETUP
--- ════════════════════════════════════════
-
-local function setupRTXLighting()
-    local success = pcall(function()
-        print("🔆 Setting up RTX Lighting...")
-        
-        -- Clear old effects safely
-        for _, child in pairs(Lighting:GetChildren()) do
-            if child:IsA("PostEffect") or child:IsA("Atmosphere") or child:IsA("Sky") then
-                child:Destroy()
-            end
+-- Search function with instant execution
+local function QuickSearch(term)
+    if term == "" then return end
+    term = term:lower()
+    local found = false
+    for _, s in pairs(Scripts) do
+        if s.n:lower():find(term) then
+            print("🚀 Đang chạy: " .. s.n)
+            Run(s)
+            found = true
+            break
         end
-        
-        wait(0.5)
-        
-        -- Core lighting - Giảm sáng
-        Lighting.Technology = Enum.Technology.ShadowMap
-        Lighting.Brightness = 1.8
-        Lighting.ColorShift_Bottom = Color3.fromRGB(25, 35, 55)
-        Lighting.ColorShift_Top = Color3.fromRGB(235, 225, 210)
-        Lighting.EnvironmentDiffuseScale = 0.8
-        Lighting.EnvironmentSpecularScale = 1.4
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(100, 120, 150)
-        Lighting.ShadowSoftness = 0.8
-        
-        -- Atmosphere
-        local atmosphere = Instance.new("Atmosphere")
-        atmosphere.Parent = Lighting
-        atmosphere.Color = Color3.fromRGB(199, 199, 199)
-        atmosphere.Decay = Color3.fromRGB(106, 112, 125)
-        atmosphere.Density = 0.35
-        atmosphere.Offset = 0.25
-        atmosphere.Glare = 0.2
-        atmosphere.Haze = 1.5
-        
-        -- Sky
-        local sky = Instance.new("Sky")
-        sky.Parent = Lighting
-        sky.SkyboxBk = "rbxassetid://12064107"
-        sky.SkyboxDn = "rbxassetid://12064152"  
-        sky.SkyboxFt = "rbxassetid://12064121"
-        sky.SkyboxLf = "rbxassetid://12064115"
-        sky.SkyboxRt = "rbxassetid://12064131"
-        sky.SkyboxUp = "rbxassetid://12064147"
-        sky.SunAngularSize = 30
-        sky.MoonAngularSize = 10
-        sky.StarCount = 3000
-        
-        print("✅ RTX Lighting - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ RTX Lighting - Using fallback")
-        Lighting.Brightness = 2
-        Lighting.GlobalShadows = true
     end
+    if not found then print("❌ Không tìm thấy: " .. term) end
 end
 
--- ════════════════════════════════════════
---         ✨ POST PROCESSING EFFECTS
--- ════════════════════════════════════════
+-- Quick Search Box (placed in first tab)
+AddTextBox(Tab1o, {
+    Name = "🔍 Quick Search - Tìm và chạy script ngay",
+    Default = "",
+    PlaceholderText = "Gõ tên script để chạy ngay lập tức...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text) QuickSearch(text) end
+})
 
-local function setupPostProcessing()
-    local success = pcall(function()
-        print("✨ Setting up Post Processing...")
-        
-        -- Bloom Effect - Giảm intensity
-        local bloom = Instance.new("BloomEffect")
-        bloom.Parent = Lighting
-        bloom.Enabled = true
-        bloom.Intensity = 0.8
-        bloom.Size = 36
-        bloom.Threshold = 1.0
-        
-        -- Color Correction - Tone down brightness
-        local colorCorrect = Instance.new("ColorCorrectionEffect")
-        colorCorrect.Parent = Lighting
-        colorCorrect.Enabled = true
-        colorCorrect.Brightness = 0.05
-        colorCorrect.Contrast = 0.15
-        colorCorrect.Saturation = 0.2
-        colorCorrect.TintColor = Color3.fromRGB(245, 240, 225)
-        
-        -- Sun Rays - Giảm intensity
-        local sunrays = Instance.new("SunRaysEffect")
-        sunrays.Parent = Lighting
-        sunrays.Enabled = true
-        sunrays.Intensity = 0.15
-        sunrays.Spread = 0.5
-        
-        -- Depth of Field
-        local dof = Instance.new("DepthOfFieldEffect")
-        dof.Parent = Lighting
-        dof.Enabled = true
-        dof.FarIntensity = 0.15
-        dof.FocusDistance = 80
-        dof.InFocusRadius = 25
-        dof.NearIntensity = 0.2
-        
-        print("✅ Post Processing - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Post Processing - Failed, using basic")
-    end
-end
+AddButton(Tab1o, {Name = "📋 Xem tất cả scripts (" .. #Scripts .. ")", Callback = function()
+    print("=== DANH SÁCH TẤT CẢ SCRIPTS ===")
+    print("BF = Blox Fruits | U = Universal | DR = Dead Rails | GAG = Grow a Garden | 99N = 99 Nights")
+    for i, s in pairs(Scripts) do print(i .. ". " .. s.n .. " (" .. s.g .. ")") end
+end})
 
--- ════════════════════════════════════════
---          💎 MATERIAL ENHANCEMENT
--- ════════════════════════════════════════
+-- Original buttons (shortened)
+local function AddScriptButton(tab, name, scriptData) AddButton(tab, {Name = name, Callback = function() Run(scriptData) end}) end
 
-local function enhanceMaterials()
-    local success = pcall(function()
-        print("💎 Enhancing Materials...")
-        
-        local function enhancePart(part)
-            if not part or not part:IsA("BasePart") or not part.Parent then
-                return
-            end
-            
-            local material = part.Material
-            
-            -- Safe material enhancement
-            if material == Enum.Material.Metal then
-                part.Reflectance = math.min(part.Reflectance + 0.4, 0.9)
-                
-            elseif material == Enum.Material.Glass then
-                part.Reflectance = 0.9
-                if part.Transparency < 0.5 then
-                    part.Transparency = 0.7
-                end
-                
-            elseif material == Enum.Material.Neon then
-                -- Add neon glow
-                if not part:FindFirstChild("RTX_NeonGlow") then
-                    local light = Instance.new("PointLight")
-                    light.Name = "RTX_NeonGlow"
-                    light.Parent = part
-                    light.Color = part.Color
-                    light.Brightness = 1.2
-                    light.Range = 20
-                    light.Shadows = false
-                end
-                
-            elseif material == Enum.Material.Water then
-                part.Reflectance = 0.6
-                part.Transparency = math.max(part.Transparency, 0.6)
-                part.Color = Color3.fromRGB(100, 150, 200)
-                
-            elseif material == Enum.Material.Marble then
-                part.Reflectance = math.min(part.Reflectance + 0.3, 0.6)
-                
-            elseif material == Enum.Material.Plastic then
-                part.Reflectance = math.min(part.Reflectance + 0.1, 0.3)
-            end
-        end
-        
-        -- Enhance existing parts safely
-        spawn(function()
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj ~= workspace and obj:IsA("BasePart") then
-                    pcall(function()
-                        enhancePart(obj)
-                    end)
-                    
-                    if tick() % 100 == 0 then
-                        wait() -- Prevent timeout
-                    end
-                end
-            end
-        end)
-        
-        -- Monitor new parts
-        workspace.DescendantAdded:Connect(function(obj)
-            wait(0.5)
-            pcall(function()
-                enhancePart(obj)
-            end)
-        end)
-        
-        print("✅ Material Enhancement - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Material Enhancement - Failed")
-    end
-end
+-- Blox Fruits
+for _, s in pairs(Scripts) do if s.g == "BF" then AddScriptButton(Tab1o, s.n, s) end end
 
--- ════════════════════════════════════════
---           💡 DYNAMIC LIGHTING
--- ════════════════════════════════════════
+-- Misc
+for _, s in pairs(Scripts) do if s.g == "U" then AddScriptButton(Tab2o, s.n, s) end end
 
-local lightSources = {}
+-- 99 Nights
+for _, s in pairs(Scripts) do if s.g == "99N" then AddScriptButton(Tab3o, s.n, s) end end
+AddScriptButton(Tab3o, "AirFlow (DR)", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
 
-local function createDynamicLighting()
-    local success = pcall(function()
-        print("💡 Creating Dynamic Lighting...")
-        
-        -- Create ambient light sources
-        for i = 1, 10 do
-            local lightPart = Instance.new("Part")
-            lightPart.Name = "RTX_Light_" .. i
-            lightPart.Anchored = true
-            lightPart.CanCollide = false
-            lightPart.CanQuery = false  
-            lightPart.CanTouch = false
-            lightPart.Size = Vector3.new(0.1, 0.1, 0.1)
-            lightPart.Transparency = 1
-            lightPart.Parent = workspace
-            
-            -- Position lights in a circle
-            local angle = (i - 1) * (360 / 10)
-            local distance = 120
-            local height = math.random(40, 80)
-            
-            lightPart.Position = Vector3.new(
-                math.cos(math.rad(angle)) * distance,
-                height,
-                math.sin(math.rad(angle)) * distance
-            )
-            
-            -- Create the light - Giảm brightness
-            local pointLight = Instance.new("PointLight")
-            pointLight.Parent = lightPart
-            pointLight.Color = Color3.fromRGB(245, 235, 200)
-            pointLight.Brightness = 1.0
-            pointLight.Range = 60
-            pointLight.Shadows = true
-            
-            table.insert(lightSources, {
-                part = lightPart,
-                light = pointLight,
-                originalBrightness = 1.0
-            })
-        end
-        
-        print("✅ Dynamic Lighting - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Dynamic Lighting - Failed")
-    end
-end
+-- Dead Rails
+for _, s in pairs(Scripts) do if s.g == "DR" then AddScriptButton(Tab4o, s.n, s) end end
+AddScriptButton(Tab4o, "AirFlow", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
 
--- ════════════════════════════════════════
---            🌊 PARTICLE EFFECTS
--- ════════════════════════════════════════
-
-local function createParticleEffects()
-    local success = pcall(function()
-        print("🌊 Creating Particle Effects...")
-        
-        -- Atmospheric dust
-        for i = 1, 15 do
-            local attachment = Instance.new("Attachment")
-            attachment.Parent = workspace
-            attachment.Position = Vector3.new(
-                math.random(-200, 200),
-                math.random(30, 100),
-                math.random(-200, 200)
-            )
-            
-            local particles = Instance.new("ParticleEmitter")
-            particles.Parent = attachment
-            particles.Texture = "rbxassetid://241650934"
-            particles.Rate = 10
-            particles.Lifetime = NumberRange.new(8, 15)
-            particles.Speed = NumberRange.new(0.5, 1.5)
-            particles.SpreadAngle = Vector2.new(45, 45)
-            particles.Color = ColorSequence.new(Color3.fromRGB(255, 240, 200))
-            particles.Size = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 0.1),
-                NumberSequenceKeypoint.new(0.5, 0.2),
-                NumberSequenceKeypoint.new(1, 0.1)
-            }
-            particles.Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 1),
-                NumberSequenceKeypoint.new(0.1, 0.8),
-                NumberSequenceKeypoint.new(0.9, 0.8), 
-                NumberSequenceKeypoint.new(1, 1)
-            }
-        end
-        
-        -- Magic sparkles
-        for i = 1, 8 do
-            local sparkle = Instance.new("Part")
-            sparkle.Name = "RTX_Sparkle"
-            sparkle.Size = Vector3.new(0.2, 0.2, 0.2)
-            sparkle.Material = Enum.Material.Neon
-            sparkle.BrickColor = BrickColor.new("Bright yellow")
-            sparkle.Shape = Enum.PartType.Ball
-            sparkle.Anchored = true
-            sparkle.CanCollide = false
-            sparkle.CanQuery = false
-            sparkle.CanTouch = false
-            sparkle.Parent = workspace
-            
-            sparkle.Position = Vector3.new(
-                math.random(-100, 100),
-                math.random(20, 60),
-                math.random(-100, 100)
-            )
-            
-            local sparkleLight = Instance.new("PointLight")
-            sparkleLight.Parent = sparkle
-            sparkleLight.Color = Color3.fromRGB(255, 255, 150)
-            sparkleLight.Brightness = 0.6
-            sparkleLight.Range = 10
-            
-            -- Floating animation
-            spawn(function()
-                while sparkle.Parent do
-                    local newPos = sparkle.Position + Vector3.new(
-                        math.random(-10, 10),
-                        math.random(-3, 3),
-                        math.random(-10, 10)
-                    )
-                    
-                    local tween = TweenService:Create(
-                        sparkle,
-                        TweenInfo.new(math.random(4, 8), Enum.EasingStyle.Sine),
-                        {Position = newPos}
-                    )
-                    tween:Play()
-                    tween.Completed:Wait()
-                end
-            end)
-        end
-        
-        print("✅ Particle Effects - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Particle Effects - Failed")
-    end
-end
-
--- ════════════════════════════════════════
---           🌤️ WEATHER SYSTEM
--- ════════════════════════════════════════
-
-local currentWeather = "Clear"
-local weatherTypes = {"Clear", "Cloudy", "Rain", "Storm", "Snow", "Fog"}
-
-local function createWeatherSystem()
-    local success = pcall(function()
-        print("🌤️ Creating Weather System...")
-        
-        local function applyWeather(weather)
-            currentWeather = weather
-            print("🌈 Weather changed to: " .. weather)
-            
-            if weather == "Clear" then
-                Lighting.ColorShift_Top = Color3.fromRGB(235, 225, 200)
-                Lighting.Brightness = 1.8
-                
-            elseif weather == "Cloudy" then
-                Lighting.ColorShift_Top = Color3.fromRGB(180, 190, 200)
-                Lighting.Brightness = 1.5
-                
-            elseif weather == "Rain" then
-                Lighting.ColorShift_Top = Color3.fromRGB(120, 130, 150)
-                Lighting.Brightness = 1.2
-                
-                -- Add rain sound
-                local rainSound = Instance.new("Sound")
-                rainSound.SoundId = "rbxassetid://131961136"
-                rainSound.Volume = 0.2
-                rainSound.Looped = true
-                rainSound.Parent = workspace
-                rainSound:Play()
-                
-                Debris:AddItem(rainSound, 30)
-                
-            elseif weather == "Storm" then
-                Lighting.ColorShift_Top = Color3.fromRGB(70, 80, 100)
-                Lighting.Brightness = 0.8
-                
-                -- Lightning flashes - Giảm intensity
-                spawn(function()
-                    for i = 1, 3 do
-                        wait(math.random(2, 5))
-                        Lighting.Brightness = 4
-                        wait(0.1)
-                        Lighting.Brightness = 0.8
-                    end
-                end)
-                
-            elseif weather == "Snow" then
-                Lighting.ColorShift_Top = Color3.fromRGB(220, 225, 235)
-                Lighting.Brightness = 1.6
-                
-            elseif weather == "Fog" then
-                Lighting.ColorShift_Top = Color3.fromRGB(160, 160, 160)
-                Lighting.Brightness = 1.4
-            end
-            
-            -- Update ambient lights
-            for _, lightData in pairs(lightSources) do
-                if lightData.light and lightData.light.Parent then
-                    if weather == "Storm" then
-                        lightData.light.Brightness = lightData.originalBrightness * 0.5
-                    elseif weather == "Rain" or weather == "Fog" then
-                        lightData.light.Brightness = lightData.originalBrightness * 0.7
-                    else
-                        lightData.light.Brightness = lightData.originalBrightness
-                    end
-                end
-            end
-        end
-        
-        -- Weather change loop
-        spawn(function()
-            while true do
-                wait(math.random(120, 300)) -- 2-5 minutes
-                local newWeather = weatherTypes[math.random(1, #weatherTypes)]
-                if newWeather ~= currentWeather then
-                    applyWeather(newWeather)
-                end
-            end
-        end)
-        
-        -- Start with clear weather
-        applyWeather("Clear")
-        
-        print("✅ Weather System - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Weather System - Failed")
-    end
-end
-
--- ════════════════════════════════════════
---           📊 PERFORMANCE MONITOR
--- ════════════════════════════════════════
-
-local fps = 60
-local frameCount = 0
-local lastTime = tick()
-
-local function monitorPerformance()
-    local success = pcall(function()
-        print("📊 Starting Performance Monitor...")
-        
-        RunService.Heartbeat:Connect(function()
-            frameCount = frameCount + 1
-            local currentTime = tick()
-            local deltaTime = currentTime - lastTime
-            
-            if deltaTime >= 1 then
-                fps = frameCount / deltaTime
-                frameCount = 0
-                lastTime = currentTime
-                
-                -- Adaptive quality
-                if fps < 45 then
-                    -- Reduce quality
-                    for _, lightData in pairs(lightSources) do
-                        if lightData.light then
-                            lightData.light.Brightness = lightData.light.Brightness * 0.9
-                        end
-                    end
-                    
-                elseif fps > 55 then
-                    -- Increase quality
-                    for _, lightData in pairs(lightSources) do
-                        if lightData.light then
-                            lightData.light.Brightness = math.min(
-                                lightData.light.Brightness * 1.05,
-                                lightData.originalBrightness
-                            )
-                        end
-                    end
-                end
-            end
-        end)
-        
-        print("✅ Performance Monitor - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Performance Monitor - Failed")
-    end
-end
-
--- ════════════════════════════════════════
---            🌅 DAY/NIGHT CYCLE
--- ════════════════════════════════════════
-
-local function createDayNightCycle()
-    local success = pcall(function()
-        print("🌅 Creating Day/Night Cycle...")
-        
-        spawn(function()
-            while true do
-                wait(2) -- Update every 2 seconds
-                
-                local timeString = Lighting.TimeOfDay
-                local hour = tonumber(string.sub(timeString, 1, 2)) or 12
-                
-                -- Adjust lighting based on time
-                if hour >= 6 and hour <= 18 then
-                    -- Daytime - Giảm brightness
-                    local dayProgress = (hour - 6) / 12
-                    local brightness = 1.2 + math.sin(dayProgress * math.pi) * 0.6
-                    Lighting.Brightness = brightness
-                    
-                    if hour <= 8 or hour >= 16 then
-                        -- Golden hour
-                        Lighting.ColorShift_Top = Color3.fromRGB(235, 180, 130)
-                    else
-                        -- Midday
-                        Lighting.ColorShift_Top = Color3.fromRGB(235, 225, 200)
-                    end
-                    
-                else
-                    -- Nighttime
-                    Lighting.Brightness = 1.0
-                    Lighting.ColorShift_Top = Color3.fromRGB(130, 150, 180)
-                end
-                
-                -- Adjust ambient lights
-                local nightMultiplier = (hour >= 20 or hour <= 6) and 0.8 or 1.0
-                for _, lightData in pairs(lightSources) do
-                    if lightData.light then
-                        lightData.light.Brightness = lightData.originalBrightness * nightMultiplier
-                    end
-                end
-            end
-        end)
-        
-        print("✅ Day/Night Cycle - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Day/Night Cycle - Failed")
-    end
-end
-
--- ════════════════════════════════════════
---            🎬 CINEMATIC EFFECTS
--- ════════════════════════════════════════
-
-local function createCinematicEffects()
-    local success = pcall(function()
-        print("🎬 Creating Cinematic Effects...")
-        
-        if player and player:FindFirstChild("PlayerGui") then
-            -- Film grain effect
-            local grainGui = Instance.new("ScreenGui")
-            grainGui.Name = "RTX_FilmGrain"
-            grainGui.Parent = player.PlayerGui
-            
-            local grainFrame = Instance.new("Frame")
-            grainFrame.Parent = grainGui
-            grainFrame.Size = UDim2.new(1, 0, 1, 0)
-            grainFrame.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
-            grainFrame.BackgroundTransparency = 0.95
-            
-            -- Animate grain
-            spawn(function()
-                while grainFrame.Parent do
-                    grainFrame.BackgroundTransparency = 0.93 + math.random() * 0.04
-                    wait(0.05)
-                end
-            end)
-            
-            -- Vignette effect
-            local vignetteGui = Instance.new("ScreenGui")
-            vignetteGui.Name = "RTX_Vignette"
-            vignetteGui.Parent = player.PlayerGui
-            
-            local vignetteFrame = Instance.new("ImageLabel")
-            vignetteFrame.Parent = vignetteGui
-            vignetteFrame.Size = UDim2.new(1, 0, 1, 0)
-            vignetteFrame.BackgroundTransparency = 1
-            vignetteFrame.Image = "rbxassetid://0" -- You can use a vignette texture
-            vignetteFrame.ImageColor3 = Color3.fromRGB(0, 0, 0)
-            vignetteFrame.ImageTransparency = 0.8
-        end
-        
-        print("✅ Cinematic Effects - Done!")
-    end)
-    
-    if not success then
-        print("⚠️ Cinematic Effects - Failed")
-    end
-end
-
--- ════════════════════════════════════════
---              🚀 MAIN EXECUTION
--- ════════════════════════════════════════
-
-local function executeRTXSystem()
-    print("🔥 Executing RTX Ultra System...")
-    print("═══════════════════════════════════")
-    
-    local modules = {
-        {name = "RTX Lighting", func = setupRTXLighting, delay = 1},
-        {name = "Post Processing", func = setupPostProcessing, delay = 0.5},
-        {name = "Material Enhancement", func = enhanceMaterials, delay = 1},
-        {name = "Dynamic Lighting", func = createDynamicLighting, delay = 1},
-        {name = "Particle Effects", func = createParticleEffects, delay = 1.5},
-        {name = "Weather System", func = createWeatherSystem, delay = 0.8},
-        {name = "Performance Monitor", func = monitorPerformance, delay = 0.3},
-        {name = "Day/Night Cycle", func = createDayNightCycle, delay = 0.5},
-        {name = "Cinematic Effects", func = createCinematicEffects, delay = 0.5}
-    }
-    
-    for i, module in pairs(modules) do
-        print(string.format("📦 [%d/%d] Loading: %s", i, #modules, module.name))
-        
-        local success, err = pcall(module.func)
-        if not success then
-            print("❌ Error in " .. module.name .. ": " .. tostring(err))
-        end
-        
-        wait(module.delay)
-        
-        local progress = (i / #modules) * 100
-        print(string.format("⏳ Progress: %.0f%%", progress))
-    end
-    
-    print("═══════════════════════════════════")
-    print("🎉 RTX ULTRA SYSTEM ACTIVATED!")
-    print("🌟 All " .. #modules .. " modules loaded!")
-    print("📊 Performance: Monitoring active")
-    print("🌤️ Weather: " .. currentWeather)
-    print("💡 Lights: " .. #lightSources .. " active")
-    print("🎬 Cinematic: Active")
-    print("═══════════════════════════════════")
-    print("✨ Enjoy ultra realistic graphics!")
-    print("🚀 RTX Ultra by Claude AI - 2025")
-    print("═══════════════════════════════════")
-    
-    -- Success notification
-    local successSound = Instance.new("Sound")
-    successSound.SoundId = "rbxassetid://131961136"
-    successSound.Volume = 0.2
-    successSound.Pitch = 1.5
-    successSound.Parent = workspace
-    successSound:Play()
-    
-    Debris:AddItem(successSound, 3)
-    
-    -- Status update
-    spawn(function()
-        wait(10)
-        print("📈 System Status:")
-        print("🔹 FPS: " .. math.floor(fps))
-        print("🔹 Weather: " .. currentWeather)  
-        print("🔹 Lights: " .. #lightSources .. " running")
-        print("✅ All systems operational!")
-    end)
-end
-
--- ════════════════════════════════════════
---             🛡️ ERROR HANDLING
--- ════════════════════════════════════════
-
-local function safeExecute()
-    local success, error = pcall(executeRTXSystem)
-    
-    if not success then
-        print("🚨 SYSTEM ERROR: " .. tostring(error))
-        print("🔧 Switching to Safe Mode...")
-        
-        -- Fallback safe mode
-        pcall(function()
-            Lighting.Brightness = 2
-            Lighting.GlobalShadows = true
-            
-            local bloom = Instance.new("BloomEffect")
-            bloom.Parent = Lighting
-            bloom.Intensity = 1
-            bloom.Size = 24
-            bloom.Threshold = 0.9
-            
-            print("✅ Safe Mode Active!")
-        end)
-    end
-end
-
--- Execute the system
-safeExecute()
-
-print("📜 RTX Ultra Script Loaded Successfully!")
-print("🎯 Version: Stable Edition 2025")
-print("💖 No bugs, pure performance!")
-print("🔚 Ready to render!")
+-- Grow a Garden  
+for _, s in pairs(Scripts) do if s.g == "GAG" then AddScriptButton(Tab5o, s.n, s) end end
+AddScriptButton(Tab5o, "Skull hub", {u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"})
+AddScriptButton(Tab5o, "Native", {u="https://getnative.cc/script/loader"})
+AddScriptButton(Tab5o, "NatHub", {u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"})
