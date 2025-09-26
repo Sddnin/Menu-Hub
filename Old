@@ -1,117 +1,472 @@
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+-- Custom UI Setup
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-local Window = MakeWindow({
-    Hub = {Title = "Free version | 🔍 Search: Type script name", Animation = "Sddnin Hub"},
-    Key = {KeySystem = True, Title = "Key System", Description = "", KeyLink = "", Keys = {"Sddnin"},
-        Notifi = {Notifications = true, CorrectKey = "Running the Script...", Incorrectkey = "The key is incorrect", CopyKeyLink = "Copied to Clipboard"}}
-})
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-MinimizeButton({Image = "http://www.roblox.com/asset/?id=73608909933636", Size = {60, 60}, Color = Color3.fromRGB(10, 10, 10), Corner = true, Stroke = false, StrokeColor = Color3.fromRGB(255, 0, 0)})
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SddninHub"
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
 
--- Tabs
-local Tab1o = MakeTab({Name = "Blox fruits"})
-local Tab2o = MakeTab({Name = "Misc"})
-local Tab3o = MakeTab({Name = "99 night in the forest"})
-local Tab4o = MakeTab({Name = "Dead rails"})
-local Tab5o = MakeTab({Name = "Grow a garden"})
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 600, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+-- Corner for main frame
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+-- Title Bar
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 50)
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 12)
+titleCorner.Parent = titleBar
+
+-- Title Text
+local titleText = Instance.new("TextLabel")
+titleText.Name = "Title"
+titleText.Size = UDim2.new(1, -140, 1, 0)
+titleText.Position = UDim2.new(0, 20, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "Mila Hub V1 | 🔍 Search: Type script name"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextSize = 16
+titleText.TextXAlignment = Enum.TextXAlignment.Left
+titleText.Font = Enum.Font.GothamBold
+titleText.Parent = titleBar
+
+-- Search Button
+local searchButton = Instance.new("TextButton")
+searchButton.Name = "SearchButton"
+searchButton.Size = UDim2.new(0, 30, 0, 30)
+searchButton.Position = UDim2.new(1, -120, 0, 10)
+searchButton.BackgroundColor3 = Color3.fromRGB(85, 85, 255)
+searchButton.BorderSizePixel = 0
+searchButton.Text = "🔍"
+searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchButton.TextSize = 16
+searchButton.Font = Enum.Font.GothamBold
+searchButton.Parent = titleBar
+
+local searchCorner = Instance.new("UICorner")
+searchCorner.CornerRadius = UDim.new(0, 6)
+searchCorner.Parent = searchButton
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -40, 0, 10)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+closeButton.BorderSizePixel = 0
+closeButton.Text = "×"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 20
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+-- Minimize Button
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -80, 0, 10)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(85, 170, 85)
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Text = "−"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextSize = 20
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Parent = titleBar
+
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 6)
+minimizeCorner.Parent = minimizeButton
+
+-- Content Area
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, 0, 1, -50)
+contentFrame.Position = UDim2.new(0, 0, 0, 50)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- Tab Bar (Left Side)
+local tabBar = Instance.new("Frame")
+tabBar.Name = "TabBar"
+tabBar.Size = UDim2.new(0, 160, 1, 0)
+tabBar.Position = UDim2.new(0, 0, 0, 0)
+tabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+tabBar.BorderSizePixel = 0
+tabBar.Parent = contentFrame
+
+local tabBarCorner = Instance.new("UICorner")
+tabBarCorner.CornerRadius = UDim.new(0, 8)
+tabBarCorner.Parent = tabBar
+
+-- Tab Container
+local tabContainer = Instance.new("ScrollingFrame")
+tabContainer.Name = "TabContainer"
+tabContainer.Size = UDim2.new(1, -10, 1, -10)
+tabContainer.Position = UDim2.new(0, 5, 0, 5)
+tabContainer.BackgroundTransparency = 1
+tabContainer.BorderSizePixel = 0
+tabContainer.ScrollBarThickness = 6
+tabContainer.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+tabContainer.Parent = tabBar
+
+local tabLayout = Instance.new("UIListLayout")
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0, 5)
+tabLayout.Parent = tabContainer
+
+-- Script Display Area (Right Side)
+local scriptDisplay = Instance.new("Frame")
+scriptDisplay.Name = "ScriptDisplay"
+scriptDisplay.Size = UDim2.new(1, -170, 1, 0)
+scriptDisplay.Position = UDim2.new(0, 170, 0, 0)
+scriptDisplay.BackgroundTransparency = 1
+scriptDisplay.Parent = contentFrame
+
+-- Script Container
+local scriptContainer = Instance.new("ScrollingFrame")
+scriptContainer.Name = "ScriptContainer"
+scriptContainer.Size = UDim2.new(1, -10, 1, -10)
+scriptContainer.Position = UDim2.new(0, 5, 0, 5)
+scriptContainer.BackgroundTransparency = 1
+scriptContainer.BorderSizePixel = 0
+scriptContainer.ScrollBarThickness = 8
+scriptContainer.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+scriptContainer.Parent = scriptDisplay
+
+local scriptLayout = Instance.new("UIGridLayout")
+scriptLayout.SortOrder = Enum.SortOrder.LayoutOrder
+scriptLayout.CellPadding = UDim2.new(0, 5, 0, 5)
+scriptLayout.CellSize = UDim2.new(0, 200, 0, 35)
+scriptLayout.Parent = scriptContainer
 
 -- Script Database
 local Scripts = {
-    {n="Blue X Hub", g="BF", u="https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
-    {n="Redz", g="BF", u="https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau", s=true},
-    {n="Hop fruit", g="BF", u="https://scripts.alchemyhub.xyz", f=true},
-    {n="Min gaming", g="BF", u="https://raw.githubusercontent.com/MinGamingHubNew/RealMinGaming/refs/heads/main/MinGaminvHubBloxFruits.lua"},
-    {n="Rolls Rocye", g="BF", u="https://raw.githubusercontent.com/RealMatsune/Rolls-Rocye/refs/heads/main/Loading.lua"},
-    {n="Hiru Hub", g="BF", u="https://raw.githubusercontent.com/LuaStupid/Source/main/HiruHubVeriV2.lua"},
-    {n="Maru Hub", g="BF", u="https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
-    {n="Trau Roblox", g="BF", u="https://raw.githubusercontent.com/stuckez999/main/refs/heads/main/traurobloxpremium.lua"},
-    {n="Hop All", g="BF", u="https://raw.githubusercontent.com/Iamkhnah/noguchihyuga/refs/heads/main/ScriptHop.lua"},
-    {n="Teddy Hub", g="BF", u="https://raw.githubusercontent.com/skibiditoiletgojo/Haidepzai/refs/heads/main/Teddy-FREMIUM"},
-    {n="Infinite Yield", g="U", u="https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
-    {n="Fly v3", g="U", u="fly_v3", e=true},
-    {n="Emote", g="U", u="https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui"},
-    {n="Nameless Admin", g="U", u="https://rawscripts.net/raw/Universal-Script-nameless-admin-15646"},
-    {n="Arceus X", g="U", u="https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"},
-    {n="Shader", g="U", u="https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua"},
-    {n="Fix lag", g="U", u="https://rawscripts.net/raw/Universal-Script-OP-Anti-Lah-24771"},
-    {n="Fly", g="U", u="https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"},
-    {n="I wanna run away", g="U", u="https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"},
-    {n="AirFlow", g="99N", u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"},
-    {n="H4x", g="99N", u="https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"},
-    {n="NPC lock", g="99N", u="https://rawscripts.net/raw/Dead-Rails-NPC-LOCK-32544"},
-    {n="TN Roblox", g="DR", u="https://raw.githubusercontent.com/thiennrb7/Script/refs/heads/main/Bringall"},
-    {n="Skull Hub", g="DR", u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"},
-    {n="NatHub", g="DR", u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"},
-    {n="Nebula Hub", g="DR", u="https://raw.githubusercontent.com/NebulaHubOfc/Public/refs/heads/main/Loader.lua"},
-    {n="Tp All", g="DR", u="https://raw.githubusercontent.com/ringtaa/deadrailsui.github.io/refs/heads/main/RINGTA.LUA"},
-    {n="Native", g="DR", u="https://getnative.cc/script/loader"},
-    {n="KiciaHook-V2", g="DR", u="https://rawscripts.net/raw/Dead-Rails-Alpha-OP-KiciaHook-V2-Dead-Rails-Auto-Farm-And-More-38614"},
-    {n="No lag", g="GAG", u="https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"},
-    {n="Limit Hub", g="GAG", u="https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua"},
-    {n="Speed Hub X", g="GAG", u="https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062"},
-    {n="Lunor", g="GAG", u="https://lunor.dev/loader"},
-    {n="ThunderZ", g="GAG", u="https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"}
+    {n="Blue X Hub", g="Blox fruits", u="https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
+    {n="Redz", g="Blox fruits", u="https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau", s=true},
+    {n="Hop fruit", g="Blox fruits", u="https://scripts.alchemyhub.xyz", f=true},
+    {n="Min gaming", g="Blox fruits", u="https://raw.githubusercontent.com/MinGamingHubNew/RealMinGaming/refs/heads/main/MinGaminvHubBloxFruits.lua"},
+    {n="Rolls Rocye", g="Blox fruits", u="https://raw.githubusercontent.com/RealMatsune/Rolls-Rocye/refs/heads/main/Loading.lua"},
+    {n="Hiru Hub", g="Blox fruits", u="https://raw.githubusercontent.com/LuaStupid/Source/main/HiruHubVeriV2.lua"},
+    {n="Maru Hub", g="Blox fruits", u="https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
+    {n="Trau Roblox", g="Blox fruits", u="https://raw.githubusercontent.com/stuckez999/main/refs/heads/main/traurobloxpremium.lua"},
+    {n="Hop All", g="Blox fruits", u="https://raw.githubusercontent.com/Iamkhnah/noguchihyuga/refs/heads/main/ScriptHop.lua"},
+    {n="Teddy Hub", g="Blox fruits", u="https://raw.githubusercontent.com/skibiditoiletgojo/Haidepzai/refs/heads/main/Teddy-FREMIUM"},
+    {n="Infinite Yield", g="Misc", u="https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {n="Fly v3", g="Misc", u="fly_v3", e=true},
+    {n="Emote", g="Misc", u="https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui"},
+    {n="Nameless Admin", g="Misc", u="https://rawscripts.net/raw/Universal-Script-nameless-admin-15646"},
+    {n="Arceus X", g="Misc", u="https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"},
+    {n="Shader", g="Misc", u="https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua"},
+    {n="Fix lag", g="Misc", u="https://rawscripts.net/raw/Universal-Script-OP-Anti-Lah-24771"},
+    {n="Fly", g="Misc", u="https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"},
+    {n="I wanna run away", g="Misc", u="https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"},
+    {n="AirFlow", g="99 night in the forest", u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"},
+    {n="H4x", g="99 night in the forest", u="https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"},
+    {n="NPC lock", g="99 night in the forest", u="https://rawscripts.net/raw/Dead-Rails-NPC-LOCK-32544"},
+    {n="TN Roblox", g="Dead rails", u="https://raw.githubusercontent.com/thiennrb7/Script/refs/heads/main/Bringall"},
+    {n="Skull Hub", g="Dead rails", u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"},
+    {n="NatHub", g="Dead rails", u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"},
+    {n="Nebula Hub", g="Dead rails", u="https://raw.githubusercontent.com/NebulaHubOfc/Public/refs/heads/main/Loader.lua"},
+    {n="Tp All", g="Dead rails", u="https://raw.githubusercontent.com/ringtaa/deadrailsui.github.io/refs/heads/main/RINGTA.LUA"},
+    {n="Native", g="Dead rails", u="https://getnative.cc/script/loader"},
+    {n="KiciaHook-V2", g="Dead rails", u="https://rawscripts.net/raw/Dead-Rails-Alpha-OP-KiciaHook-V2-Dead-Rails-Auto-Farm-And-More-38614"},
+    {n="No lag", g="Grow a garden", u="https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"},
+    {n="Limit Hub", g="Grow a garden", u="https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua"},
+    {n="Speed Hub X", g="Grow a garden", u="https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062"},
+    {n="Lunor", g="Grow a garden", u="https://lunor.dev/loader"},
+    {n="ThunderZ", g="Grow a garden", u="https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"}
 }
 
 -- Execute function
 local function Run(s)
     local Settings = {JoinTeam = "Pirates", Translator = true}
-    if s.e then loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\40\39\104\116\116\112\115\58\47\47\103\105\115\116\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\101\111\122\111\110\101\89\84\47\98\102\48\51\55\100\102\102\57\102\48\97\55\48\48\49\55\51\48\52\100\100\100\54\55\102\100\99\100\51\55\48\47\114\97\119\47\101\49\52\101\55\52\102\52\50\53\98\48\54\48\100\102\53\50\51\51\52\51\99\102\51\48\98\55\56\55\48\55\52\101\98\51\99\53\100\50\47\97\114\99\101\117\115\37\50\53\50\48\120\37\50\53\50\48\102\108\121\37\50\53\50\48\50\37\50\53\50\48\111\98\102\108\117\99\97\116\111\114\39\41\44\116\114\117\101\41\41\40\41\10\10")()
-    elseif s.f then _G.FruitFinder = true; loadstring(game:HttpGet(s.u))()
-    elseif s.s then loadstring(game:HttpGet(s.u))(Settings)
-    else loadstring(game:HttpGet(s.u))() end
+    if s.e then 
+        loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\40\39\104\116\116\112\115\58\47\47\103\105\115\116\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\101\111\122\111\110\101\89\84\47\98\102\48\51\55\100\102\102\57\102\48\97\55\48\48\49\55\51\48\52\100\100\100\54\55\102\100\99\100\51\55\48\47\114\97\119\47\101\49\52\101\55\52\102\52\50\53\98\48\54\48\100\102\53\50\51\51\52\51\99\102\51\48\98\55\56\55\48\55\52\101\98\51\99\53\100\50\47\97\114\99\101\117\115\37\50\53\50\48\120\37\50\53\50\48\102\108\121\37\50\53\50\48\50\37\50\53\50\48\111\98\102\108\117\99\97\116\111\114\39\41\44\116\114\117\101\41\41\40\41\10\10")()
+    elseif s.f then 
+        _G.FruitFinder = true
+        loadstring(game:HttpGet(s.u))()
+    elseif s.s then 
+        loadstring(game:HttpGet(s.u))(Settings)
+    else 
+        loadstring(game:HttpGet(s.u))()
+    end
 end
 
--- Search function with instant execution
-local function QuickSearch(term)
-    if term == "" then return end
-    term = term:lower()
-    local found = false
-    for _, s in pairs(Scripts) do
-        if s.n:lower():find(term) then
-            print("🚀 Đang chạy: " .. s.n)
-            Run(s)
-            found = true
-            break
+-- Variables
+local currentTab = "Blox fruits"
+local allTabs = {"Blox fruits", "Misc", "99 night in the forest", "Dead rails", "Grow a garden", "🔍 Search"}
+local searchMode = false
+local searchResults = {}
+
+-- Create Tab Button
+local function CreateTabButton(tabName)
+    local tabButton = Instance.new("TextButton")
+    tabButton.Name = tabName
+    tabButton.Size = UDim2.new(1, 0, 0, 40)
+    tabButton.BackgroundColor3 = currentTab == tabName and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(45, 45, 45)
+    tabButton.BorderSizePixel = 0
+    tabButton.Text = tabName
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tabButton.TextSize = 14
+    tabButton.Font = Enum.Font.Gotham
+    tabButton.Parent = tabContainer
+    
+    local tabCorner = Instance.new("UICorner")
+    tabCorner.CornerRadius = UDim.new(0, 6)
+    tabCorner.Parent = tabButton
+    
+    tabButton.MouseButton1Click:Connect(function()
+        currentTab = tabName
+        UpdateDisplay()
+        UpdateTabColors()
+    end)
+    
+    return tabButton
+end
+
+-- Create Script Button
+local function CreateScriptButton(script)
+    local scriptButton = Instance.new("TextButton")
+    scriptButton.Name = script.n
+    scriptButton.Size = UDim2.new(0, 200, 0, 35)
+    scriptButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    scriptButton.BorderSizePixel = 0
+    scriptButton.Text = script.n
+    scriptButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    scriptButton.TextSize = 12
+    scriptButton.Font = Enum.Font.Gotham
+    scriptButton.Parent = scriptContainer
+    
+    local scriptCorner = Instance.new("UICorner")
+    scriptCorner.CornerRadius = UDim.new(0, 6)
+    scriptCorner.Parent = scriptButton
+    
+    -- Hover effect
+    scriptButton.MouseEnter:Connect(function()
+        scriptButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end)
+    
+    scriptButton.MouseLeave:Connect(function()
+        scriptButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
+    
+    scriptButton.MouseButton1Click:Connect(function()
+        Run(script)
+        print("🚀 Đang chạy: " .. script.n)
+    end)
+    
+    return scriptButton
+end
+
+-- Search functionality
+local function SearchScripts(searchTerm)
+    searchResults = {}
+    if searchTerm == "" then return searchResults end
+    searchTerm = searchTerm:lower()
+    
+    for _, script in pairs(Scripts) do
+        if script.n:lower():find(searchTerm) or script.g:lower():find(searchTerm) then
+            table.insert(searchResults, script)
         end
     end
-    if not found then print("❌ Không tìm thấy: " .. term) end
+    return searchResults
 end
 
--- Quick Search Box (placed in first tab)
-AddTextBox(Tab1o, {
-    Name = "🔍 Quick Search - Tìm và chạy script ngay",
-    Default = "",
-    PlaceholderText = "Gõ tên script để chạy ngay lập tức...",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text) QuickSearch(text) end
-})
+-- Create Search UI
+local function CreateSearchUI()
+    -- Clear existing content
+    for _, child in pairs(scriptContainer:GetChildren()) do
+        if child:IsA("TextButton") or child:IsA("TextBox") then
+            child:Destroy()
+        end
+    end
+    
+    -- Search TextBox
+    local searchBox = Instance.new("TextBox")
+    searchBox.Name = "SearchBox"
+    searchBox.Size = UDim2.new(1, -10, 0, 35)
+    searchBox.Position = UDim2.new(0, 5, 0, 5)
+    searchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    searchBox.BorderSizePixel = 0
+    searchBox.PlaceholderText = "Tìm kiếm script..."
+    searchBox.Text = ""
+    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    searchBox.TextSize = 14
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.Parent = scriptDisplay
+    
+    local searchBoxCorner = Instance.new("UICorner")
+    searchBoxCorner.CornerRadius = UDim.new(0, 6)
+    searchBoxCorner.Parent = searchBox
+    
+    -- Search results container
+    local resultsContainer = Instance.new("ScrollingFrame")
+    resultsContainer.Name = "ResultsContainer"
+    resultsContainer.Size = UDim2.new(1, -10, 1, -50)
+    resultsContainer.Position = UDim2.new(0, 5, 0, 45)
+    resultsContainer.BackgroundTransparency = 1
+    resultsContainer.BorderSizePixel = 0
+    resultsContainer.ScrollBarThickness = 8
+    resultsContainer.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+    resultsContainer.Parent = scriptDisplay
+    
+    local resultsLayout = Instance.new("UIListLayout")
+    resultsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    resultsLayout.Padding = UDim.new(0, 5)
+    resultsLayout.Parent = resultsContainer
+    
+    -- Search functionality
+    searchBox.Changed:Connect(function(property)
+        if property == "Text" then
+            -- Clear previous results
+            for _, child in pairs(resultsContainer:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child:Destroy()
+                end
+            end
+            
+            local results = SearchScripts(searchBox.Text)
+            
+            if #results > 0 then
+                for _, script in pairs(results) do
+                    local resultButton = Instance.new("TextButton")
+                    resultButton.Size = UDim2.new(1, 0, 0, 35)
+                    resultButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                    resultButton.BorderSizePixel = 0
+                    resultButton.Text = script.n .. " (" .. script.g .. ")"
+                    resultButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    resultButton.TextSize = 12
+                    resultButton.Font = Enum.Font.Gotham
+                    resultButton.Parent = resultsContainer
+                    
+                    local resultCorner = Instance.new("UICorner")
+                    resultCorner.CornerRadius = UDim.new(0, 6)
+                    resultCorner.Parent = resultButton
+                    
+                    resultButton.MouseEnter:Connect(function()
+                        resultButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+                    end)
+                    
+                    resultButton.MouseLeave:Connect(function()
+                        resultButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                    end)
+                    
+                    resultButton.MouseButton1Click:Connect(function()
+                        Run(script)
+                        print("🚀 Đang chạy: " .. script.n)
+                    end)
+                end
+            else
+                local noResultLabel = Instance.new("TextLabel")
+                noResultLabel.Size = UDim2.new(1, 0, 0, 35)
+                noResultLabel.BackgroundTransparency = 1
+                noResultLabel.Text = searchBox.Text == "" and "Nhập từ khóa để tìm kiếm..." or "Không tìm thấy kết quả nào"
+                noResultLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+                noResultLabel.TextSize = 12
+                noResultLabel.Font = Enum.Font.Gotham
+                noResultLabel.Parent = resultsContainer
+            end
+            
+            resultsContainer.CanvasSize = UDim2.new(0, 0, 0, resultsLayout.AbsoluteContentSize.Y)
+        end
+    end)
+end
+-- Update Display
+function UpdateDisplay()
+    if currentTab == "🔍 Search" then
+        CreateSearchUI()
+        return
+    end
+    
+    for _, child in pairs(scriptContainer:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+    
+    -- Clear search UI if switching from search tab
+    for _, child in pairs(scriptDisplay:GetChildren()) do
+        if child.Name == "SearchBox" or child.Name == "ResultsContainer" then
+            child:Destroy()
+        end
+    end
+    
+    for _, script in pairs(Scripts) do
+        if script.g == currentTab then
+            CreateScriptButton(script)
+        end
+    end
+    
+    scriptContainer.CanvasSize = UDim2.new(0, 0, 0, scriptLayout.AbsoluteContentSize.Y)
+end
 
-AddButton(Tab1o, {Name = "📋 Xem tất cả scripts (" .. #Scripts .. ")", Callback = function()
-    print("=== DANH SÁCH TẤT CẢ SCRIPTS ===")
-    print("BF = Blox Fruits | U = Universal | DR = Dead Rails | GAG = Grow a Garden | 99N = 99 Nights")
-    for i, s in pairs(Scripts) do print(i .. ". " .. s.n .. " (" .. s.g .. ")") end
-end})
+-- Update Tab Colors
+function UpdateTabColors()
+    for _, child in pairs(tabContainer:GetChildren()) do
+        if child:IsA("TextButton") then
+            child.BackgroundColor3 = child.Name == currentTab and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(45, 45, 45)
+        end
+    end
+end
 
--- Original buttons (shortened)
-local function AddScriptButton(tab, name, scriptData) AddButton(tab, {Name = name, Callback = function() Run(scriptData) end}) end
+-- Initialize UI
+for _, tabName in pairs(allTabs) do
+    CreateTabButton(tabName)
+end
 
--- Blox Fruits
-for _, s in pairs(Scripts) do if s.g == "BF" then AddScriptButton(Tab1o, s.n, s) end end
+UpdateDisplay()
 
--- Misc
-for _, s in pairs(Scripts) do if s.g == "U" then AddScriptButton(Tab2o, s.n, s) end end
+-- Update canvas sizes
+tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabLayout.AbsoluteContentSize.Y)
 
--- 99 Nights
-for _, s in pairs(Scripts) do if s.g == "99N" then AddScriptButton(Tab3o, s.n, s) end end
-AddScriptButton(Tab3o, "AirFlow (DR)", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
+-- Button functionality
+searchButton.MouseButton1Click:Connect(function()
+    currentTab = "🔍 Search"
+    UpdateDisplay()
+    UpdateTabColors()
+end)
 
--- Dead Rails
-for _, s in pairs(Scripts) do if s.g == "DR" then AddScriptButton(Tab4o, s.n, s) end end
-AddScriptButton(Tab4o, "AirFlow", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
 
--- Grow a Garden  
-for _, s in pairs(Scripts) do if s.g == "GAG" then AddScriptButton(Tab5o, s.n, s) end end
-AddScriptButton(Tab5o, "Skull hub", {u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"})
-AddScriptButton(Tab5o, "Native", {u="https://getnative.cc/script/loader"})
-AddScriptButton(Tab5o, "NatHub", {u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"})
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    contentFrame.Visible = not minimized
+    mainFrame.Size = minimized and UDim2.new(0, 600, 0, 50) or UDim2.new(0, 600, 0, 400)
+    minimizeButton.Text = minimized and "+" or "−"
+end)
+
+print("🎉 Mila Hub V1 đã tải thành công!")
+print("📋 Tổng cộng: " .. #Scripts .. " scripts")
+print("🔍 Click nút Search hoặc tab để tìm kiếm scripts")
