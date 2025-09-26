@@ -16,8 +16,8 @@ screenGui.ResetOnSpawn = false
 -- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 600, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+mainFrame.Size = UDim2.new(0, 480, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -240, 0.5, -160)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -46,11 +46,11 @@ titleCorner.Parent = titleBar
 local titleText = Instance.new("TextLabel")
 titleText.Name = "Title"
 titleText.Size = UDim2.new(1, -140, 1, 0)
-titleText.Position = UDim2.new(0, 20, 0, 0)
+titleText.Position = UDim2.new(0, 15, 0, 0)
 titleText.BackgroundTransparency = 1
-titleText.Text = "Mila Hub V1 | 🔍 Search: Type script name"
+titleText.Text = "Mila Hub V1"
 titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleText.TextSize = 16
+titleText.TextSize = 14
 titleText.TextXAlignment = Enum.TextXAlignment.Left
 titleText.Font = Enum.Font.GothamBold
 titleText.Parent = titleBar
@@ -58,52 +58,52 @@ titleText.Parent = titleBar
 -- Search Button
 local searchButton = Instance.new("TextButton")
 searchButton.Name = "SearchButton"
-searchButton.Size = UDim2.new(0, 30, 0, 30)
-searchButton.Position = UDim2.new(1, -120, 0, 10)
+searchButton.Size = UDim2.new(0, 25, 0, 25)
+searchButton.Position = UDim2.new(1, -100, 0, 12.5)
 searchButton.BackgroundColor3 = Color3.fromRGB(85, 85, 255)
 searchButton.BorderSizePixel = 0
 searchButton.Text = "🔍"
 searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-searchButton.TextSize = 16
+searchButton.TextSize = 12
 searchButton.Font = Enum.Font.GothamBold
 searchButton.Parent = titleBar
 
 local searchCorner = Instance.new("UICorner")
-searchCorner.CornerRadius = UDim.new(0, 6)
+searchCorner.CornerRadius = UDim.new(0, 4)
 searchCorner.Parent = searchButton
 
 -- Close Button
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 10)
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -35, 0, 12.5)
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
 closeButton.BorderSizePixel = 0
 closeButton.Text = "×"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextSize = 20
+closeButton.TextSize = 16
 closeButton.Font = Enum.Font.GothamBold
 closeButton.Parent = titleBar
 
 local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.CornerRadius = UDim.new(0, 4)
 closeCorner.Parent = closeButton
 
 -- Minimize Button
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Name = "MinimizeButton"
-minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-minimizeButton.Position = UDim2.new(1, -80, 0, 10)
+minimizeButton.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton.Position = UDim2.new(1, -65, 0, 12.5)
 minimizeButton.BackgroundColor3 = Color3.fromRGB(85, 170, 85)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Text = "−"
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.TextSize = 20
+minimizeButton.TextSize = 16
 minimizeButton.Font = Enum.Font.GothamBold
 minimizeButton.Parent = titleBar
 
 local minimizeCorner = Instance.new("UICorner")
-minimizeCorner.CornerRadius = UDim.new(0, 6)
+minimizeCorner.CornerRadius = UDim.new(0, 4)
 minimizeCorner.Parent = minimizeButton
 
 -- Content Area
@@ -117,7 +117,7 @@ contentFrame.Parent = mainFrame
 -- Tab Bar (Left Side)
 local tabBar = Instance.new("Frame")
 tabBar.Name = "TabBar"
-tabBar.Size = UDim2.new(0, 160, 1, 0)
+tabBar.Size = UDim2.new(0, 120, 1, 0)
 tabBar.Position = UDim2.new(0, 0, 0, 0)
 tabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 tabBar.BorderSizePixel = 0
@@ -146,8 +146,8 @@ tabLayout.Parent = tabContainer
 -- Script Display Area (Right Side)
 local scriptDisplay = Instance.new("Frame")
 scriptDisplay.Name = "ScriptDisplay"
-scriptDisplay.Size = UDim2.new(1, -170, 1, 0)
-scriptDisplay.Position = UDim2.new(0, 170, 0, 0)
+scriptDisplay.Size = UDim2.new(1, -125, 1, 0)
+scriptDisplay.Position = UDim2.new(0, 125, 0, 0)
 scriptDisplay.BackgroundTransparency = 1
 scriptDisplay.Parent = contentFrame
 
@@ -164,8 +164,8 @@ scriptContainer.Parent = scriptDisplay
 
 local scriptLayout = Instance.new("UIGridLayout")
 scriptLayout.SortOrder = Enum.SortOrder.LayoutOrder
-scriptLayout.CellPadding = UDim2.new(0, 5, 0, 5)
-scriptLayout.CellSize = UDim2.new(0, 200, 0, 35)
+scriptLayout.CellPadding = UDim2.new(0, 3, 0, 3)
+scriptLayout.CellSize = UDim2.new(0, 165, 0, 30)
 scriptLayout.Parent = scriptContainer
 
 -- Script Database
@@ -231,12 +231,12 @@ local searchResults = {}
 local function CreateTabButton(tabName)
     local tabButton = Instance.new("TextButton")
     tabButton.Name = tabName
-    tabButton.Size = UDim2.new(1, 0, 0, 40)
+    tabButton.Size = UDim2.new(1, 0, 0, 30)
     tabButton.BackgroundColor3 = currentTab == tabName and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(45, 45, 45)
     tabButton.BorderSizePixel = 0
     tabButton.Text = tabName
     tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tabButton.TextSize = 14
+    tabButton.TextSize = 10
     tabButton.Font = Enum.Font.Gotham
     tabButton.Parent = tabContainer
     
@@ -257,12 +257,12 @@ end
 local function CreateScriptButton(script)
     local scriptButton = Instance.new("TextButton")
     scriptButton.Name = script.n
-    scriptButton.Size = UDim2.new(0, 200, 0, 35)
+    scriptButton.Size = UDim2.new(0, 165, 0, 30)
     scriptButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     scriptButton.BorderSizePixel = 0
     scriptButton.Text = script.n
     scriptButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    scriptButton.TextSize = 12
+    scriptButton.TextSize = 10
     scriptButton.Font = Enum.Font.Gotham
     scriptButton.Parent = scriptContainer
     
@@ -313,14 +313,14 @@ local function CreateSearchUI()
     -- Search TextBox
     local searchBox = Instance.new("TextBox")
     searchBox.Name = "SearchBox"
-    searchBox.Size = UDim2.new(1, -10, 0, 35)
+    searchBox.Size = UDim2.new(1, -10, 0, 25)
     searchBox.Position = UDim2.new(0, 5, 0, 5)
     searchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     searchBox.BorderSizePixel = 0
-    searchBox.PlaceholderText = "Tìm kiếm script..."
+    searchBox.PlaceholderText = "Tìm script..."
     searchBox.Text = ""
     searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    searchBox.TextSize = 14
+    searchBox.TextSize = 10
     searchBox.Font = Enum.Font.Gotham
     searchBox.Parent = scriptDisplay
     
@@ -331,11 +331,11 @@ local function CreateSearchUI()
     -- Search results container
     local resultsContainer = Instance.new("ScrollingFrame")
     resultsContainer.Name = "ResultsContainer"
-    resultsContainer.Size = UDim2.new(1, -10, 1, -50)
-    resultsContainer.Position = UDim2.new(0, 5, 0, 45)
+    resultsContainer.Size = UDim2.new(1, -10, 1, -35)
+    resultsContainer.Position = UDim2.new(0, 5, 0, 30)
     resultsContainer.BackgroundTransparency = 1
     resultsContainer.BorderSizePixel = 0
-    resultsContainer.ScrollBarThickness = 8
+    resultsContainer.ScrollBarThickness = 4
     resultsContainer.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
     resultsContainer.Parent = scriptDisplay
     
@@ -359,12 +359,12 @@ local function CreateSearchUI()
             if #results > 0 then
                 for _, script in pairs(results) do
                     local resultButton = Instance.new("TextButton")
-                    resultButton.Size = UDim2.new(1, 0, 0, 35)
+                    resultButton.Size = UDim2.new(1, 0, 0, 25)
                     resultButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
                     resultButton.BorderSizePixel = 0
                     resultButton.Text = script.n .. " (" .. script.g .. ")"
                     resultButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    resultButton.TextSize = 12
+                    resultButton.TextSize = 9
                     resultButton.Font = Enum.Font.Gotham
                     resultButton.Parent = resultsContainer
                     
@@ -387,11 +387,11 @@ local function CreateSearchUI()
                 end
             else
                 local noResultLabel = Instance.new("TextLabel")
-                noResultLabel.Size = UDim2.new(1, 0, 0, 35)
+                noResultLabel.Size = UDim2.new(1, 0, 0, 25)
                 noResultLabel.BackgroundTransparency = 1
-                noResultLabel.Text = searchBox.Text == "" and "Nhập từ khóa để tìm kiếm..." or "Không tìm thấy kết quả nào"
+                noResultLabel.Text = searchBox.Text == "" and "Nhập để tìm..." or "Không tìm thấy"
                 noResultLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-                noResultLabel.TextSize = 12
+                noResultLabel.TextSize = 9
                 noResultLabel.Font = Enum.Font.Gotham
                 noResultLabel.Parent = resultsContainer
             end
@@ -463,7 +463,7 @@ local minimized = false
 minimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     contentFrame.Visible = not minimized
-    mainFrame.Size = minimized and UDim2.new(0, 600, 0, 50) or UDim2.new(0, 600, 0, 400)
+    mainFrame.Size = minimized and UDim2.new(0, 480, 0, 50) or UDim2.new(0, 480, 0, 320)
     minimizeButton.Text = minimized and "+" or "−"
 end)
 
