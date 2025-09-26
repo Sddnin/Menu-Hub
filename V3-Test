@@ -1,5 +1,5 @@
--- Mila Command UI for Roblox with Commands
--- Created by Mila
+-- Mila Command UI for Roblox - Fixed Version
+-- Created by Assistant
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -10,7 +10,11 @@ local TeleportService = game:GetService("TeleportService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local mouse = player:GetMouse()
+
+-- Clean up existing GUI first
+if playerGui:FindFirstChild("MilaCommandGUI") then
+    playerGui.MilaCommandGUI:Destroy()
+end
 
 -- Variables for features
 local noclipEnabled = false
@@ -29,19 +33,22 @@ local bodyAngularVelocity = nil
 local savedPositions = {}
 local visualEffects = {}
 local originalGravity = workspace.Gravity
+local antiAFKEnabled = false
+local antiAFKConnection = nil
 
 -- ESP Variables
 local espFolder = Instance.new("Folder")
 espFolder.Name = "ESPFolder"
 espFolder.Parent = workspace
 
--- Tạo ScreenGui chính
+-- Create main ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MilaCommandGUI"
 screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
 
--- Frame chính
+-- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 500, 0, 400)
@@ -50,12 +57,12 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
--- Bo tròn góc
+-- Round corners
 local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 10)
 mainCorner.Parent = mainFrame
 
--- Hiệu ứng đổ bóng
+-- Shadow effect
 local shadow = Instance.new("Frame")
 shadow.Name = "Shadow"
 shadow.Size = UDim2.new(1, 6, 1, 6)
@@ -69,7 +76,7 @@ local shadowCorner = Instance.new("UICorner")
 shadowCorner.CornerRadius = UDim.new(0, 10)
 shadowCorner.Parent = shadow
 
--- Header (thanh tiêu đề)
+-- Header
 local header = Instance.new("Frame")
 header.Name = "Header"
 header.Size = UDim2.new(1, 0, 0, 40)
@@ -82,7 +89,7 @@ local headerCorner = Instance.new("UICorner")
 headerCorner.CornerRadius = UDim.new(0, 10)
 headerCorner.Parent = header
 
--- Tạo phần dưới header phẳng
+-- Make header bottom flat
 local headerBottom = Instance.new("Frame")
 headerBottom.Size = UDim2.new(1, 0, 0, 10)
 headerBottom.Position = UDim2.new(0, 0, 1, -10)
@@ -90,7 +97,7 @@ headerBottom.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
 headerBottom.BorderSizePixel = 0
 headerBottom.Parent = header
 
--- Tiêu đề
+-- Title
 local title = Instance.new("TextLabel")
 title.Name = "Title"
 title.Size = UDim2.new(1, -80, 1, 0)
@@ -103,7 +110,7 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = header
 
--- Nút thu gọn/phóng to
+-- Minimize button
 local minimizeBtn = Instance.new("TextButton")
 minimizeBtn.Name = "MinimizeButton"
 minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
@@ -120,7 +127,7 @@ local minimizeBtnCorner = Instance.new("UICorner")
 minimizeBtnCorner.CornerRadius = UDim.new(0, 5)
 minimizeBtnCorner.Parent = minimizeBtn
 
--- Nút đóng
+-- Close button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Name = "CloseButton"
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
@@ -137,7 +144,7 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 5)
 closeBtnCorner.Parent = closeBtn
 
--- Nội dung chính
+-- Content frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "Content"
 contentFrame.Size = UDim2.new(1, -20, 1, -60)
@@ -145,14 +152,14 @@ contentFrame.Position = UDim2.new(0, 10, 0, 50)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
--- Ô nhập lệnh
+-- Command input
 local commandInput = Instance.new("TextBox")
 commandInput.Name = "CommandInput"
 commandInput.Size = UDim2.new(1, -80, 0, 35)
 commandInput.Position = UDim2.new(0, 0, 1, -45)
 commandInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 commandInput.Text = ""
-commandInput.PlaceholderText = "Nhập lệnh... (fb, nc, sp 50, tp player, v player, etc.)"
+commandInput.PlaceholderText = "Nhập lệnh... (help để xem tất cả lệnh)"
 commandInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 commandInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 commandInput.TextScaled = true
@@ -164,7 +171,7 @@ local inputCorner = Instance.new("UICorner")
 inputCorner.CornerRadius = UDim.new(0, 5)
 inputCorner.Parent = commandInput
 
--- Nút thực thi
+-- Execute button
 local executeBtn = Instance.new("TextButton")
 executeBtn.Name = "ExecuteButton"
 executeBtn.Size = UDim2.new(0, 70, 0, 35)
@@ -181,7 +188,7 @@ local executeBtnCorner = Instance.new("UICorner")
 executeBtnCorner.CornerRadius = UDim.new(0, 5)
 executeBtnCorner.Parent = executeBtn
 
--- Khung hiển thị kết quả
+-- Output frame
 local outputFrame = Instance.new("ScrollingFrame")
 outputFrame.Name = "OutputFrame"
 outputFrame.Size = UDim2.new(1, 0, 1, -55)
@@ -190,21 +197,21 @@ outputFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 outputFrame.BorderSizePixel = 0
 outputFrame.ScrollBarThickness = 8
 outputFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+outputFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 outputFrame.Parent = contentFrame
 
 local outputCorner = Instance.new("UICorner")
 outputCorner.CornerRadius = UDim.new(0, 5)
 outputCorner.Parent = outputFrame
 
--- TextLabel cho output
+-- Output text
 local outputText = Instance.new("TextLabel")
 outputText.Name = "OutputText"
-outputText.Size = UDim2.new(1, -10, 0, 0)
+outputText.Size = UDim2.new(1, -10, 0, 1000)
 outputText.Position = UDim2.new(0, 5, 0, 5)
 outputText.BackgroundTransparency = 1
-outputText.Text = "💫 Mila Command - Phiên bản nâng cao!\n📝 Các lệnh có sẵn:\n🔆 fb/unfb - Fullbright | nofog/unfog - No Fog\n👻 nc/unnc - Noclip | grty [số]/ungrty - Gravity\n⚡ sp [số]/unsp - Speed | wsp [số]/unwsp - WalkSpeed\n🦘 jp [số]/unjp - Jump | infj/uninfj - Infinite Jump\n👁️ es/unes - ESP | v [tên]/unv - View\n📍 tp [tên] - Teleport | go [tên]/ungo - Fly to Player\n💾 savepos [tên] - Lưu vị trí | loadpos [tên] - Tải vị trí\n📊 serverinfo - Thông tin server | jobid - Copy Job ID | placeid - Copy Place ID\n📍 getpos - Lấy vị trí hiện tại | goto [x] [y] [z] - Đến tọa độ\n⏰ time [giờ] - Đặt thời gian (0-24)\n✨ smoke/fire/trail/glow - Hiệu ứng visual\n🔄 rejoin - Rejoin | serverhop - Server Hop | help - Trợ giúp"
+outputText.Text = "💫 Mila Command - Phiên bản nâng cao!\n✨ Gõ 'help' để xem danh sách lệnh đầy đủ\n🚀 UI đã sẵn sàng để sử dụng!"
 outputText.TextColor3 = Color3.fromRGB(200, 200, 200)
-outputText.TextScaled = false
 outputText.TextSize = 12
 outputText.Font = Enum.Font.Gotham
 outputText.TextXAlignment = Enum.TextXAlignment.Left
@@ -212,16 +219,19 @@ outputText.TextYAlignment = Enum.TextYAlignment.Top
 outputText.TextWrapped = true
 outputText.Parent = outputFrame
 
--- Variables cho dragging
-local dragging = false
-local dragStart = nil
-local startPos = nil
-
--- Variables cho minimize
-local isMinimized = false
-local originalSize = mainFrame.Size
-
 -- COMMAND FUNCTIONS
+
+-- No Fog
+local function setNoFog(enabled)
+    if enabled then
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 0
+    else
+        Lighting.FogEnd = 1000
+        Lighting.FogStart = 0
+    end
+end
+
 -- Fullbright
 local function setFullbright(enabled)
     if enabled then
@@ -266,6 +276,49 @@ local function setNoclip(enabled)
     end
 end
 
+-- Gravity
+local function setGravity(value)
+    if value then
+        workspace.Gravity = value
+    else
+        workspace.Gravity = originalGravity
+    end
+end
+
+-- Time
+local function setTime(hour)
+    if hour then
+        Lighting.ClockTime = hour
+    end
+end
+
+-- Position functions
+local function savePosition(name)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        savedPositions[name] = player.Character.HumanoidRootPart.CFrame
+        return true
+    end
+    return false
+end
+
+local function loadPosition(name)
+    if savedPositions[name] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = savedPositions[name]
+        return true
+    end
+    return false
+end
+
+-- Find Player
+local function findPlayer(name)
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(string.lower(name)) or string.lower(p.DisplayName):find(string.lower(name)) then
+            return p
+        end
+    end
+    return nil
+end
+
 -- ESP
 local function createESP(targetPlayer)
     if not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -296,7 +349,6 @@ local function createESP(targetPlayer)
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, 0, 0.6, 0)
-    nameLabel.Position = UDim2.new(0, 0, 0, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = targetPlayer.Name
     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -326,13 +378,8 @@ local function setESP(enabled)
                     if not existingESP then
                         createESP(targetPlayer)
                     else
-                        -- Update distance
                         local billboard = existingESP
-                        local distanceLabel = billboard.Frame:FindFirstChild("TextLabel")
-                        if distanceLabel and distanceLabel.Name ~= "TextLabel" then
-                            distanceLabel = billboard.Frame:GetChildren()[3] -- Distance label
-                        end
-                        
+                        local distanceLabel = billboard.Frame:GetChildren()[3]
                         if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and distanceLabel then
                             local distance = (player.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude
                             distanceLabel.Text = math.floor(distance) .. " studs"
@@ -346,6 +393,57 @@ local function setESP(enabled)
             espConnection:Disconnect()
         end
         espFolder:ClearAllChildren()
+    end
+end
+
+-- Server Hop
+local function serverHop()
+    local success, result = pcall(function()
+        local Http = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local Api = "https://games.roblox.com/v1/games/"
+        
+        local _place = game.PlaceId
+        local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        local function ListServers(cursor)
+            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+            return Http:JSONDecode(Raw)
+        end
+        
+        local Server, Next; repeat
+            local Servers = ListServers(Next)
+            Server = Servers.data[1]
+            Next = Servers.nextPageCursor
+        until Server
+        
+        if Server then
+            TeleportService:TeleportToPlaceInstance(_place, Server.id, player)
+            return true
+        end
+        return false
+    end)
+    
+    return success
+end
+
+-- Anti AFK
+local function setAntiAFK(enabled)
+    if enabled then
+        antiAFKEnabled = true
+        antiAFKConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if antiAFKEnabled then
+                local VirtualUser = game:service("VirtualUser")
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end
+        end)
+    else
+        antiAFKEnabled = false
+        if antiAFKConnection then
+            antiAFKConnection:Disconnect()
+            antiAFKConnection = nil
+        end
     end
 end
 
@@ -364,144 +462,7 @@ local function setInfiniteJump(enabled)
     end
 end
 
--- Fly to Player
-local function flyToPlayer(targetName, enabled)
-    local targetPlayer = nil
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(targetName)) or string.lower(p.DisplayName):find(string.lower(targetName)) then
-            targetPlayer = p
-            break
-        end
-    end
-    
-    if not targetPlayer then return false end
-    if not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then return false end
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return false end
-    
-    if enabled then
-        local rootPart = player.Character.HumanoidRootPart
-        
-        bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        bodyVelocity.Parent = rootPart
-        
-        bodyAngularVelocity = Instance.new("BodyAngularVelocity")
-        bodyAngularVelocity.MaxTorque = Vector3.new(4000, 4000, 4000)
-        bodyAngularVelocity.AngularVelocity = Vector3.new(0, 0, 0)
-        bodyAngularVelocity.Parent = rootPart
-        
-        flyConnection = RunService.Heartbeat:Connect(function()
-            if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                local direction = (targetPlayer.Character.HumanoidRootPart.Position - rootPart.Position).Unit
-                bodyVelocity.Velocity = direction * 50
-            end
-        end)
-    else
-        if flyConnection then
-            flyConnection:Disconnect()
-        end
-        if bodyVelocity then
-            bodyVelocity:Destroy()
-            bodyVelocity = nil
-        end
-        if bodyAngularVelocity then
-            bodyAngularVelocity:Destroy()
-            bodyAngularVelocity = nil
-        end
-    end
-    
-    return true
-end
-
--- No Fog
-local function setNoFog(enabled)
-    if enabled then
-        Lighting.FogEnd = 100000
-        Lighting.FogStart = 0
-    else
-        Lighting.FogEnd = 1000
-        Lighting.FogStart = 0
-    end
-end
-
--- Gravity
-local function setGravity(value)
-    if value then
-        workspace.Gravity = value
-    else
-        workspace.Gravity = originalGravity
-    end
-end
-
--- Time
-local function setTime(hour)
-    if hour then
-        Lighting.ClockTime = hour
-    end
-end
-
--- Save/Load Position
-local function savePosition(name)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        savedPositions[name] = player.Character.HumanoidRootPart.CFrame
-        return true
-    end
-    return false
-end
-
-local function loadPosition(name)
-    if savedPositions[name] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = savedPositions[name]
-        return true
-    end
-    return false
-end
-
--- Teleport to coordinates
-local function teleportToCoords(x, y, z)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(x, y, z))
-        return true
-    end
-    return false
-end
-
--- Get current position
-local function getCurrentPosition()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local pos = player.Character.HumanoidRootPart.Position
-        return pos.X, pos.Y, pos.Z
-    end
-    return nil, nil, nil
-end
-
--- Server Info
-local function getServerInfo()
-    local info = {
-        JobId = game.JobId,
-        PlaceId = game.PlaceId,
-        Players = #Players:GetPlayers(),
-        MaxPlayers = Players.MaxPlayers,
-        GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-    }
-    return info
-end
-
--- Copy to clipboard (simulated by showing the text for manual copy)
-local function copyToOutput(text, label)
-    addOutput("📋 " .. label .. ": " .. text)
-    addOutput("💡 Đã hiển thị " .. label .. " để bạn copy thủ công!")
-end
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(name)) or string.lower(p.DisplayName):find(string.lower(name)) then
-            return p
-        end
-    end
-    return nil
-end
-
--- Hàm cập nhật kích thước output text
+-- Update output text size
 local function updateOutputSize()
     local textService = game:GetService("TextService")
     local textSize = textService:GetTextSize(outputText.Text, 12, Enum.Font.Gotham, Vector2.new(outputText.AbsoluteSize.X, math.huge))
@@ -509,186 +470,49 @@ local function updateOutputSize()
     outputFrame.CanvasSize = UDim2.new(0, 0, 0, textSize.Y + 20)
 end
 
--- Gọi function khi text thay đổi
-outputText:GetPropertyChangedSignal("Text"):Connect(updateOutputSize)
-outputFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateOutputSize)
-
--- Hàm thêm text vào output
+-- Add output function
 local function addOutput(text)
     outputText.Text = outputText.Text .. "\n> " .. text
     updateOutputSize()
-    -- Scroll xuống dưới
     outputFrame.CanvasPosition = Vector2.new(0, outputFrame.CanvasSize.Y.Offset)
 end
 
--- COMMAND PROCESSOR
+-- Command processor
 local function processCommand(cmd)
-    local args = string.split(cmd, " ")
-    local command = string.lower(args[1])
+    local args = {}
+    for word in cmd:gmatch("%S+") do
+        table.insert(args, word)
+    end
     
-    -- No Fog
-    elseif command == "nofog" then
-        setNoFog(true)
-        addOutput("✅ No Fog đã BẬT")
+    local command = string.lower(args[1] or "")
+    
+    if command == "help" or command == "h" then
+        addOutput("📋 LỆNH CƠ BẢN:")
+        addOutput("fb/unfb - Fullbright | nc/unnc - Noclip")
+        addOutput("sp [số]/unsp - Speed | wsp [số]/unwsp - WalkSpeed") 
+        addOutput("jp [số]/unjp - Jump | es/unes - ESP")
+        addOutput("tp [tên] - Teleport | v [tên]/unv - View")
+        addOutput("infj/uninfj - Infinite Jump")
+        addOutput("nofog/unfog - No Fog | grty [số]/ungrty - Gravity")
+        addOutput("time [0-24] - Set Time | rejoin - Rejoin")
+        addOutput("sho - Server Hop | afk - Anti AFK")
         
-    elseif command == "unfog" then
-        setNoFog(false)
-        addOutput("❌ No Fog đã TẮT")
-        
-    -- Gravity
-    elseif command == "grty" or command == "gravity" then
-        local gravity = tonumber(args[2]) or 50
-        setGravity(gravity)
-        addOutput("🌍 Gravity đặt thành " .. gravity)
-        
-    elseif command == "ungrty" or command == "ungravity" then
-        setGravity()
-        addOutput("❌ Gravity đã reset về " .. originalGravity)
-        
-    -- Time
-    elseif command == "time" then
-        local hour = tonumber(args[2])
-        if hour and hour >= 0 and hour <= 24 then
-            setTime(hour)
-            addOutput("⏰ Thời gian đặt thành " .. hour .. ":00")
-        else
-            addOutput("❌ Giờ phải từ 0-24. Ví dụ: time 12")
-        end
-        
-    -- Save Position
-    elseif command == "savepos" then
-        if args[2] then
-            if savePosition(args[2]) then
-                addOutput("💾 Đã lưu vị trí: " .. args[2])
-            else
-                addOutput("❌ Không thể lưu vị trí")
-            end
-        else
-            addOutput("❌ Cách dùng: savepos [tên]")
-        end
-        
-    -- Load Position
-    elseif command == "loadpos" then
-        if args[2] then
-            if loadPosition(args[2]) then
-                addOutput("📂 Đã tải vị trí: " .. args[2])
-            else
-                addOutput("❌ Không tìm thấy vị trí đã lưu: " .. args[2])
-            end
-        else
-            addOutput("❌ Cách dùng: loadpos [tên]")
-        end
-        
-    -- Server Info
-    elseif command == "serverinfo" then
-        local info = getServerInfo()
-        addOutput("📊 THÔNG TIN SERVER:")
-        addOutput("🎮 Game: " .. info.GameName)
-        addOutput("👥 Người chơi: " .. info.Players .. "/" .. info.MaxPlayers)
-        addOutput("🆔 Place ID: " .. info.PlaceId)
-        addOutput("💼 Job ID: " .. info.JobId)
-        
-    -- Copy Job ID
-    elseif command == "jobid" then
-        copyToOutput(game.JobId, "Job ID")
-        
-    -- Copy Place ID
-    elseif command == "placeid" then
-        copyToOutput(tostring(game.PlaceId), "Place ID")
-        
-    -- Get Position
-    elseif command == "getpos" then
-        local x, y, z = getCurrentPosition()
-        if x then
-            addOutput("📍 VỊ TRÍ HIỆN TẠI:")
-            addOutput("X: " .. math.floor(x))
-            addOutput("Y: " .. math.floor(y)) 
-            addOutput("Z: " .. math.floor(z))
-        else
-            addOutput("❌ Không thể lấy vị trí")
-        end
-        
-    -- Goto Coordinates
-    elseif command == "goto" then
-        local x = tonumber(args[2])
-        local y = tonumber(args[3])
-        local z = tonumber(args[4])
-        if x and y and z then
-            if teleportToCoords(x, y, z) then
-                addOutput("📍 Đã teleport đến tọa độ: " .. x .. ", " .. y .. ", " .. z)
-            else
-                addOutput("❌ Không thể teleport")
-            end
-        else
-            addOutput("❌ Cách dùng: goto [x] [y] [z]")
-        end
-        
-    -- Visual Effects
-    elseif command == "smoke" then
-        if createVisualEffect("smoke") then
-            addOutput("💨 Hiệu ứng khói đã BẬT")
-        else
-            addOutput("❌ Không thể tạo hiệu ứng khói")
-        end
-        
-    elseif command == "unsmoke" then
-        if removeVisualEffect("smoke") then
-            addOutput("❌ Hiệu ứng khói đã TẮT")
-        end
-        
-    elseif command == "fire" then
-        if createVisualEffect("fire") then
-            addOutput("🔥 Hiệu ứng lửa đã BẬT")
-        else
-            addOutput("❌ Không thể tạo hiệu ứng lửa")
-        end
-        
-    elseif command == "unfire" then
-        if removeVisualEffect("fire") then
-            addOutput("❌ Hiệu ứng lửa đã TẮT")
-        end
-        
-    elseif command == "trail" then
-        if createVisualEffect("trail") then
-            addOutput("✨ Hiệu ứng trail đã BẬT")
-        else
-            addOutput("❌ Không thể tạo hiệu ứng trail")
-        end
-        
-    elseif command == "untrail" then
-        if removeVisualEffect("trail") then
-            addOutput("❌ Hiệu ứng trail đã TẮT")
-        end
-        
-    elseif command == "glow" then
-        if createVisualEffect("glow") then
-            addOutput("💡 Hiệu ứng glow đã BẬT")
-        else
-            addOutput("❌ Không thể tạo hiệu ứng glow")
-        end
-        
-    elseif command == "unglow" then
-        if removeVisualEffect("glow") then
-            addOutput("❌ Hiệu ứng glow đã TẮT")
-        end
-    if command == "fb" or command == "fullbright" then
+    elseif command == "fb" or command == "fullbright" then
         setFullbright(true)
         addOutput("✅ Fullbright đã BẬT")
         
-    elseif command == "unfb" or command == "unfullbright" then
+    elseif command == "unfb" then
         setFullbright(false)
         addOutput("❌ Fullbright đã TẮT")
         
-    -- Noclip
     elseif command == "nc" or command == "noclip" then
         setNoclip(true)
         addOutput("✅ Noclip đã BẬT")
         
-    elseif command == "unnc" or command == "unnoclip" then
+    elseif command == "unnc" then
         setNoclip(false)
         addOutput("❌ Noclip đã TẮT")
         
-    -- Speed
     elseif command == "sp" or command == "speed" then
         local speed = tonumber(args[2]) or 50
         if player.Character and player.Character:FindFirstChild("Humanoid") then
@@ -696,29 +520,25 @@ local function processCommand(cmd)
             addOutput("⚡ Speed đặt thành " .. speed)
         end
         
-    elseif command == "unsp" or command == "unspeed" then
+    elseif command == "unsp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = originalWalkSpeed
-            addOutput("❌ Speed đã reset về " .. originalWalkSpeed)
+            addOutput("❌ Speed đã reset")
         end
         
-    -- WalkSpeed
     elseif command == "wsp" or command == "walkspeed" then
         local speed = tonumber(args[2]) or 16
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = speed
-            originalWalkSpeed = speed
             addOutput("🚶 WalkSpeed đặt thành " .. speed)
         end
         
-    elseif command == "unwsp" or command == "unwalkspeed" then
+    elseif command == "unwsp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = 16
-            originalWalkSpeed = 16
-            addOutput("❌ WalkSpeed đã reset về 16")
+            addOutput("❌ WalkSpeed đã reset")
         end
         
-    -- Jump
     elseif command == "jp" or command == "jump" then
         local jumpPower = tonumber(args[2]) or 100
         if player.Character and player.Character:FindFirstChild("Humanoid") then
@@ -726,24 +546,20 @@ local function processCommand(cmd)
             addOutput("🦘 Jump Power đặt thành " .. jumpPower)
         end
         
-    elseif command == "unjp" or command == "unjump" then
+    elseif command == "unjp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.JumpPower = originalJumpPower
-            addOutput("❌ Jump Power đã reset về " .. originalJumpPower)
+            addOutput("❌ Jump Power đã reset")
         end
         
-    -- ESP
     elseif command == "es" or command == "esp" then
         setESP(true)
-        espEnabled = true
         addOutput("✅ ESP đã BẬT")
         
-    elseif command == "unes" or command == "unesp" then
+    elseif command == "unes" then
         setESP(false)
-        espEnabled = false
         addOutput("❌ ESP đã TẮT")
         
-    -- Teleport
     elseif command == "tp" or command == "teleport" then
         if args[2] then
             local targetPlayer = findPlayer(args[2])
@@ -759,7 +575,6 @@ local function processCommand(cmd)
             addOutput("❌ Cách dùng: tp [tên người chơi]")
         end
         
-    -- View
     elseif command == "v" or command == "view" then
         if args[2] then
             local targetPlayer = findPlayer(args[2])
@@ -773,72 +588,79 @@ local function processCommand(cmd)
             addOutput("❌ Cách dùng: v [tên người chơi]")
         end
         
-    elseif command == "unv" or command == "unview" then
+    elseif command == "unv" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             currentCamera.CameraSubject = player.Character.Humanoid
-            addOutput("❌ Đã ngừng xem, trở về bản thân")
+            addOutput("❌ Đã ngừng xem")
         end
         
-    -- Infinite Jump
-    elseif command == "infj" or command == "infinitejump" then
+    elseif command == "infj" then
         setInfiniteJump(true)
-        infJumpEnabled = true
         addOutput("✅ Infinite Jump đã BẬT")
         
-    elseif command == "uninfj" or command == "uninfinitejump" then
+    elseif command == "uninfj" then
         setInfiniteJump(false)
-        infJumpEnabled = false
         addOutput("❌ Infinite Jump đã TẮT")
         
-    -- Fly to Player
-    elseif command == "go" then
-        if args[2] then
-            local success = flyToPlayer(args[2], true)
-            if success then
-                flyEnabled = true
-                addOutput("✈️ Đang bay đến người chơi: " .. args[2])
-            else
-                addOutput("❌ Không tìm thấy người chơi: " .. args[2])
-            end
+    elseif command == "nofog" then
+        setNoFog(true)
+        addOutput("✅ No Fog đã BẬT")
+        
+    elseif command == "unfog" then
+        setNoFog(false)
+        addOutput("❌ No Fog đã TẮT")
+        
+    elseif command == "grty" or command == "gravity" then
+        local gravity = tonumber(args[2]) or 50
+        setGravity(gravity)
+        addOutput("🌍 Gravity đặt thành " .. gravity)
+        
+    elseif command == "ungrty" then
+        setGravity()
+        addOutput("❌ Gravity đã reset")
+        
+    elseif command == "time" then
+        local hour = tonumber(args[2])
+        if hour and hour >= 0 and hour <= 24 then
+            setTime(hour)
+            addOutput("⏰ Thời gian đặt thành " .. hour .. ":00")
         else
-            addOutput("❌ Cách dùng: go [tên người chơi]")
+            addOutput("❌ Giờ phải từ 0-24")
         end
         
-    elseif command == "ungo" then
-        flyToPlayer("", false)
-        flyEnabled = false
-        addOutput("❌ Đã ngừng bay")
-        
-    -- Rejoin
     elseif command == "rejoin" then
-        addOutput("🔄 Đang rejoin server...")
+        addOutput("🔄 Đang rejoin...")
         TeleportService:Teleport(game.PlaceId, player)
         
-    -- Server Hop
-    elseif command == "serverhop" then
+    elseif command == "sho" or command == "serverhop" then
         addOutput("🌐 Đang tìm server khác...")
-        local servers = {}
-        pcall(function()
-            local req = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
-            local body = game:GetService("HttpService"):JSONDecode(req)
-            for i, v in next, body.data do
-                if type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId then
-                    servers[#servers + 1] = v.id
-                end
-            end
-        end)
-        
-        if #servers > 0 then
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], player)
+        if serverHop() then
+            addOutput("✅ Đang chuyển server...")
         else
-            addOutput("❌ Không tìm thấy server khác")
+            addOutput("❌ Không thể server hop")
+        end
+        
+    elseif command == "afk" then
+        if not antiAFKEnabled then
+            setAntiAFK(true)
+            addOutput("✅ Anti AFK đã BẬT")
+        else
+            setAntiAFK(false)
+            addOutput("❌ Anti AFK đã TẮT")
         end
         
     else
         addOutput("❌ Lệnh không hợp lệ: " .. command)
-        addOutput("📋 Gõ 'help' để xem danh sách lệnh")
+        addOutput("💡 Gõ 'help' để xem danh sách lệnh")
     end
 end
+
+-- Variables for dragging
+local dragging = false
+local dragStart = nil
+local startPos = nil
+local isMinimized = false
+local originalSize = mainFrame.Size
 
 -- Dragging functionality
 header.InputBegan:Connect(function(input)
@@ -862,17 +684,15 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
--- Minimize/Maximize functionality
+-- Minimize functionality
 minimizeBtn.MouseButton1Click:Connect(function()
     local tween
     if isMinimized then
-        -- Phóng to
         tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = originalSize})
         minimizeBtn.Text = "−"
         contentFrame.Visible = true
         isMinimized = false
     else
-        -- Thu gọn
         tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 500, 0, 40)})
         minimizeBtn.Text = "+"
         contentFrame.Visible = false
@@ -883,18 +703,10 @@ end)
 
 -- Close functionality
 closeBtn.MouseButton1Click:Connect(function()
-    -- Clean up all effects
     setNoclip(false)
     setESP(false)
     setInfiniteJump(false)
-    flyToPlayer("", false)
-    setNoFog(false)
-    setGravity()
-    
-    -- Clean up visual effects
-    for effectType, _ in pairs(visualEffects) do
-        removeVisualEffect(effectType)
-    end
+    setAntiAFK(false)
     
     local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
         Size = UDim2.new(0, 0, 0, 0),
@@ -910,7 +722,7 @@ end)
 executeBtn.MouseButton1Click:Connect(function()
     local command = commandInput.Text
     if command ~= "" then
-        addOutput("📝 Lệnh: " .. command)
+        addOutput("📝 " .. command)
         processCommand(command)
         commandInput.Text = ""
     else
@@ -940,70 +752,7 @@ createHoverEffect(executeBtn, Color3.fromRGB(40, 167, 69), Color3.fromRGB(50, 18
 createHoverEffect(minimizeBtn, Color3.fromRGB(255, 193, 7), Color3.fromRGB(255, 210, 50))
 createHoverEffect(closeBtn, Color3.fromRGB(220, 53, 69), Color3.fromRGB(235, 70, 85))
 
--- Visual Effects for Player
-local function createPlayerEffects()
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-        return
-    end
-    
-    local rootPart = player.Character.HumanoidRootPart
-    
-    -- Particle Effect
-    local attachment = Instance.new("Attachment")
-    attachment.Parent = rootPart
-    
-    local particle = Instance.new("ParticleEmitter")
-    particle.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-    particle.Lifetime = NumberRange.new(0.5, 1.0)
-    particle.Rate = 50
-    particle.SpreadAngle = Vector2.new(360, 360)
-    particle.Speed = NumberRange.new(5, 10)
-    particle.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0))
-    }
-    particle.Size = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0),
-        NumberSequenceKeypoint.new(0.5, 1),
-        NumberSequenceKeypoint.new(1, 0)
-    }
-    particle.Parent = attachment
-    
-    -- Glow Effect
-    local pointLight = Instance.new("PointLight")
-    pointLight.Brightness = 1
-    pointLight.Color = Color3.fromRGB(0, 255, 255)
-    pointLight.Range = 10
-    pointLight.Parent = rootPart
-    
-    -- Rainbow Light Effect
-    spawn(function()
-        while pointLight and pointLight.Parent do
-            for i = 0, 1, 0.01 do
-                if pointLight and pointLight.Parent then
-                    pointLight.Color = Color3.fromHSV(i, 1, 1)
-                    wait(0.1)
-                end
-            end
-        end
-    end)
-    
-    addOutput("✨ Hiệu ứng visual đã được thêm!")
-end
-
--- Auto-create effects when player spawns
-player.CharacterAdded:Connect(function()
-    wait(2) -- Wait for character to fully load
-    createPlayerEffects()
-end)
-
--- Create effects for current character if exists
-if player.Character then
-    createPlayerEffects()
-end
-
--- Player left detection for ESP cleanup
+-- Player left detection
 Players.PlayerRemoving:Connect(function(leavingPlayer)
     local esp = espFolder:FindFirstChild(leavingPlayer.Name .. "_ESP")
     if esp then
@@ -1011,75 +760,13 @@ Players.PlayerRemoving:Connect(function(leavingPlayer)
     end
 end)
 
--- Help command
-local function showHelp()
-    local helpText = [[
-📋 DANH SÁCH LỆNH MILA COMMAND:
+-- Initialize output size
+spawn(function()
+    wait(0.5)
+    updateOutputSize()
+end)
 
-🔆 LIGHTING & ENVIRONMENT:
-- fb/unfb - Bật/tắt Fullbright
-- nofog/unfog - Bật/tắt No Fog
-- time [0-24] - Đặt thời gian (ví dụ: time 12)
-
-🌍 PHYSICS:
-- grty [số]/ungrty - Đặt/reset Gravity (ví dụ: grty 50)
-
-👻 MOVEMENT:
-- nc/unnc - Bật/tắt Noclip
-- sp [số]/unsp - Đặt/reset Speed
-- wsp [số]/unwsp - Đặt/reset WalkSpeed  
-- jp [số]/unjp - Đặt/reset Jump Power
-- infj/uninfj - Bật/tắt Infinite Jump
-
-👁️ VISUAL & MONITORING:
-- es/unes - Bật/tắt ESP (hiển thị tên + khoảng cách)
-- v [tên]/unv - Xem/ngừng xem người chơi
-
-📍 TELEPORT & POSITION:
-- tp [tên] - Teleport đến người chơi
-- go [tên]/ungo - Bay đến/ngừng bay đến người chơi
-- savepos [tên] - Lưu vị trí hiện tại
-- loadpos [tên] - Tải vị trí đã lưu
-- getpos - Lấy tọa độ hiện tại
-- goto [x] [y] [z] - Teleport đến tọa độ
-
-✨ VISUAL EFFECTS:
-- smoke/unsmoke - Bật/tắt hiệu ứng khói
-- fire/unfire - Bật/tắt hiệu ứng lửa  
-- trail/untrail - Bật/tắt hiệu ứng trail
-- glow/unglow - Bật/tắt hiệu ứng ánh sáng
-
-📊 SERVER & INFO:
-- serverinfo - Hiển thị thông tin server
-- jobid - Hiển thị Job ID để copy
-- placeid - Hiển thị Place ID để copy
-
-🌐 SERVER ACTIONS:
-- rejoin - Rejoin server hiện tại
-- serverhop - Chuyển sang server khác
-
-💡 VÍ DỤ SỬ DỤNG:
-- sp 50 (speed 50)
-- tp john (tp đến john)
-- savepos home (lưu vị trí tên "home")
-- goto 100 50 200 (đến tọa độ x100 y50 z200)
-- time 18 (đặt thời gian 6 giờ chiều)
-]]
-    addOutput(helpText)
-end
-
--- Add help to command processor
-local originalProcessCommand = processCommand
-processCommand = function(cmd)
-    local command = string.lower(string.split(cmd, " ")[1])
-    if command == "help" or command == "h" then
-        showHelp()
-    else
-        originalProcessCommand(cmd)
-    end
-end
-
--- Hiệu ứng xuất hiện
+-- Appearance animation
 mainFrame.Size = UDim2.new(0, 0, 0, 0)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 
@@ -1089,5 +776,5 @@ local appearTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.Easin
 })
 appearTween:Play()
 
-print("🌟 Mila Command đã được tải!")
-addOutput("🚀 Hệ thống sẵn sàng! Gõ 'help' để xem lệnh!")
+print("🌟 Mila Command UI đã tải thành công!")
+addOutput("🚀 Sẵn sàng sử dụng! Gõ 'help' để xem lệnh!")
