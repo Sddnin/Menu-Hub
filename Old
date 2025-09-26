@@ -1,948 +1,117 @@
--- Mila Command UI for Roblox - Fixed Version
--- Created by Mila
-
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
-local TeleportService = game:GetService("TeleportService")
-
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
--- Clean up existing GUI first
-if playerGui:FindFirstChild("MilaCommandGUI") then
-    playerGui.MilaCommandGUI:Destroy()
-end
-
--- Variables for features
-local noclipEnabled = false
-local espEnabled = false
-local infJumpEnabled = false
-local flyEnabled = false
-local originalWalkSpeed = 16
-local originalJumpPower = 50
-local noclipConnection = nil
-local espConnection = nil
-local infJumpConnection = nil
-local flyConnection = nil
-local currentCamera = workspace.CurrentCamera
-local bodyVelocity = nil
-local bodyAngularVelocity = nil
-local savedPositions = {}
-local visualEffects = {}
-local originalGravity = workspace.Gravity
-local antiAFKEnabled = false
-local antiAFKConnection = nil
-local wallWalkEnabled = false
-local wallWalkConnection = nil
-
--- ESP Variables
-local espFolder = Instance.new("Folder")
-espFolder.Name = "ESPFolder"
-espFolder.Parent = workspace
-
--- Create main ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MilaCommandGUI"
-screenGui.Parent = playerGui
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-
--- Main Frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
-
--- Round corners
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
-mainCorner.Parent = mainFrame
-
--- Shadow effect
-local shadow = Instance.new("Frame")
-shadow.Name = "Shadow"
-shadow.Size = UDim2.new(1, 6, 1, 6)
-shadow.Position = UDim2.new(0, -3, 0, -3)
-shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-shadow.BackgroundTransparency = 0.5
-shadow.ZIndex = mainFrame.ZIndex - 1
-shadow.Parent = mainFrame
-
-local shadowCorner = Instance.new("UICorner")
-shadowCorner.CornerRadius = UDim.new(0, 10)
-shadowCorner.Parent = shadow
-
--- Header
-local header = Instance.new("Frame")
-header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 40)
-header.Position = UDim2.new(0, 0, 0, 0)
-header.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
-header.BorderSizePixel = 0
-header.Parent = mainFrame
-
-local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 10)
-headerCorner.Parent = header
-
--- Make header bottom flat
-local headerBottom = Instance.new("Frame")
-headerBottom.Size = UDim2.new(1, 0, 0, 10)
-headerBottom.Position = UDim2.new(0, 0, 1, -10)
-headerBottom.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
-headerBottom.BorderSizePixel = 0
-headerBottom.Parent = header
-
--- Title
-local title = Instance.new("TextLabel")
-title.Name = "Title"
-title.Size = UDim2.new(1, -80, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "🌟 Mila Command"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextScaled = true
-title.Font = Enum.Font.GothamBold
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = header
-
--- Minimize button
-local minimizeBtn = Instance.new("TextButton")
-minimizeBtn.Name = "MinimizeButton"
-minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-minimizeBtn.Position = UDim2.new(1, -65, 0, 5)
-minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 193, 7)
-minimizeBtn.Text = "−"
-minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeBtn.TextScaled = true
-minimizeBtn.Font = Enum.Font.GothamBold
-minimizeBtn.BorderSizePixel = 0
-minimizeBtn.Parent = header
-
-local minimizeBtnCorner = Instance.new("UICorner")
-minimizeBtnCorner.CornerRadius = UDim.new(0, 5)
-minimizeBtnCorner.Parent = minimizeBtn
-
--- Close button
-local closeBtn = Instance.new("TextButton")
-closeBtn.Name = "CloseButton"
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -30, 0, 5)
-closeBtn.BackgroundColor3 = Color3.fromRGB(220, 53, 69)
-closeBtn.Text = "❌"
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.TextScaled = true
-closeBtn.Font = Enum.Font.Gotham
-closeBtn.BorderSizePixel = 0
-closeBtn.Parent = header
-
-local closeBtnCorner = Instance.new("UICorner")
-closeBtnCorner.CornerRadius = UDim.new(0, 5)
-closeBtnCorner.Parent = closeBtn
-
--- Content frame
-local contentFrame = Instance.new("Frame")
-contentFrame.Name = "Content"
-contentFrame.Size = UDim2.new(1, -20, 1, -60)
-contentFrame.Position = UDim2.new(0, 10, 0, 50)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = mainFrame
-
--- Command input
-local commandInput = Instance.new("TextBox")
-commandInput.Name = "CommandInput"
-commandInput.Size = UDim2.new(1, -80, 0, 35)
-commandInput.Position = UDim2.new(0, 0, 1, -45)
-commandInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-commandInput.Text = ""
-commandInput.PlaceholderText = "Nhập lệnh... (help để xem tất cả lệnh)"
-commandInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-commandInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-commandInput.TextScaled = true
-commandInput.Font = Enum.Font.Gotham
-commandInput.BorderSizePixel = 0
-commandInput.Parent = contentFrame
-
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 5)
-inputCorner.Parent = commandInput
-
--- Execute button
-local executeBtn = Instance.new("TextButton")
-executeBtn.Name = "ExecuteButton"
-executeBtn.Size = UDim2.new(0, 70, 0, 35)
-executeBtn.Position = UDim2.new(1, -70, 1, -45)
-executeBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-executeBtn.Text = "Chạy"
-executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-executeBtn.TextScaled = true
-executeBtn.Font = Enum.Font.GothamBold
-executeBtn.BorderSizePixel = 0
-executeBtn.Parent = contentFrame
-
-local executeBtnCorner = Instance.new("UICorner")
-executeBtnCorner.CornerRadius = UDim.new(0, 5)
-executeBtnCorner.Parent = executeBtn
-
--- Output frame
-local outputFrame = Instance.new("ScrollingFrame")
-outputFrame.Name = "OutputFrame"
-outputFrame.Size = UDim2.new(1, 0, 1, -55)
-outputFrame.Position = UDim2.new(0, 0, 0, 0)
-outputFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-outputFrame.BorderSizePixel = 0
-outputFrame.ScrollBarThickness = 8
-outputFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
-outputFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-outputFrame.Parent = contentFrame
-
-local outputCorner = Instance.new("UICorner")
-outputCorner.CornerRadius = UDim.new(0, 5)
-outputCorner.Parent = outputFrame
-
--- Output text
-local outputText = Instance.new("TextLabel")
-outputText.Name = "OutputText"
-outputText.Size = UDim2.new(1, -10, 0, 1000)
-outputText.Position = UDim2.new(0, 5, 0, 5)
-outputText.BackgroundTransparency = 1
-outputText.Text = "💫 Mila Command - Phiên bản nâng cao!\n✨ Gõ 'help' để xem danh sách lệnh đầy đủ\n🚀 UI đã sẵn sàng để sử dụng!"
-outputText.TextColor3 = Color3.fromRGB(200, 200, 200)
-outputText.TextSize = 12
-outputText.Font = Enum.Font.Gotham
-outputText.TextXAlignment = Enum.TextXAlignment.Left
-outputText.TextYAlignment = Enum.TextYAlignment.Top
-outputText.TextWrapped = true
-outputText.Parent = outputFrame
-
--- COMMAND FUNCTIONS
-
--- No Fog
-local function setNoFog(enabled)
-    if enabled then
-        Lighting.FogEnd = 100000
-        Lighting.FogStart = 0
-    else
-        Lighting.FogEnd = 1000
-        Lighting.FogStart = 0
-    end
-end
-
--- Fullbright
-local function setFullbright(enabled)
-    if enabled then
-        Lighting.Brightness = 2
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 100000
-        Lighting.GlobalShadows = false
-        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-    else
-        Lighting.Brightness = 1
-        Lighting.ClockTime = 12
-        Lighting.FogEnd = 1000
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
-    end
-end
-
--- Noclip
-local function setNoclip(enabled)
-    noclipEnabled = enabled
-    if enabled then
-        noclipConnection = RunService.Stepped:Connect(function()
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                for _, part in pairs(player.Character:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        end)
-    else
-        if noclipConnection then
-            noclipConnection:Disconnect()
-        end
-        if player.Character then
-            for _, part in pairs(player.Character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    part.CanCollide = true
-                end
-            end
-        end
-    end
-end
-
--- Gravity
-local function setGravity(value)
-    if value then
-        workspace.Gravity = value
-    else
-        workspace.Gravity = originalGravity
-    end
-end
-
--- Time
-local function setTime(hour)
-    if hour then
-        Lighting.ClockTime = hour
-    end
-end
-
--- Position functions
-local function savePosition(name)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        savedPositions[name] = player.Character.HumanoidRootPart.CFrame
-        return true
-    end
-    return false
-end
-
-local function loadPosition(name)
-    if savedPositions[name] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = savedPositions[name]
-        return true
-    end
-    return false
-end
-
--- Find Player
-local function findPlayer(name)
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(name)) or string.lower(p.DisplayName):find(string.lower(name)) then
-            return p
-        end
-    end
-    return nil
-end
-
--- ESP
-local function createESP(targetPlayer)
-    if not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        return
-    end
-
-    local char = targetPlayer.Character
-    local rootPart = char.HumanoidRootPart
-
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = targetPlayer.Name .. "_ESP"
-    billboard.Adornee = rootPart
-    billboard.Size = UDim2.new(0, 200, 0, 50)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
-    billboard.AlwaysOnTop = true
-    billboard.Parent = espFolder
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 0.5
-    frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    frame.BorderSizePixel = 0
-    frame.Parent = billboard
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 5)
-    corner.Parent = frame
-
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, 0, 0.6, 0)
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Text = targetPlayer.Name
-    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    nameLabel.TextScaled = true
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.Parent = frame
-
-    local distanceLabel = Instance.new("TextLabel")
-    distanceLabel.Size = UDim2.new(1, 0, 0.4, 0)
-    distanceLabel.Position = UDim2.new(0, 0, 0.6, 0)
-    distanceLabel.BackgroundTransparency = 1
-    distanceLabel.Text = "0 studs"
-    distanceLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    distanceLabel.TextScaled = true
-    distanceLabel.Font = Enum.Font.Gotham
-    distanceLabel.Parent = frame
-
-    return billboard, distanceLabel
-end
-
-local function setESP(enabled)
-    if enabled then
-        espConnection = RunService.Heartbeat:Connect(function()
-            for _, targetPlayer in pairs(Players:GetPlayers()) do
-                if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    local existingESP = espFolder:FindFirstChild(targetPlayer.Name .. "_ESP")
-                    if not existingESP then
-                        createESP(targetPlayer)
-                    else
-                        local billboard = existingESP
-                        local distanceLabel = billboard.Frame:GetChildren()[3]
-                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and distanceLabel then
-                            local distance = (player.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude
-                            distanceLabel.Text = math.floor(distance) .. " studs"
-                        end
-                    end
-                end
-            end
-        end)
-    else
-        if espConnection then
-            espConnection:Disconnect()
-        end
-        espFolder:ClearAllChildren()
-    end
-end
-
--- Server Hop
-local function serverHop()
-    local success, result = pcall(function()
-        local Http = game:GetService("HttpService")
-        local TeleportService = game:GetService("TeleportService")
-        local Api = "https://games.roblox.com/v1/games/"
-        
-        local _place = game.PlaceId
-        local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
-        
-        local function ListServers(cursor)
-            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-            return Http:JSONDecode(Raw)
-        end
-        
-        local Server, Next; repeat
-            local Servers = ListServers(Next)
-            Server = Servers.data[1]
-            Next = Servers.nextPageCursor
-        until Server
-        
-        if Server then
-            TeleportService:TeleportToPlaceInstance(_place, Server.id, player)
-            return true
-        end
-        return false
-    end)
-    
-    return success
-end
-
--- WallWalk
-local function setWallWalk(enabled)
-    if enabled then
-        wallWalkEnabled = true
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            wallWalkConnection = RunService.Heartbeat:Connect(function()
-                if wallWalkEnabled and player.Character and player.Character:FindFirstChild("Humanoid") then
-                    player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-                    wait(0.1)
-                    player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-                end
-            end)
-        end
-    else
-        wallWalkEnabled = false
-        if wallWalkConnection then
-            wallWalkConnection:Disconnect()
-            wallWalkConnection = nil
-        end
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end
-end
-
--- Hidden Old Script Function
-local function showPasswordPrompt()
-    -- Create password prompt UI
-    local promptGui = Instance.new("ScreenGui")
-    promptGui.Name = "PasswordPrompt"
-    promptGui.Parent = playerGui
-    promptGui.ResetOnSpawn = false
-    
-    local promptFrame = Instance.new("Frame")
-    promptFrame.Size = UDim2.new(0, 400, 0, 200)
-    promptFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
-    promptFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    promptFrame.BorderSizePixel = 0
-    promptFrame.Parent = promptGui
-    
-    local promptCorner = Instance.new("UICorner")
-    promptCorner.CornerRadius = UDim.new(0, 10)
-    promptCorner.Parent = promptFrame
-    
-    local promptTitle = Instance.new("TextLabel")
-    promptTitle.Size = UDim2.new(1, -20, 0, 50)
-    promptTitle.Position = UDim2.new(0, 10, 0, 10)
-    promptTitle.BackgroundTransparency = 1
-    promptTitle.Text = "🎉 Chúc mừng! Bạn đã tìm thấy lệnh ẩn!"
-    promptTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
-    promptTitle.TextScaled = true
-    promptTitle.Font = Enum.Font.GothamBold
-    promptTitle.Parent = promptFrame
-    
-    local promptLabel = Instance.new("TextLabel")
-    promptLabel.Size = UDim2.new(1, -20, 0, 30)
-    promptLabel.Position = UDim2.new(0, 10, 0, 70)
-    promptLabel.BackgroundTransparency = 1
-    promptLabel.Text = "🔐 Nhập mật khẩu để tiếp tục:"
-    promptLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    promptLabel.TextScaled = true
-    promptLabel.Font = Enum.Font.Gotham
-    promptLabel.Parent = promptFrame
-    
-    local passwordInput = Instance.new("TextBox")
-    passwordInput.Size = UDim2.new(1, -40, 0, 35)
-    passwordInput.Position = UDim2.new(0, 20, 0, 110)
-    passwordInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    passwordInput.Text = ""
-    passwordInput.PlaceholderText = "Nhập mật khẩu..."
-    passwordInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-    passwordInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    passwordInput.TextScaled = true
-    passwordInput.Font = Enum.Font.Gotham
-    passwordInput.BorderSizePixel = 0
-    passwordInput.Parent = promptFrame
-    
-    local inputCorner = Instance.new("UICorner")
-    inputCorner.CornerRadius = UDim.new(0, 5)
-    inputCorner.Parent = passwordInput
-    
-    local submitBtn = Instance.new("TextButton")
-    submitBtn.Size = UDim2.new(0, 100, 0, 30)
-    submitBtn.Position = UDim2.new(0.5, -50, 0, 160)
-    submitBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-    submitBtn.Text = "Xác nhận"
-    submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    submitBtn.TextScaled = true
-    submitBtn.Font = Enum.Font.GothamBold
-    submitBtn.BorderSizePixel = 0
-    submitBtn.Parent = promptFrame
-    
-    local submitCorner = Instance.new("UICorner")
-    submitCorner.CornerRadius = UDim.new(0, 5)
-    submitCorner.Parent = submitBtn
-    
-    local closePromptBtn = Instance.new("TextButton")
-    closePromptBtn.Size = UDim2.new(0, 25, 0, 25)
-    closePromptBtn.Position = UDim2.new(1, -30, 0, 5)
-    closePromptBtn.BackgroundColor3 = Color3.fromRGB(220, 53, 69)
-    closePromptBtn.Text = "✕"
-    closePromptBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closePromptBtn.TextScaled = true
-    closePromptBtn.Font = Enum.Font.GothamBold
-    closePromptBtn.BorderSizePixel = 0
-    closePromptBtn.Parent = promptFrame
-    
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 5)
-    closeCorner.Parent = closePromptBtn
-    
-    -- Submit password
-    local function checkPassword()
-        local password = passwordInput.Text
-        if password == "Memory" then
-            addOutput("✅ Mật khẩu đúng! Đang tải Old Menu Hub...")
-            promptGui:Destroy()
-            
-            -- Execute the script
-            local success, error = pcall(function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Old"))()
-            end)
-            
-            if success then
-                addOutput("🎉 Old Menu Hub đã được tải thành công!")
-            else
-                addOutput("❌ Lỗi khi tải Old Menu Hub: " .. tostring(error))
-            end
-        else
-            addOutput("❌ Mật khẩu sai!")
-            passwordInput.Text = ""
-        end
-    end
-    
-    submitBtn.MouseButton1Click:Connect(checkPassword)
-    closePromptBtn.MouseButton1Click:Connect(function()
-        promptGui:Destroy()
-        addOutput("❌ Đã hủy nhập mật khẩu")
-    end)
-    
-    passwordInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            checkPassword()
-        end
-    end)
-    
-    -- Auto focus on password input
-    wait(0.1)
-    passwordInput:CaptureFocus()
-end
-
--- Anti AFK
-local function setAntiAFK(enabled)
-    if enabled then
-        antiAFKEnabled = true
-        antiAFKConnection = game:GetService("RunService").Heartbeat:Connect(function()
-            if antiAFKEnabled then
-                local VirtualUser = game:service("VirtualUser")
-                VirtualUser:CaptureController()
-                VirtualUser:ClickButton2(Vector2.new())
-            end
-        end)
-    else
-        antiAFKEnabled = false
-        if antiAFKConnection then
-            antiAFKConnection:Disconnect()
-            antiAFKConnection = nil
-        end
-    end
-end
-
--- Infinite Jump
-local function setInfiniteJump(enabled)
-    if enabled then
-        infJumpConnection = UserInputService.JumpRequest:Connect(function()
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end)
-    else
-        if infJumpConnection then
-            infJumpConnection:Disconnect()
-        end
-    end
-end
-
--- Update output text size
-local function updateOutputSize()
-    local textService = game:GetService("TextService")
-    local textSize = textService:GetTextSize(outputText.Text, 12, Enum.Font.Gotham, Vector2.new(outputText.AbsoluteSize.X, math.huge))
-    outputText.Size = UDim2.new(1, -10, 0, math.max(textSize.Y + 10, outputFrame.AbsoluteSize.Y))
-    outputFrame.CanvasSize = UDim2.new(0, 0, 0, textSize.Y + 20)
-end
-
--- Add output function
-local function addOutput(text)
-    outputText.Text = outputText.Text .. "\n> " .. text
-    updateOutputSize()
-    outputFrame.CanvasPosition = Vector2.new(0, outputFrame.CanvasSize.Y.Offset)
-end
-
--- Command processor
-local function processCommand(cmd)
-    local args = {}
-    for word in cmd:gmatch("%S+") do
-        table.insert(args, word)
-    end
-    
-    local command = string.lower(args[1] or "")
-    
-    if command == "help" or command == "h" then
-        addOutput("📋 LỆNH CƠ BẢN:")
-        addOutput("fb/unfb - Fullbright | nc/unnc - Noclip")
-        addOutput("sp [số]/unsp - Speed | wsp [số]/unwsp - WalkSpeed") 
-        addOutput("jp [số]/unjp - Jump | es/unes - ESP")
-        addOutput("tp [tên] - Teleport | v [tên]/unv - View")
-        addOutput("infj/uninfj - Infinite Jump")
-        addOutput("nofog/unfog - No Fog | grty [số]/ungrty - Gravity")
-        addOutput("time [0-24] - Set Time | rejoin - Rejoin")
-        addOutput("sho - Server Hop | afk - Anti AFK")
-        addOutput("wallwalk - Đi trên tường")
-        
-    elseif command == "fb" or command == "fullbright" then
-        setFullbright(true)
-        addOutput("✅ Fullbright đã BẬT")
-        
-    elseif command == "unfb" then
-        setFullbright(false)
-        addOutput("❌ Fullbright đã TẮT")
-        
-    elseif command == "nc" or command == "noclip" then
-        setNoclip(true)
-        addOutput("✅ Noclip đã BẬT")
-        
-    elseif command == "unnc" then
-        setNoclip(false)
-        addOutput("❌ Noclip đã TẮT")
-        
-    elseif command == "sp" or command == "speed" then
-        local speed = tonumber(args[2]) or 50
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = speed
-            addOutput("⚡ Speed đặt thành " .. speed)
-        end
-        
-    elseif command == "unsp" then
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = originalWalkSpeed
-            addOutput("❌ Speed đã reset")
-        end
-        
-    elseif command == "wsp" or command == "walkspeed" then
-        local speed = tonumber(args[2]) or 16
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = speed
-            addOutput("🚶 WalkSpeed đặt thành " .. speed)
-        end
-        
-    elseif command == "unwsp" then
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = 16
-            addOutput("❌ WalkSpeed đã reset")
-        end
-        
-    elseif command == "jp" or command == "jump" then
-        local jumpPower = tonumber(args[2]) or 100
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.JumpPower = jumpPower
-            addOutput("🦘 Jump Power đặt thành " .. jumpPower)
-        end
-        
-    elseif command == "unjp" then
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.JumpPower = originalJumpPower
-            addOutput("❌ Jump Power đã reset")
-        end
-        
-    elseif command == "es" or command == "esp" then
-        setESP(true)
-        addOutput("✅ ESP đã BẬT")
-        
-    elseif command == "unes" then
-        setESP(false)
-        addOutput("❌ ESP đã TẮT")
-        
-    elseif command == "tp" or command == "teleport" then
-        if args[2] then
-            local targetPlayer = findPlayer(args[2])
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                    addOutput("📍 Đã teleport đến " .. targetPlayer.Name)
-                end
-            else
-                addOutput("❌ Không tìm thấy người chơi: " .. args[2])
-            end
-        else
-            addOutput("❌ Cách dùng: tp [tên người chơi]")
-        end
-        
-    elseif command == "v" or command == "view" then
-        if args[2] then
-            local targetPlayer = findPlayer(args[2])
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
-                currentCamera.CameraSubject = targetPlayer.Character.Humanoid
-                addOutput("👀 Đang xem " .. targetPlayer.Name)
-            else
-                addOutput("❌ Không tìm thấy người chơi: " .. args[2])
-            end
-        else
-            addOutput("❌ Cách dùng: v [tên người chơi]")
-        end
-        
-    elseif command == "unv" then
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            currentCamera.CameraSubject = player.Character.Humanoid
-            addOutput("❌ Đã ngừng xem")
-        end
-        
-    elseif command == "infj" then
-        setInfiniteJump(true)
-        addOutput("✅ Infinite Jump đã BẬT")
-        
-    elseif command == "uninfj" then
-        setInfiniteJump(false)
-        addOutput("❌ Infinite Jump đã TẮT")
-        
-    elseif command == "nofog" then
-        setNoFog(true)
-        addOutput("✅ No Fog đã BẬT")
-        
-    elseif command == "unfog" then
-        setNoFog(false)
-        addOutput("❌ No Fog đã TẮT")
-        
-    elseif command == "grty" or command == "gravity" then
-        local gravity = tonumber(args[2]) or 50
-        setGravity(gravity)
-        addOutput("🌍 Gravity đặt thành " .. gravity)
-        
-    elseif command == "ungrty" then
-        setGravity()
-        addOutput("❌ Gravity đã reset")
-        
-    elseif command == "time" then
-        local hour = tonumber(args[2])
-        if hour and hour >= 0 and hour <= 24 then
-            setTime(hour)
-            addOutput("⏰ Thời gian đặt thành " .. hour .. ":00")
-        else
-            addOutput("❌ Giờ phải từ 0-24")
-        end
-        
-    elseif command == "rejoin" then
-        addOutput("🔄 Đang rejoin...")
-        TeleportService:Teleport(game.PlaceId, player)
-        
-    elseif command == "sho" or command == "serverhop" then
-        addOutput("🌐 Đang tìm server khác...")
-        if serverHop() then
-            addOutput("✅ Đang chuyển server...")
-        else
-            addOutput("❌ Không thể server hop")
-        end
-        
-    elseif command == "afk" then
-        if not antiAFKEnabled then
-            setAntiAFK(true)
-            addOutput("✅ Anti AFK đã BẬT")
-        else
-            setAntiAFK(false)
-            addOutput("❌ Anti AFK đã TẮT")
-        end
-        
-    elseif command == "wallwalk" then
-        if not wallWalkEnabled then
-            setWallWalk(true)
-            addOutput("🚶‍♂️ Wall Walk đã BẬT - Bạn có thể đi trên tường!")
-        else
-            setWallWalk(false)
-            addOutput("❌ Wall Walk đã TẮT")
-        end
-        
-    elseif command == "old" then
-        addOutput("🎊 Chúc mừng bạn đã tìm thấy lệnh ẩn!")
-        showPasswordPrompt()
-        
-    else
-        addOutput("❌ Lệnh không hợp lệ: " .. command)
-        addOutput("💡 Gõ 'help' để xem danh sách lệnh")
-    end
-end
-
--- Variables for dragging
-local dragging = false
-local dragStart = nil
-local startPos = nil
-local isMinimized = false
-local originalSize = mainFrame.Size
-
--- Dragging functionality
-header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
--- Minimize functionality
-minimizeBtn.MouseButton1Click:Connect(function()
-    local tween
-    if isMinimized then
-        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = originalSize})
-        minimizeBtn.Text = "−"
-        contentFrame.Visible = true
-        isMinimized = false
-    else
-        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 500, 0, 40)})
-        minimizeBtn.Text = "+"
-        contentFrame.Visible = false
-        isMinimized = true
-    end
-    tween:Play()
-end)
-
--- Close functionality
-closeBtn.MouseButton1Click:Connect(function()
-    setNoclip(false)
-    setESP(false)
-    setInfiniteJump(false)
-    setAntiAFK(false)
-    setWallWalk(false)
-    
-    local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0)
-    })
-    tween:Play()
-    tween.Completed:Connect(function()
-        screenGui:Destroy()
-    end)
-end)
-
--- Execute command functionality
-executeBtn.MouseButton1Click:Connect(function()
-    local command = commandInput.Text
-    if command ~= "" then
-        addOutput("📝 " .. command)
-        processCommand(command)
-        commandInput.Text = ""
-    else
-        addOutput("⚠️ Vui lòng nhập lệnh!")
-    end
-end)
-
--- Enter key support
-commandInput.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        executeBtn.MouseButton1Click:Fire()
-    end
-end)
-
--- Hover effects
-local function createHoverEffect(button, normalColor, hoverColor)
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
-    end)
-    
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = normalColor}):Play()
-    end)
-end
-
-createHoverEffect(executeBtn, Color3.fromRGB(40, 167, 69), Color3.fromRGB(50, 180, 80))
-createHoverEffect(minimizeBtn, Color3.fromRGB(255, 193, 7), Color3.fromRGB(255, 210, 50))
-createHoverEffect(closeBtn, Color3.fromRGB(220, 53, 69), Color3.fromRGB(235, 70, 85))
-
--- Player left detection
-Players.PlayerRemoving:Connect(function(leavingPlayer)
-    local esp = espFolder:FindFirstChild(leavingPlayer.Name .. "_ESP")
-    if esp then
-        esp:Destroy()
-    end
-end)
-
--- Initialize output size
-spawn(function()
-    wait(0.5)
-    updateOutputSize()
-end)
-
--- Appearance animation
-mainFrame.Size = UDim2.new(0, 0, 0, 0)
-mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-local appearTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-    Size = UDim2.new(0, 500, 0, 400),
-    Position = UDim2.new(0.5, -250, 0.5, -200)
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+
+local Window = MakeWindow({
+    Hub = {Title = "Mila Hub V1  | 🔍 Search: Type script name", Animation = "Mila Hub"},
+    Key = {KeySystem = True, Title = "Key System", Description = "", KeyLink = "", Keys = {"Sddnin"},
+        Notifi = {Notifications = true, CorrectKey = "Running the Script...", Incorrectkey = "The key is incorrect", CopyKeyLink = "Copied to Clipboard"}}
 })
-appearTween:Play()
 
-print("🌟 Mila Command UI đã tải thành công!")
-addOutput("🚀 Sẵn sàng sử dụng! Gõ 'help' để xem lệnh!")
+MinimizeButton({Image = "http://www.roblox.com/asset/?id=73608909933636", Size = {60, 60}, Color = Color3.fromRGB(10, 10, 10), Corner = true, Stroke = false, StrokeColor = Color3.fromRGB(255, 0, 0)})
+
+-- Tabs
+local Tab1o = MakeTab({Name = "Blox fruits"})
+local Tab2o = MakeTab({Name = "Misc"})
+local Tab3o = MakeTab({Name = "99 night in the forest"})
+local Tab4o = MakeTab({Name = "Dead rails"})
+local Tab5o = MakeTab({Name = "Grow a garden"})
+
+-- Script Database
+local Scripts = {
+    {n="Blue X Hub", g="BF", u="https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
+    {n="Redz", g="BF", u="https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau", s=true},
+    {n="Hop fruit", g="BF", u="https://scripts.alchemyhub.xyz", f=true},
+    {n="Min gaming", g="BF", u="https://raw.githubusercontent.com/MinGamingHubNew/RealMinGaming/refs/heads/main/MinGaminvHubBloxFruits.lua"},
+    {n="Rolls Rocye", g="BF", u="https://raw.githubusercontent.com/RealMatsune/Rolls-Rocye/refs/heads/main/Loading.lua"},
+    {n="Hiru Hub", g="BF", u="https://raw.githubusercontent.com/LuaStupid/Source/main/HiruHubVeriV2.lua"},
+    {n="Maru Hub", g="BF", u="https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
+    {n="Trau Roblox", g="BF", u="https://raw.githubusercontent.com/stuckez999/main/refs/heads/main/traurobloxpremium.lua"},
+    {n="Hop All", g="BF", u="https://raw.githubusercontent.com/Iamkhnah/noguchihyuga/refs/heads/main/ScriptHop.lua"},
+    {n="Teddy Hub", g="BF", u="https://raw.githubusercontent.com/skibiditoiletgojo/Haidepzai/refs/heads/main/Teddy-FREMIUM"},
+    {n="Infinite Yield", g="U", u="https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {n="Fly v3", g="U", u="fly_v3", e=true},
+    {n="Emote", g="U", u="https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui"},
+    {n="Nameless Admin", g="U", u="https://rawscripts.net/raw/Universal-Script-nameless-admin-15646"},
+    {n="Arceus X", g="U", u="https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"},
+    {n="Shader", g="U", u="https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua"},
+    {n="Fix lag", g="U", u="https://rawscripts.net/raw/Universal-Script-OP-Anti-Lah-24771"},
+    {n="Fly", g="U", u="https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"},
+    {n="I wanna run away", g="U", u="https://raw.githubusercontent.com/0riginalWarrior/Stalkie/refs/heads/main/roblox.lua"},
+    {n="AirFlow", g="99N", u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"},
+    {n="H4x", g="99N", u="https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua"},
+    {n="NPC lock", g="99N", u="https://rawscripts.net/raw/Dead-Rails-NPC-LOCK-32544"},
+    {n="TN Roblox", g="DR", u="https://raw.githubusercontent.com/thiennrb7/Script/refs/heads/main/Bringall"},
+    {n="Skull Hub", g="DR", u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"},
+    {n="NatHub", g="DR", u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"},
+    {n="Nebula Hub", g="DR", u="https://raw.githubusercontent.com/NebulaHubOfc/Public/refs/heads/main/Loader.lua"},
+    {n="Tp All", g="DR", u="https://raw.githubusercontent.com/ringtaa/deadrailsui.github.io/refs/heads/main/RINGTA.LUA"},
+    {n="Native", g="DR", u="https://getnative.cc/script/loader"},
+    {n="KiciaHook-V2", g="DR", u="https://rawscripts.net/raw/Dead-Rails-Alpha-OP-KiciaHook-V2-Dead-Rails-Auto-Farm-And-More-38614"},
+    {n="No lag", g="GAG", u="https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"},
+    {n="Limit Hub", g="GAG", u="https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua"},
+    {n="Speed Hub X", g="GAG", u="https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062"},
+    {n="Lunor", g="GAG", u="https://lunor.dev/loader"},
+    {n="ThunderZ", g="GAG", u="https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"}
+}
+
+-- Execute function
+local function Run(s)
+    local Settings = {JoinTeam = "Pirates", Translator = true}
+    if s.e then loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\40\39\104\116\116\112\115\58\47\47\103\105\115\116\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\101\111\122\111\110\101\89\84\47\98\102\48\51\55\100\102\102\57\102\48\97\55\48\48\49\55\51\48\52\100\100\100\54\55\102\100\99\100\51\55\48\47\114\97\119\47\101\49\52\101\55\52\102\52\50\53\98\48\54\48\100\102\53\50\51\51\52\51\99\102\51\48\98\55\56\55\48\55\52\101\98\51\99\53\100\50\47\97\114\99\101\117\115\37\50\53\50\48\120\37\50\53\50\48\102\108\121\37\50\53\50\48\50\37\50\53\50\48\111\98\102\108\117\99\97\116\111\114\39\41\44\116\114\117\101\41\41\40\41\10\10")()
+    elseif s.f then _G.FruitFinder = true; loadstring(game:HttpGet(s.u))()
+    elseif s.s then loadstring(game:HttpGet(s.u))(Settings)
+    else loadstring(game:HttpGet(s.u))() end
+end
+
+-- Search function with instant execution
+local function QuickSearch(term)
+    if term == "" then return end
+    term = term:lower()
+    local found = false
+    for _, s in pairs(Scripts) do
+        if s.n:lower():find(term) then
+            print("🚀 Đang chạy: " .. s.n)
+            Run(s)
+            found = true
+            break
+        end
+    end
+    if not found then print("❌ Không tìm thấy: " .. term) end
+end
+
+-- Quick Search Box (placed in first tab)
+AddTextBox(Tab1o, {
+    Name = "🔍 Quick Search - Tìm và chạy script ngay",
+    Default = "",
+    PlaceholderText = "Gõ tên script để chạy ngay lập tức...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text) QuickSearch(text) end
+})
+
+AddButton(Tab1o, {Name = "📋 Xem tất cả scripts (" .. #Scripts .. ")", Callback = function()
+    print("=== DANH SÁCH TẤT CẢ SCRIPTS ===")
+    print("BF = Blox Fruits | U = Universal | DR = Dead Rails | GAG = Grow a Garden | 99N = 99 Nights")
+    for i, s in pairs(Scripts) do print(i .. ". " .. s.n .. " (" .. s.g .. ")") end
+end})
+
+-- Original buttons (shortened)
+local function AddScriptButton(tab, name, scriptData) AddButton(tab, {Name = name, Callback = function() Run(scriptData) end}) end
+
+-- Blox Fruits
+for _, s in pairs(Scripts) do if s.g == "BF" then AddScriptButton(Tab1o, s.n, s) end end
+
+-- Misc
+for _, s in pairs(Scripts) do if s.g == "U" then AddScriptButton(Tab2o, s.n, s) end end
+
+-- 99 Nights
+for _, s in pairs(Scripts) do if s.g == "99N" then AddScriptButton(Tab3o, s.n, s) end end
+AddScriptButton(Tab3o, "AirFlow (DR)", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
+
+-- Dead Rails
+for _, s in pairs(Scripts) do if s.g == "DR" then AddScriptButton(Tab4o, s.n, s) end end
+AddScriptButton(Tab4o, "AirFlow", {u="https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua"})
+
+-- Grow a Garden  
+for _, s in pairs(Scripts) do if s.g == "GAG" then AddScriptButton(Tab5o, s.n, s) end end
+AddScriptButton(Tab5o, "Skull hub", {u="https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua"})
+AddScriptButton(Tab5o, "Native", {u="https://getnative.cc/script/loader"})
+AddScriptButton(Tab5o, "NatHub", {u="https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"})
