@@ -45,7 +45,10 @@ local languages = {
         antiAFKOn = "✅ Anti-AFK ON",
         antiAFKOff = "❌ Anti-AFK OFF",
         language = "Language",
-        languageDesc = "Change interface language"
+        languageDesc = "Change interface language",
+        commandConsole = "Command Console",
+        commandDesc = "Advanced command line interface",
+        openCommand = "💻 Open Console"
     },
     vi = {
         tabScript = "Script",
@@ -72,7 +75,10 @@ local languages = {
         antiAFKOn = "✅ Chống AFK BẬT",
         antiAFKOff = "❌ Chống AFK TẮT",
         language = "Ngôn Ngữ",
-        languageDesc = "Thay đổi ngôn ngữ giao diện"
+        languageDesc = "Thay đổi ngôn ngữ giao diện",
+        commandConsole = "Console Lệnh",
+        commandDesc = "Giao diện dòng lệnh nâng cao",
+        openCommand = "💻 Mở Console"
     },
     ja = {
         tabScript = "スクリプト",
@@ -99,7 +105,10 @@ local languages = {
         antiAFKOn = "✅ AFK防止 ON",
         antiAFKOff = "❌ AFK防止 OFF",
         language = "言語",
-        languageDesc = "インターフェース言語を変更"
+        languageDesc = "インターフェース言語を変更",
+        commandConsole = "コマンドコンソール",
+        commandDesc = "高度なコマンドラインインターフェース",
+        openCommand = "💻 コンソールを開く"
     },
     zh = {
         tabScript = "脚本",
@@ -126,7 +135,10 @@ local languages = {
         antiAFKOn = "✅ 防挂机 开启",
         antiAFKOff = "❌ 防挂机 关闭",
         language = "语言",
-        languageDesc = "更改界面语言"
+        languageDesc = "更改界面语言",
+        commandConsole = "命令控制台",
+        commandDesc = "高级命令行界面",
+        openCommand = "💻 打开控制台"
     }
 }
 
@@ -351,7 +363,7 @@ otherContent.Name = "OtherContent"
 otherContent.Size = UDim2.new(1, 0, 1, 0)
 otherContent.BackgroundTransparency = 1
 otherContent.ScrollBarThickness = 6
-otherContent.CanvasSize = UDim2.new(0, 0, 0, 600)
+otherContent.CanvasSize = UDim2.new(0, 0, 0, 680)
 otherContent.Visible = false
 otherContent.Parent = contentArea
 
@@ -878,9 +890,30 @@ local function createOtherFeatures()
         end
     })
 
-    -- Language Settings
+    -- Command Console
     createFeature({
         position = UDim2.new(0, 5, 0, 440),
+        icon = "💻",
+        iconColor = Color3.new(0.1, 0.1, 0.1),
+        title = getText("commandConsole"),
+        description = getText("commandDesc"),
+        buttonText = getText("openCommand"),
+        buttonColor = Color3.new(0.2, 0.2, 0.2),
+        hoverColor = Color3.new(0.1, 0.1, 0.1),
+        bgColor = Color3.new(0.95, 0.95, 0.95),
+        callback = function()
+            spawn(function()
+                showLoadingAnimation("Command Console")
+            end)
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))()
+            end)
+        end
+    })
+
+    -- Language Settings
+    createFeature({
+        position = UDim2.new(0, 5, 0, 520),
         icon = "🌐",
         iconColor = Color3.new(0.3, 0.5, 0.9),
         title = getText("language"),
