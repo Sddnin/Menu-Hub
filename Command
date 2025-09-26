@@ -1,5 +1,5 @@
 -- Mila Command UI for Roblox - Fixed Version
--- Created by Mila
+-- Created by Assistant
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -35,6 +35,8 @@ local visualEffects = {}
 local originalGravity = workspace.Gravity
 local antiAFKEnabled = false
 local antiAFKConnection = nil
+local wallWalkEnabled = false
+local wallWalkConnection = nil
 
 -- ESP Variables
 local espFolder = Instance.new("Folder")
@@ -116,7 +118,7 @@ minimizeBtn.Name = "MinimizeButton"
 minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
 minimizeBtn.Position = UDim2.new(1, -65, 0, 5)
 minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 193, 7)
-minimizeBtn.Text = "➖"
+minimizeBtn.Text = "−"
 minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeBtn.TextScaled = true
 minimizeBtn.Font = Enum.Font.GothamBold
@@ -427,6 +429,157 @@ local function serverHop()
     return success
 end
 
+-- WallWalk
+local function setWallWalk(enabled)
+    if enabled then
+        wallWalkEnabled = true
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            wallWalkConnection = RunService.Heartbeat:Connect(function()
+                if wallWalkEnabled and player.Character and player.Character:FindFirstChild("Humanoid") then
+                    player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+                    wait(0.1)
+                    player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                end
+            end)
+        end
+    else
+        wallWalkEnabled = false
+        if wallWalkConnection then
+            wallWalkConnection:Disconnect()
+            wallWalkConnection = nil
+        end
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end
+end
+
+-- Hidden Old Script Function
+local function showPasswordPrompt()
+    -- Create password prompt UI
+    local promptGui = Instance.new("ScreenGui")
+    promptGui.Name = "PasswordPrompt"
+    promptGui.Parent = playerGui
+    promptGui.ResetOnSpawn = false
+    
+    local promptFrame = Instance.new("Frame")
+    promptFrame.Size = UDim2.new(0, 400, 0, 200)
+    promptFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
+    promptFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    promptFrame.BorderSizePixel = 0
+    promptFrame.Parent = promptGui
+    
+    local promptCorner = Instance.new("UICorner")
+    promptCorner.CornerRadius = UDim.new(0, 10)
+    promptCorner.Parent = promptFrame
+    
+    local promptTitle = Instance.new("TextLabel")
+    promptTitle.Size = UDim2.new(1, -20, 0, 50)
+    promptTitle.Position = UDim2.new(0, 10, 0, 10)
+    promptTitle.BackgroundTransparency = 1
+    promptTitle.Text = "🎉 Chúc mừng! Bạn đã tìm thấy lệnh ẩn!"
+    promptTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
+    promptTitle.TextScaled = true
+    promptTitle.Font = Enum.Font.GothamBold
+    promptTitle.Parent = promptFrame
+    
+    local promptLabel = Instance.new("TextLabel")
+    promptLabel.Size = UDim2.new(1, -20, 0, 30)
+    promptLabel.Position = UDim2.new(0, 10, 0, 70)
+    promptLabel.BackgroundTransparency = 1
+    promptLabel.Text = "🔐 Nhập mật khẩu để tiếp tục:"
+    promptLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    promptLabel.TextScaled = true
+    promptLabel.Font = Enum.Font.Gotham
+    promptLabel.Parent = promptFrame
+    
+    local passwordInput = Instance.new("TextBox")
+    passwordInput.Size = UDim2.new(1, -40, 0, 35)
+    passwordInput.Position = UDim2.new(0, 20, 0, 110)
+    passwordInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    passwordInput.Text = ""
+    passwordInput.PlaceholderText = "Nhập mật khẩu..."
+    passwordInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    passwordInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    passwordInput.TextScaled = true
+    passwordInput.Font = Enum.Font.Gotham
+    passwordInput.BorderSizePixel = 0
+    passwordInput.Parent = promptFrame
+    
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 5)
+    inputCorner.Parent = passwordInput
+    
+    local submitBtn = Instance.new("TextButton")
+    submitBtn.Size = UDim2.new(0, 100, 0, 30)
+    submitBtn.Position = UDim2.new(0.5, -50, 0, 160)
+    submitBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+    submitBtn.Text = "Xác nhận"
+    submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    submitBtn.TextScaled = true
+    submitBtn.Font = Enum.Font.GothamBold
+    submitBtn.BorderSizePixel = 0
+    submitBtn.Parent = promptFrame
+    
+    local submitCorner = Instance.new("UICorner")
+    submitCorner.CornerRadius = UDim.new(0, 5)
+    submitCorner.Parent = submitBtn
+    
+    local closePromptBtn = Instance.new("TextButton")
+    closePromptBtn.Size = UDim2.new(0, 25, 0, 25)
+    closePromptBtn.Position = UDim2.new(1, -30, 0, 5)
+    closePromptBtn.BackgroundColor3 = Color3.fromRGB(220, 53, 69)
+    closePromptBtn.Text = "✕"
+    closePromptBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closePromptBtn.TextScaled = true
+    closePromptBtn.Font = Enum.Font.GothamBold
+    closePromptBtn.BorderSizePixel = 0
+    closePromptBtn.Parent = promptFrame
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 5)
+    closeCorner.Parent = closePromptBtn
+    
+    -- Submit password
+    local function checkPassword()
+        local password = passwordInput.Text
+        if password == "Memory" then
+            addOutput("✅ Mật khẩu đúng! Đang tải Old Menu Hub...")
+            promptGui:Destroy()
+            
+            -- Execute the script
+            local success, error = pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Old"))()
+            end)
+            
+            if success then
+                addOutput("🎉 Old Menu Hub đã được tải thành công!")
+            else
+                addOutput("❌ Lỗi khi tải Old Menu Hub: " .. tostring(error))
+            end
+        else
+            addOutput("❌ Mật khẩu sai!")
+            passwordInput.Text = ""
+        end
+    end
+    
+    submitBtn.MouseButton1Click:Connect(checkPassword)
+    closePromptBtn.MouseButton1Click:Connect(function()
+        promptGui:Destroy()
+        addOutput("❌ Đã hủy nhập mật khẩu")
+    end)
+    
+    passwordInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            checkPassword()
+        end
+    end)
+    
+    -- Auto focus on password input
+    wait(0.1)
+    passwordInput:CaptureFocus()
+end
+
 -- Anti AFK
 local function setAntiAFK(enabled)
     if enabled then
@@ -496,6 +649,7 @@ local function processCommand(cmd)
         addOutput("nofog/unfog - No Fog | grty [số]/ungrty - Gravity")
         addOutput("time [0-24] - Set Time | rejoin - Rejoin")
         addOutput("sho - Server Hop | afk - Anti AFK")
+        addOutput("wallwalk - Đi trên tường")
         
     elseif command == "fb" or command == "fullbright" then
         setFullbright(true)
@@ -649,6 +803,19 @@ local function processCommand(cmd)
             addOutput("❌ Anti AFK đã TẮT")
         end
         
+    elseif command == "wallwalk" then
+        if not wallWalkEnabled then
+            setWallWalk(true)
+            addOutput("🚶‍♂️ Wall Walk đã BẬT - Bạn có thể đi trên tường!")
+        else
+            setWallWalk(false)
+            addOutput("❌ Wall Walk đã TẮT")
+        end
+        
+    elseif command == "old" then
+        addOutput("🎊 Chúc mừng bạn đã tìm thấy lệnh ẩn!")
+        showPasswordPrompt()
+        
     else
         addOutput("❌ Lệnh không hợp lệ: " .. command)
         addOutput("💡 Gõ 'help' để xem danh sách lệnh")
@@ -707,6 +874,7 @@ closeBtn.MouseButton1Click:Connect(function()
     setESP(false)
     setInfiniteJump(false)
     setAntiAFK(false)
+    setWallWalk(false)
     
     local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
         Size = UDim2.new(0, 0, 0, 0),
