@@ -1,6 +1,5 @@
--- Mila UI V4.0
--- Created by: Mila
--- New: Dark Mode, Themes, Save Settings, Favorites
+-- Mila UI V3.0 - Simple & Stable
+-- Created by: Assistant
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -20,8 +19,6 @@ local fullbright = false
 local jumpConnection = nil
 local afkConnection = nil
 local espConnection = nil
-local darkMode = false
-local currentTheme = "Blue"
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -102,18 +99,6 @@ tabFrame.BackgroundTransparency = 1
 tabFrame.ZIndex = 2
 tabFrame.Parent = mainFrame
 
--- Version Label
-local versionLabel = Instance.new("TextLabel")
-versionLabel.Size = UDim2.new(0, 50, 0, 15)
-versionLabel.Position = UDim2.new(1, -55, 0, -20)
-versionLabel.BackgroundTransparency = 1
-versionLabel.Text = "V4.0"
-versionLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-versionLabel.TextSize = 10
-versionLabel.Font = Enum.Font.GothamBold
-versionLabel.ZIndex = 3
-versionLabel.Parent = mainFrame
-
 local homeTab = Instance.new("TextButton")
 homeTab.Size = UDim2.new(0.33, -5, 1, 0)
 homeTab.Position = UDim2.new(0, 0, 0, 0)
@@ -159,21 +144,6 @@ local otherCorner = Instance.new("UICorner")
 otherCorner.CornerRadius = UDim.new(0, 8)
 otherCorner.Parent = otherTab
 
-local settingsTab = Instance.new("TextButton")
-settingsTab.Size = UDim2.new(0, 30, 0, 35)
-settingsTab.Position = UDim2.new(1, -35, 0, 0)
-settingsTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-settingsTab.Text = "⚙️"
-settingsTab.TextColor3 = Color3.fromRGB(128, 128, 128)
-settingsTab.TextSize = 14
-settingsTab.Font = Enum.Font.Gotham
-settingsTab.ZIndex = 2
-settingsTab.Parent = tabFrame
-
-local settingsCorner = Instance.new("UICorner")
-settingsCorner.CornerRadius = UDim.new(0, 8)
-settingsCorner.Parent = settingsTab
-
 -- Content Area
 local contentArea = Instance.new("Frame")
 contentArea.Size = UDim2.new(1, -20, 1, -65)
@@ -211,189 +181,7 @@ otherContent.Visible = false
 otherContent.ZIndex = 1
 otherContent.Parent = contentArea
 
--- Settings Content
-local settingsContent = Instance.new("ScrollingFrame")
-settingsContent.Size = UDim2.new(1, 0, 1, 0)
-settingsContent.BackgroundTransparency = 1
-settingsContent.ScrollBarThickness = 4
-settingsContent.CanvasSize = UDim2.new(0, 0, 0, 300)
-settingsContent.Visible = false
-settingsContent.ZIndex = 1
-settingsContent.Parent = contentArea
-
--- Settings Header
-local settingsHeader = Instance.new("TextLabel")
-settingsHeader.Size = UDim2.new(1, 0, 0, 30)
-settingsHeader.Position = UDim2.new(0, 0, 0, 5)
-settingsHeader.BackgroundTransparency = 1
-settingsHeader.Text = "⚙️ Settings - V4.0"
-settingsHeader.TextColor3 = Color3.fromRGB(51, 51, 51)
-settingsHeader.TextSize = 14
-settingsHeader.Font = Enum.Font.GothamBold
-settingsHeader.TextXAlignment = Enum.TextXAlignment.Left
-settingsHeader.ZIndex = 2
-settingsHeader.Parent = settingsContent
-
--- Dark Mode Toggle
-local darkModeFrame = Instance.new("Frame")
-darkModeFrame.Size = UDim2.new(1, -10, 0, 50)
-darkModeFrame.Position = UDim2.new(0, 5, 0, 40)
-darkModeFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-darkModeFrame.BorderSizePixel = 0
-darkModeFrame.ZIndex = 2
-darkModeFrame.Parent = settingsContent
-
-local darkModeCorner = Instance.new("UICorner")
-darkModeCorner.CornerRadius = UDim.new(0, 8)
-darkModeCorner.Parent = darkModeFrame
-
-local darkModeLabel = Instance.new("TextLabel")
-darkModeLabel.Size = UDim2.new(0, 200, 0, 50)
-darkModeLabel.Position = UDim2.new(0, 10, 0, 0)
-darkModeLabel.BackgroundTransparency = 1
-darkModeLabel.Text = "🌙 Dark Mode"
-darkModeLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
-darkModeLabel.TextSize = 12
-darkModeLabel.Font = Enum.Font.GothamBold
-darkModeLabel.TextXAlignment = Enum.TextXAlignment.Left
-darkModeLabel.ZIndex = 3
-darkModeLabel.Parent = darkModeFrame
-
-local darkModeToggle = Instance.new("TextButton")
-darkModeToggle.Size = UDim2.new(0, 80, 0, 30)
-darkModeToggle.Position = UDim2.new(1, -90, 0, 10)
-darkModeToggle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-darkModeToggle.Text = "OFF"
-darkModeToggle.TextColor3 = Color3.fromRGB(51, 51, 51)
-darkModeToggle.TextSize = 11
-darkModeToggle.Font = Enum.Font.GothamBold
-darkModeToggle.ZIndex = 3
-darkModeToggle.Parent = darkModeFrame
-
-local darkModeToggleCorner = Instance.new("UICorner")
-darkModeToggleCorner.CornerRadius = UDim.new(0, 6)
-darkModeToggleCorner.Parent = darkModeToggle
-
--- Theme Selector
-local themeFrame = Instance.new("Frame")
-themeFrame.Size = UDim2.new(1, -10, 0, 80)
-themeFrame.Position = UDim2.new(0, 5, 0, 100)
-themeFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-themeFrame.BorderSizePixel = 0
-themeFrame.ZIndex = 2
-themeFrame.Parent = settingsContent
-
-local themeFrameCorner = Instance.new("UICorner")
-themeFrameCorner.CornerRadius = UDim.new(0, 8)
-themeFrameCorner.Parent = themeFrame
-
-local themeLabel = Instance.new("TextLabel")
-themeLabel.Size = UDim2.new(1, -20, 0, 25)
-themeLabel.Position = UDim2.new(0, 10, 0, 5)
-themeLabel.BackgroundTransparency = 1
-themeLabel.Text = "🎨 Theme Colors"
-themeLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
-themeLabel.TextSize = 12
-themeLabel.Font = Enum.Font.GothamBold
-themeLabel.TextXAlignment = Enum.TextXAlignment.Left
-themeLabel.ZIndex = 3
-themeLabel.Parent = themeFrame
-
-local themes = {
-    {name = "Blue", color = Color3.fromRGB(51, 102, 204), gradient1 = Color3.fromRGB(25, 76, 204), gradient2 = Color3.fromRGB(76, 153, 255)},
-    {name = "Purple", color = Color3.fromRGB(147, 51, 234), gradient1 = Color3.fromRGB(107, 33, 168), gradient2 = Color3.fromRGB(167, 85, 221)},
-    {name = "Pink", color = Color3.fromRGB(236, 72, 153), gradient1 = Color3.fromRGB(219, 39, 119), gradient2 = Color3.fromRGB(244, 114, 182)},
-    {name = "Green", color = Color3.fromRGB(34, 197, 94), gradient1 = Color3.fromRGB(22, 163, 74), gradient2 = Color3.fromRGB(74, 222, 128)}
-}
-
-local themeButtons = {}
-for i, theme in ipairs(themes) do
-    local themeBtn = Instance.new("TextButton")
-    themeBtn.Size = UDim2.new(0, 70, 0, 35)
-    themeBtn.Position = UDim2.new(0, 10 + (i-1) * 75, 0, 35)
-    themeBtn.BackgroundColor3 = theme.color
-    themeBtn.Text = theme.name
-    themeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    themeBtn.TextSize = 10
-    themeBtn.Font = Enum.Font.GothamBold
-    themeBtn.ZIndex = 3
-    themeBtn.Parent = themeFrame
-    
-    local themeBtnCorner = Instance.new("UICorner")
-    themeBtnCorner.CornerRadius = UDim.new(0, 6)
-    themeBtnCorner.Parent = themeBtn
-    
-    themeButtons[theme.name] = {button = themeBtn, theme = theme}
-end
-
--- Save Settings Button
-local saveBtn = Instance.new("TextButton")
-saveBtn.Size = UDim2.new(0, 150, 0, 35)
-saveBtn.Position = UDim2.new(0.5, -75, 0, 190)
-saveBtn.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
-saveBtn.Text = "💾 Save Settings"
-saveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-saveBtn.TextSize = 12
-saveBtn.Font = Enum.Font.GothamBold
-saveBtn.ZIndex = 3
-saveBtn.Parent = settingsContent
-
-local saveBtnCorner = Instance.new("UICorner")
-saveBtnCorner.CornerRadius = UDim.new(0, 8)
-saveBtnCorner.Parent = saveBtn
-
 -- Functions
-local function applyTheme(theme)
-    currentTheme = theme.name
-    bgGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, theme.gradient1),
-        ColorSequenceKeypoint.new(1, theme.gradient2)
-    }
-    
-    -- Update active tab color
-    if homeContent.Visible then
-        homeTab.BackgroundColor3 = theme.color
-    elseif scriptContent.Visible then
-        scriptTab.BackgroundColor3 = theme.color
-    elseif otherContent.Visible then
-        otherTab.BackgroundColor3 = theme.color
-    elseif settingsContent.Visible then
-        settingsTab.BackgroundColor3 = theme.color
-    end
-end
-
-local function toggleDarkMode()
-    darkMode = not darkMode
-    
-    if darkMode then
-        mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-        darkModeToggle.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
-        darkModeToggle.Text = "ON"
-        darkModeToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-        darkModeLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-        themeLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-        settingsHeader.TextColor3 = Color3.fromRGB(220, 220, 220)
-        speedLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        jumpLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        fovLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        darkModeFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-        themeFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    else
-        mainFrame.BackgroundColor3 = Color3.fromRGB(250, 250, 252)
-        darkModeToggle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-        darkModeToggle.Text = "OFF"
-        darkModeToggle.TextColor3 = Color3.fromRGB(51, 51, 51)
-        darkModeLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
-        themeLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
-        settingsHeader.TextColor3 = Color3.fromRGB(51, 51, 51)
-        speedLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
-        jumpLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
-        fovLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
-        darkModeFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-        themeFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-    end
-end
-
 local function createButton(text, position, parent, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0, 95, 0, 25)
@@ -627,62 +415,40 @@ RunService.Stepped:Connect(function()
 end)
 
 -- Tab Switching
-local function switchToTab(tabName)
-    homeContent.Visible = false
+homeTab.MouseButton1Click:Connect(function()
+    homeContent.Visible = true
     scriptContent.Visible = false
     otherContent.Visible = false
-    settingsContent.Visible = false
-    
-    homeTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    homeTab.TextColor3 = Color3.fromRGB(128, 128, 128)
+    homeTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
+    homeTab.TextColor3 = Color3.fromRGB(255, 255, 255)
     scriptTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     scriptTab.TextColor3 = Color3.fromRGB(128, 128, 128)
     otherTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     otherTab.TextColor3 = Color3.fromRGB(128, 128, 128)
-    settingsTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    settingsTab.TextColor3 = Color3.fromRGB(128, 128, 128)
-    
-    local activeColor = Color3.fromRGB(51, 102, 204)
-    for _, data in pairs(themeButtons) do
-        if data.theme.name == currentTheme then
-            activeColor = data.theme.color
-            break
-        end
-    end
-    
-    if tabName == "Home" then
-        homeContent.Visible = true
-        homeTab.BackgroundColor3 = activeColor
-        homeTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    elseif tabName == "Script" then
-        scriptContent.Visible = true
-        scriptTab.BackgroundColor3 = activeColor
-        scriptTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    elseif tabName == "Other" then
-        otherContent.Visible = true
-        otherTab.BackgroundColor3 = activeColor
-        otherTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    elseif tabName == "Settings" then
-        settingsContent.Visible = true
-        settingsTab.BackgroundColor3 = activeColor
-        settingsTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    end
-end
-
-homeTab.MouseButton1Click:Connect(function()
-    switchToTab("Home")
 end)
 
 scriptTab.MouseButton1Click:Connect(function()
-    switchToTab("Script")
+    homeContent.Visible = false
+    scriptContent.Visible = true
+    otherContent.Visible = false
+    homeTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    homeTab.TextColor3 = Color3.fromRGB(128, 128, 128)
+    scriptTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
+    scriptTab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    otherTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    otherTab.TextColor3 = Color3.fromRGB(128, 128, 128)
 end)
 
 otherTab.MouseButton1Click:Connect(function()
-    switchToTab("Other")
-end)
-
-settingsTab.MouseButton1Click:Connect(function()
-    switchToTab("Settings")
+    homeContent.Visible = false
+    scriptContent.Visible = false
+    otherContent.Visible = true
+    homeTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    homeTab.TextColor3 = Color3.fromRGB(128, 128, 128)
+    scriptTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    scriptTab.TextColor3 = Color3.fromRGB(128, 128, 128)
+    otherTab.BackgroundColor3 = Color3.fromRGB(51, 102, 204)
+    otherTab.TextColor3 = Color3.fromRGB(255, 255, 255)
 end)
 
 -- Close/Toggle
@@ -705,28 +471,5 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     end
 end)
 
--- Theme Buttons Events
-for themeName, data in pairs(themeButtons) do
-    data.button.MouseButton1Click:Connect(function()
-        applyTheme(data.theme)
-        switchToTab(homeContent.Visible and "Home" or scriptContent.Visible and "Script" or otherContent.Visible and "Other" or "Settings")
-    end)
-end
-
--- Dark Mode Toggle
-darkModeToggle.MouseButton1Click:Connect(function()
-    toggleDarkMode()
-end)
-
--- Save Settings
-saveBtn.MouseButton1Click:Connect(function()
-    saveBtn.Text = "✅ Saved!"
-    saveBtn.BackgroundColor3 = Color3.fromRGB(22, 163, 74)
-    wait(1.5)
-    saveBtn.Text = "💾 Save Settings"
-    saveBtn.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
-end)
-
-print("✨ Mila UI V4.0 Loaded!")
+print("✨ Mila UI V3.0 Loaded!")
 print("📌 Press Right Shift to toggle")
-print("🆕 New: Dark Mode, Themes, Settings Tab!")
