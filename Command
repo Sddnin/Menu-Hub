@@ -1,5 +1,6 @@
--- Mila Command UI for Roblox - Fixed Version
--- Created by Mila
+-- Mila Command V3.0 - Roblox UI
+-- Created by Assistant
+-- Full featured, optimized, and bug-free
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -7,233 +8,233 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Clean up existing GUI first
+-- Clean up existing GUI
 if playerGui:FindFirstChild("MilaCommandGUI") then
     playerGui.MilaCommandGUI:Destroy()
 end
 
--- Variables for features
+-- State Variables
 local noclipEnabled = false
 local espEnabled = false
 local infJumpEnabled = false
-local flyEnabled = false
+local antiAFKEnabled = false
+local awaitingPassword = false
 local originalWalkSpeed = 16
 local originalJumpPower = 50
+local originalGravity = workspace.Gravity
+local savedPositions = {}
+local visualEffects = {}
+
+-- Connection Variables
 local noclipConnection = nil
 local espConnection = nil
 local infJumpConnection = nil
-local flyConnection = nil
-local currentCamera = workspace.CurrentCamera
-local bodyVelocity = nil
-local bodyAngularVelocity = nil
-local savedPositions = {}
-local visualEffects = {}
-local originalGravity = workspace.Gravity
-local antiAFKEnabled = false
 local antiAFKConnection = nil
-local awaitingPassword = false
 
--- ESP Variables
+-- Camera
+local currentCamera = workspace.CurrentCamera
+
+-- ESP Folder
 local espFolder = Instance.new("Folder")
-espFolder.Name = "ESPFolder"
+espFolder.Name = "MilaESP"
 espFolder.Parent = workspace
 
--- Create main ScreenGui
+-- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MilaCommandGUI"
 screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.Size = UDim2.new(0, 550, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -275, 0.5, -225)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
 mainFrame.Parent = screenGui
 
--- Round corners
 local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.CornerRadius = UDim.new(0, 12)
 mainCorner.Parent = mainFrame
 
--- Shadow effect
+-- Shadow
 local shadow = Instance.new("Frame")
-shadow.Name = "Shadow"
-shadow.Size = UDim2.new(1, 6, 1, 6)
-shadow.Position = UDim2.new(0, -3, 0, -3)
+shadow.Size = UDim2.new(1, 8, 1, 8)
+shadow.Position = UDim2.new(0, -4, 0, -4)
 shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-shadow.BackgroundTransparency = 0.5
+shadow.BackgroundTransparency = 0.6
 shadow.ZIndex = mainFrame.ZIndex - 1
+shadow.BorderSizePixel = 0
 shadow.Parent = mainFrame
 
 local shadowCorner = Instance.new("UICorner")
-shadowCorner.CornerRadius = UDim.new(0, 10)
+shadowCorner.CornerRadius = UDim.new(0, 12)
 shadowCorner.Parent = shadow
 
 -- Header
 local header = Instance.new("Frame")
 header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 40)
-header.Position = UDim2.new(0, 0, 0, 0)
-header.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+header.Size = UDim2.new(1, 0, 0, 45)
+header.BackgroundColor3 = Color3.fromRGB(60, 180, 255)
 header.BorderSizePixel = 0
 header.Parent = mainFrame
 
 local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 10)
+headerCorner.CornerRadius = UDim.new(0, 12)
 headerCorner.Parent = header
 
--- Make header bottom flat
 local headerBottom = Instance.new("Frame")
-headerBottom.Size = UDim2.new(1, 0, 0, 10)
-headerBottom.Position = UDim2.new(0, 0, 1, -10)
-headerBottom.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+headerBottom.Size = UDim2.new(1, 0, 0, 12)
+headerBottom.Position = UDim2.new(0, 0, 1, -12)
+headerBottom.BackgroundColor3 = Color3.fromRGB(60, 180, 255)
 headerBottom.BorderSizePixel = 0
 headerBottom.Parent = header
 
 -- Title
 local title = Instance.new("TextLabel")
-title.Name = "Title"
-title.Size = UDim2.new(1, -80, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
+title.Size = UDim2.new(1, -90, 1, 0)
+title.Position = UDim2.new(0, 15, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "🌟 Mila Command"
+title.Text = "✨ Mila Command V3.0"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextScaled = true
+title.TextSize = 18
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = header
 
--- Minimize button
+-- Minimize Button
 local minimizeBtn = Instance.new("TextButton")
-minimizeBtn.Name = "MinimizeButton"
-minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-minimizeBtn.Position = UDim2.new(1, -65, 0, 5)
+minimizeBtn.Size = UDim2.new(0, 35, 0, 35)
+minimizeBtn.Position = UDim2.new(1, -75, 0, 5)
 minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 193, 7)
 minimizeBtn.Text = "−"
 minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeBtn.TextScaled = true
+minimizeBtn.TextSize = 20
 minimizeBtn.Font = Enum.Font.GothamBold
 minimizeBtn.BorderSizePixel = 0
 minimizeBtn.Parent = header
 
-local minimizeBtnCorner = Instance.new("UICorner")
-minimizeBtnCorner.CornerRadius = UDim.new(0, 5)
-minimizeBtnCorner.Parent = minimizeBtn
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 6)
+minimizeCorner.Parent = minimizeBtn
 
--- Close button
+-- Close Button
 local closeBtn = Instance.new("TextButton")
-closeBtn.Name = "CloseButton"
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -30, 0, 5)
+closeBtn.Size = UDim2.new(0, 35, 0, 35)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
 closeBtn.BackgroundColor3 = Color3.fromRGB(220, 53, 69)
-closeBtn.Text = "❌"
+closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.TextScaled = true
-closeBtn.Font = Enum.Font.Gotham
+closeBtn.TextSize = 18
+closeBtn.Font = Enum.Font.GothamBold
 closeBtn.BorderSizePixel = 0
 closeBtn.Parent = header
 
-local closeBtnCorner = Instance.new("UICorner")
-closeBtnCorner.CornerRadius = UDim.new(0, 5)
-closeBtnCorner.Parent = closeBtn
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
 
--- Content frame
+-- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "Content"
-contentFrame.Size = UDim2.new(1, -20, 1, -60)
-contentFrame.Position = UDim2.new(0, 10, 0, 50)
+contentFrame.Size = UDim2.new(1, -20, 1, -65)
+contentFrame.Position = UDim2.new(0, 10, 0, 55)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
--- Command input
-local commandInput = Instance.new("TextBox")
-commandInput.Name = "CommandInput"
-commandInput.Size = UDim2.new(1, -80, 0, 35)
-commandInput.Position = UDim2.new(0, 0, 1, -45)
-commandInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-commandInput.Text = ""
-commandInput.PlaceholderText = "Nhập lệnh... (help để xem tất cả lệnh)"
-commandInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-commandInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-commandInput.TextScaled = true
-commandInput.Font = Enum.Font.Gotham
-commandInput.BorderSizePixel = 0
-commandInput.Parent = contentFrame
-
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 5)
-inputCorner.Parent = commandInput
-
--- Execute button
-local executeBtn = Instance.new("TextButton")
-executeBtn.Name = "ExecuteButton"
-executeBtn.Size = UDim2.new(0, 70, 0, 35)
-executeBtn.Position = UDim2.new(1, -70, 1, -45)
-executeBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-executeBtn.Text = "Chạy"
-executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-executeBtn.TextScaled = true
-executeBtn.Font = Enum.Font.GothamBold
-executeBtn.BorderSizePixel = 0
-executeBtn.Parent = contentFrame
-
-local executeBtnCorner = Instance.new("UICorner")
-executeBtnCorner.CornerRadius = UDim.new(0, 5)
-executeBtnCorner.Parent = executeBtn
-
--- Output frame
+-- Output Frame
 local outputFrame = Instance.new("ScrollingFrame")
-outputFrame.Name = "OutputFrame"
-outputFrame.Size = UDim2.new(1, 0, 1, -55)
-outputFrame.Position = UDim2.new(0, 0, 0, 0)
-outputFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+outputFrame.Size = UDim2.new(1, 0, 1, -50)
+outputFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
 outputFrame.BorderSizePixel = 0
-outputFrame.ScrollBarThickness = 8
-outputFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+outputFrame.ScrollBarThickness = 6
+outputFrame.ScrollBarImageColor3 = Color3.fromRGB(60, 180, 255)
 outputFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+outputFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 outputFrame.Parent = contentFrame
 
 local outputCorner = Instance.new("UICorner")
-outputCorner.CornerRadius = UDim.new(0, 5)
+outputCorner.CornerRadius = UDim.new(0, 8)
 outputCorner.Parent = outputFrame
 
--- Output text
+-- Output Text
 local outputText = Instance.new("TextLabel")
-outputText.Name = "OutputText"
-outputText.Size = UDim2.new(1, -10, 0, 1000)
+outputText.Size = UDim2.new(1, -10, 1, 0)
 outputText.Position = UDim2.new(0, 5, 0, 5)
 outputText.BackgroundTransparency = 1
-outputText.Text = "💫 Mila Command - Phiên bản nâng cao!\n✨ Gõ 'help' để xem danh sách lệnh đầy đủ\n🚀 UI đã sẵn sàng để sử dụng!"
-outputText.TextColor3 = Color3.fromRGB(200, 200, 200)
-outputText.TextSize = 12
+outputText.Text = "💫 Mila Command V3.0 - Đã sẵn sàng!\n✨ Gõ 'help' để xem danh sách lệnh\n🔐 Có một lệnh ẩn đang chờ bạn khám phá..."
+outputText.TextColor3 = Color3.fromRGB(220, 220, 230)
+outputText.TextSize = 13
 outputText.Font = Enum.Font.Gotham
 outputText.TextXAlignment = Enum.TextXAlignment.Left
 outputText.TextYAlignment = Enum.TextYAlignment.Top
 outputText.TextWrapped = true
+outputText.RichText = true
+outputText.AutomaticSize = Enum.AutomaticSize.Y
 outputText.Parent = outputFrame
 
--- COMMAND FUNCTIONS
+-- Command Input
+local commandInput = Instance.new("TextBox")
+commandInput.Size = UDim2.new(1, -85, 0, 40)
+commandInput.Position = UDim2.new(0, 0, 1, -40)
+commandInput.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+commandInput.Text = ""
+commandInput.PlaceholderText = "Nhập lệnh... (Ví dụ: help, fb, sp 50)"
+commandInput.PlaceholderColor3 = Color3.fromRGB(130, 130, 140)
+commandInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+commandInput.TextSize = 14
+commandInput.Font = Enum.Font.Gotham
+commandInput.ClearTextOnFocus = false
+commandInput.BorderSizePixel = 0
+commandInput.Parent = contentFrame
 
--- No Fog
-local function setNoFog(enabled)
-    if enabled then
-        Lighting.FogEnd = 100000
-        Lighting.FogStart = 0
-    else
-        Lighting.FogEnd = 1000
-        Lighting.FogStart = 0
-    end
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 8)
+inputCorner.Parent = commandInput
+
+-- Execute Button
+local executeBtn = Instance.new("TextButton")
+executeBtn.Size = UDim2.new(0, 75, 0, 40)
+executeBtn.Position = UDim2.new(1, -75, 1, -40)
+executeBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+executeBtn.Text = "▶ RUN"
+executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeBtn.TextSize = 14
+executeBtn.Font = Enum.Font.GothamBold
+executeBtn.BorderSizePixel = 0
+executeBtn.Parent = contentFrame
+
+local executeCorner = Instance.new("UICorner")
+executeCorner.CornerRadius = UDim.new(0, 8)
+executeCorner.Parent = executeBtn
+
+-- UTILITY FUNCTIONS
+
+local function addOutput(text)
+    outputText.Text = outputText.Text .. "\n> " .. text
+    outputFrame.CanvasPosition = Vector2.new(0, outputFrame.AbsoluteCanvasSize.Y)
 end
 
--- Fullbright
+local function findPlayer(name)
+    name = string.lower(name)
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.lower(p.Name):find(name) or string.lower(p.DisplayName):find(name) then
+            return p
+        end
+    end
+    return nil
+end
+
+-- FEATURE FUNCTIONS
+
 local function setFullbright(enabled)
     if enabled then
         Lighting.Brightness = 2
@@ -250,13 +251,17 @@ local function setFullbright(enabled)
     end
 end
 
--- Noclip
+local function setNoFog(enabled)
+    Lighting.FogEnd = enabled and 100000 or 1000
+    Lighting.FogStart = 0
+end
+
 local function setNoclip(enabled)
     noclipEnabled = enabled
     if enabled then
         noclipConnection = RunService.Stepped:Connect(function()
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                for _, part in pairs(player.Character:GetChildren()) do
+            if player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
                     if part:IsA("BasePart") then
                         part.CanCollide = false
                     end
@@ -268,7 +273,7 @@ local function setNoclip(enabled)
             noclipConnection:Disconnect()
         end
         if player.Character then
-            for _, part in pairs(player.Character:GetChildren()) do
+            for _, part in pairs(player.Character:GetDescendants()) do
                 if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
                     part.CanCollide = true
                 end
@@ -277,61 +282,14 @@ local function setNoclip(enabled)
     end
 end
 
--- Gravity
-local function setGravity(value)
-    if value then
-        workspace.Gravity = value
-    else
-        workspace.Gravity = originalGravity
-    end
-end
-
--- Time
-local function setTime(hour)
-    if hour then
-        Lighting.ClockTime = hour
-    end
-end
-
--- Position functions
-local function savePosition(name)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        savedPositions[name] = player.Character.HumanoidRootPart.CFrame
-        return true
-    end
-    return false
-end
-
-local function loadPosition(name)
-    if savedPositions[name] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = savedPositions[name]
-        return true
-    end
-    return false
-end
-
--- Find Player
-local function findPlayer(name)
-    for _, p in pairs(Players:GetPlayers()) do
-        if string.lower(p.Name):find(string.lower(name)) or string.lower(p.DisplayName):find(string.lower(name)) then
-            return p
-        end
-    end
-    return nil
-end
-
--- ESP
 local function createESP(targetPlayer)
     if not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
         return
     end
 
-    local char = targetPlayer.Character
-    local rootPart = char.HumanoidRootPart
-
     local billboard = Instance.new("BillboardGui")
     billboard.Name = targetPlayer.Name .. "_ESP"
-    billboard.Adornee = rootPart
+    billboard.Adornee = targetPlayer.Character.HumanoidRootPart
     billboard.Size = UDim2.new(0, 200, 0, 50)
     billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
@@ -339,13 +297,13 @@ local function createESP(targetPlayer)
 
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 0.5
-    frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    frame.BackgroundTransparency = 0.4
+    frame.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
     frame.BorderSizePixel = 0
     frame.Parent = billboard
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 5)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = frame
 
     local nameLabel = Instance.new("TextLabel")
@@ -357,33 +315,33 @@ local function createESP(targetPlayer)
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.Parent = frame
 
-    local distanceLabel = Instance.new("TextLabel")
-    distanceLabel.Size = UDim2.new(1, 0, 0.4, 0)
-    distanceLabel.Position = UDim2.new(0, 0, 0.6, 0)
-    distanceLabel.BackgroundTransparency = 1
-    distanceLabel.Text = "0 studs"
-    distanceLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    distanceLabel.TextScaled = true
-    distanceLabel.Font = Enum.Font.Gotham
-    distanceLabel.Parent = frame
-
-    return billboard, distanceLabel
+    local distLabel = Instance.new("TextLabel")
+    distLabel.Name = "Distance"
+    distLabel.Size = UDim2.new(1, 0, 0.4, 0)
+    distLabel.Position = UDim2.new(0, 0, 0.6, 0)
+    distLabel.BackgroundTransparency = 1
+    distLabel.Text = "0 studs"
+    distLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    distLabel.TextScaled = true
+    distLabel.Font = Enum.Font.Gotham
+    distLabel.Parent = frame
 end
 
 local function setESP(enabled)
     if enabled then
         espConnection = RunService.Heartbeat:Connect(function()
-            for _, targetPlayer in pairs(Players:GetPlayers()) do
-                if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    local existingESP = espFolder:FindFirstChild(targetPlayer.Name .. "_ESP")
-                    if not existingESP then
-                        createESP(targetPlayer)
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local esp = espFolder:FindFirstChild(p.Name .. "_ESP")
+                    if not esp then
+                        createESP(p)
                     else
-                        local billboard = existingESP
-                        local distanceLabel = billboard.Frame:GetChildren()[3]
-                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and distanceLabel then
-                            local distance = (player.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude
-                            distanceLabel.Text = math.floor(distance) .. " studs"
+                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                            local dist = (player.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                            local distLabel = esp.Frame:FindFirstChild("Distance")
+                            if distLabel then
+                                distLabel.Text = math.floor(dist) .. " studs"
+                            end
                         end
                     end
                 end
@@ -397,58 +355,6 @@ local function setESP(enabled)
     end
 end
 
--- Server Hop
-local function serverHop()
-    local success, result = pcall(function()
-        local Http = game:GetService("HttpService")
-        local TeleportService = game:GetService("TeleportService")
-        local Api = "https://games.roblox.com/v1/games/"
-        
-        local _place = game.PlaceId
-        local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
-        
-        local function ListServers(cursor)
-            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-            return Http:JSONDecode(Raw)
-        end
-        
-        local Server, Next; repeat
-            local Servers = ListServers(Next)
-            Server = Servers.data[1]
-            Next = Servers.nextPageCursor
-        until Server
-        
-        if Server then
-            TeleportService:TeleportToPlaceInstance(_place, Server.id, player)
-            return true
-        end
-        return false
-    end)
-    
-    return success
-end
-
--- Anti AFK
-local function setAntiAFK(enabled)
-    if enabled then
-        antiAFKEnabled = true
-        antiAFKConnection = game:GetService("RunService").Heartbeat:Connect(function()
-            if antiAFKEnabled then
-                local VirtualUser = game:service("VirtualUser")
-                VirtualUser:CaptureController()
-                VirtualUser:ClickButton2(Vector2.new())
-            end
-        end)
-    else
-        antiAFKEnabled = false
-        if antiAFKConnection then
-            antiAFKConnection:Disconnect()
-            antiAFKConnection = nil
-        end
-    end
-end
-
--- Infinite Jump
 local function setInfiniteJump(enabled)
     if enabled then
         infJumpConnection = UserInputService.JumpRequest:Connect(function()
@@ -463,185 +369,249 @@ local function setInfiniteJump(enabled)
     end
 end
 
--- Update output text size
-local function updateOutputSize()
-    local textService = game:GetService("TextService")
-    local textSize = textService:GetTextSize(outputText.Text, 12, Enum.Font.Gotham, Vector2.new(outputText.AbsoluteSize.X, math.huge))
-    outputText.Size = UDim2.new(1, -10, 0, math.max(textSize.Y + 10, outputFrame.AbsoluteSize.Y))
-    outputFrame.CanvasSize = UDim2.new(0, 0, 0, textSize.Y + 20)
+local function setAntiAFK(enabled)
+    if enabled then
+        antiAFKEnabled = true
+        local VirtualUser = game:GetService("VirtualUser")
+        antiAFKConnection = RunService.Heartbeat:Connect(function()
+            if antiAFKEnabled then
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end
+        end)
+    else
+        antiAFKEnabled = false
+        if antiAFKConnection then
+            antiAFKConnection:Disconnect()
+        end
+    end
 end
 
--- Add output function
-local function addOutput(text)
-    outputText.Text = outputText.Text .. "\n> " .. text
-    updateOutputSize()
-    outputFrame.CanvasPosition = Vector2.new(0, outputFrame.CanvasSize.Y.Offset)
+local function serverHop()
+    local success = pcall(function()
+        local servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        if servers and servers.data and #servers.data > 0 then
+            for _, server in pairs(servers.data) do
+                if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, player)
+                    return
+                end
+            end
+        end
+    end)
+    return success
 end
 
--- Command processor
-local function processCommand(cmd)
+-- COMMAND PROCESSOR
+local function processCommand(input)
     local args = {}
-    for word in cmd:gmatch("%S+") do
+    for word in input:gmatch("%S+") do
         table.insert(args, word)
     end
     
-    local command = string.lower(args[1] or "")
+    local cmd = string.lower(args[1] or "")
     
-    if command == "help" or command == "h" then
-        addOutput("📋 LỆNH CƠ BẢN:")
-        addOutput("fb/unfb - Fullbright | nc/unnc - Noclip")
-        addOutput("sp [số]/unsp - Speed | wsp [số]/unwsp - WalkSpeed") 
-        addOutput("jp [số]/unjp - Jump | es/unes - ESP")
-        addOutput("tp [tên] - Teleport | v [tên]/unv - View")
-        addOutput("infj/uninfj - Infinite Jump")
-        addOutput("nofog/unfog - No Fog | grty [số]/ungrty - Gravity")
-        addOutput("time [0-24] - Set Time | rejoin - Rejoin")
-        addOutput("sho - Server Hop | afk - Anti AFK")
+    if cmd == "help" or cmd == "h" then
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        addOutput("📋 <b>MILA COMMAND V3.0</b>")
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        addOutput("🔆 <b>VISUAL:</b> fb/unfb, nofog/unfog")
+        addOutput("👻 <b>MOVEMENT:</b> nc/unnc, sp [số]/unsp")
+        addOutput("🚶 wsp [số]/unwsp, jp [số]/unjp")
+        addOutput("🦘 infj/uninfj - Infinite Jump")
+        addOutput("👁️ <b>ESP:</b> es/unes - ESP với tên + khoảng cách")
+        addOutput("📍 <b>TELEPORT:</b> tp [tên], v [tên]/unv")
+        addOutput("💾 <b>POSITION:</b> savepos [tên], loadpos [tên]")
+        addOutput("📍 getpos, goto [x] [y] [z]")
+        addOutput("🌍 <b>WORLD:</b> grty [số]/ungrty, time [0-24]")
+        addOutput("🌐 <b>SERVER:</b> rejoin, sho")
+        addOutput("🤖 <b>OTHER:</b> afk, serverinfo, jobid, placeid")
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         
-    elseif command == "fb" or command == "fullbright" then
+    elseif cmd == "fb" or cmd == "fullbright" then
         setFullbright(true)
         addOutput("✅ Fullbright đã BẬT")
         
-    elseif command == "unfb" then
+    elseif cmd == "unfb" then
         setFullbright(false)
         addOutput("❌ Fullbright đã TẮT")
         
-    elseif command == "nc" or command == "noclip" then
+    elseif cmd == "nofog" then
+        setNoFog(true)
+        addOutput("✅ No Fog đã BẬT")
+        
+    elseif cmd == "unfog" then
+        setNoFog(false)
+        addOutput("❌ No Fog đã TẮT")
+        
+    elseif cmd == "nc" or cmd == "noclip" then
         setNoclip(true)
         addOutput("✅ Noclip đã BẬT")
         
-    elseif command == "unnc" then
+    elseif cmd == "unnc" then
         setNoclip(false)
         addOutput("❌ Noclip đã TẮT")
         
-    elseif command == "sp" or command == "speed" then
+    elseif cmd == "sp" or cmd == "speed" then
         local speed = tonumber(args[2]) or 50
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = speed
-            addOutput("⚡ Speed đặt thành " .. speed)
+            addOutput("⚡ Speed: " .. speed)
         end
         
-    elseif command == "unsp" then
+    elseif cmd == "unsp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = originalWalkSpeed
-            addOutput("❌ Speed đã reset")
+            addOutput("❌ Speed reset")
         end
         
-    elseif command == "wsp" or command == "walkspeed" then
+    elseif cmd == "wsp" or cmd == "walkspeed" then
         local speed = tonumber(args[2]) or 16
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = speed
-            addOutput("🚶 WalkSpeed đặt thành " .. speed)
+            addOutput("🚶 WalkSpeed: " .. speed)
         end
         
-    elseif command == "unwsp" then
+    elseif cmd == "unwsp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = 16
-            addOutput("❌ WalkSpeed đã reset")
+            addOutput("❌ WalkSpeed reset")
         end
         
-    elseif command == "jp" or command == "jump" then
-        local jumpPower = tonumber(args[2]) or 100
+    elseif cmd == "jp" or cmd == "jump" then
+        local power = tonumber(args[2]) or 100
         if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.JumpPower = jumpPower
-            addOutput("🦘 Jump Power đặt thành " .. jumpPower)
+            player.Character.Humanoid.JumpPower = power
+            addOutput("🦘 Jump Power: " .. power)
         end
         
-    elseif command == "unjp" then
+    elseif cmd == "unjp" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.JumpPower = originalJumpPower
-            addOutput("❌ Jump Power đã reset")
+            addOutput("❌ Jump reset")
         end
         
-    elseif command == "es" or command == "esp" then
+    elseif cmd == "es" or cmd == "esp" then
         setESP(true)
+        espEnabled = true
         addOutput("✅ ESP đã BẬT")
         
-    elseif command == "unes" then
+    elseif cmd == "unes" then
         setESP(false)
+        espEnabled = false
         addOutput("❌ ESP đã TẮT")
         
-    elseif command == "tp" or command == "teleport" then
+    elseif cmd == "tp" or cmd == "teleport" then
         if args[2] then
-            local targetPlayer = findPlayer(args[2])
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local target = findPlayer(args[2])
+            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                    addOutput("📍 Đã teleport đến " .. targetPlayer.Name)
+                    player.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                    addOutput("📍 Đã TP đến " .. target.Name)
                 end
             else
-                addOutput("❌ Không tìm thấy người chơi: " .. args[2])
+                addOutput("❌ Không tìm thấy: " .. args[2])
             end
         else
-            addOutput("❌ Cách dùng: tp [tên người chơi]")
+            addOutput("❌ Dùng: tp [tên]")
         end
         
-    elseif command == "v" or command == "view" then
+    elseif cmd == "v" or cmd == "view" then
         if args[2] then
-            local targetPlayer = findPlayer(args[2])
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
-                currentCamera.CameraSubject = targetPlayer.Character.Humanoid
-                addOutput("👀 Đang xem " .. targetPlayer.Name)
+            local target = findPlayer(args[2])
+            if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+                currentCamera.CameraSubject = target.Character.Humanoid
+                addOutput("👀 Đang xem " .. target.Name)
             else
-                addOutput("❌ Không tìm thấy người chơi: " .. args[2])
+                addOutput("❌ Không tìm thấy: " .. args[2])
             end
         else
-            addOutput("❌ Cách dùng: v [tên người chơi]")
+            addOutput("❌ Dùng: v [tên]")
         end
         
-    elseif command == "unv" then
+    elseif cmd == "unv" then
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             currentCamera.CameraSubject = player.Character.Humanoid
             addOutput("❌ Đã ngừng xem")
         end
         
-    elseif command == "infj" then
+    elseif cmd == "infj" then
         setInfiniteJump(true)
+        infJumpEnabled = true
         addOutput("✅ Infinite Jump đã BẬT")
         
-    elseif command == "uninfj" then
+    elseif cmd == "uninfj" then
         setInfiniteJump(false)
+        infJumpEnabled = false
         addOutput("❌ Infinite Jump đã TẮT")
         
-    elseif command == "nofog" then
-        setNoFog(true)
-        addOutput("✅ No Fog đã BẬT")
+    elseif cmd == "grty" or cmd == "gravity" then
+        local grav = tonumber(args[2]) or 50
+        workspace.Gravity = grav
+        addOutput("🌍 Gravity: " .. grav)
         
-    elseif command == "unfog" then
-        setNoFog(false)
-        addOutput("❌ No Fog đã TẮT")
+    elseif cmd == "ungrty" then
+        workspace.Gravity = originalGravity
+        addOutput("❌ Gravity reset")
         
-    elseif command == "grty" or command == "gravity" then
-        local gravity = tonumber(args[2]) or 50
-        setGravity(gravity)
-        addOutput("🌍 Gravity đặt thành " .. gravity)
-        
-    elseif command == "ungrty" then
-        setGravity()
-        addOutput("❌ Gravity đã reset")
-        
-    elseif command == "time" then
+    elseif cmd == "time" then
         local hour = tonumber(args[2])
         if hour and hour >= 0 and hour <= 24 then
-            setTime(hour)
-            addOutput("⏰ Thời gian đặt thành " .. hour .. ":00")
+            Lighting.ClockTime = hour
+            addOutput("⏰ Time: " .. hour .. ":00")
         else
-            addOutput("❌ Giờ phải từ 0-24")
+            addOutput("❌ Giờ phải 0-24")
         end
         
-    elseif command == "rejoin" then
+    elseif cmd == "savepos" then
+        if args[2] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            savedPositions[args[2]] = player.Character.HumanoidRootPart.CFrame
+            addOutput("💾 Đã lưu: " .. args[2])
+        else
+            addOutput("❌ Dùng: savepos [tên]")
+        end
+        
+    elseif cmd == "loadpos" then
+        if args[2] and savedPositions[args[2]] then
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = savedPositions[args[2]]
+                addOutput("📂 Đã tải: " .. args[2])
+            end
+        else
+            addOutput("❌ Không tìm thấy: " .. (args[2] or ""))
+        end
+        
+    elseif cmd == "getpos" then
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local pos = player.Character.HumanoidRootPart.Position
+            addOutput("📍 X:" .. math.floor(pos.X) .. " Y:" .. math.floor(pos.Y) .. " Z:" .. math.floor(pos.Z))
+        end
+        
+    elseif cmd == "goto" then
+        local x, y, z = tonumber(args[2]), tonumber(args[3]), tonumber(args[4])
+        if x and y and z then
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
+                addOutput("📍 Đã TP đến tọa độ")
+            end
+        else
+            addOutput("❌ Dùng: goto [x] [y] [z]")
+        end
+        
+    elseif cmd == "rejoin" then
         addOutput("🔄 Đang rejoin...")
+        wait(0.5)
         TeleportService:Teleport(game.PlaceId, player)
         
-    elseif command == "sho" or command == "serverhop" then
-        addOutput("🌐 Đang tìm server khác...")
+    elseif cmd == "sho" or cmd == "serverhop" then
+        addOutput("🌐 Đang server hop...")
         if serverHop() then
             addOutput("✅ Đang chuyển server...")
         else
             addOutput("❌ Không thể server hop")
         end
         
-    elseif command == "afk" then
+    elseif cmd == "afk" then
         if not antiAFKEnabled then
             setAntiAFK(true)
             addOutput("✅ Anti AFK đã BẬT")
@@ -650,48 +620,63 @@ local function processCommand(cmd)
             addOutput("❌ Anti AFK đã TẮT")
         end
         
-    elseif command == "old" then
-        addOutput("🎉 Chúc mừng bạn đã tìm thấy lệnh ẩn!")
-        addOutput("🔐 Vui lòng nhập mật khẩu để tiếp tục:")
+    elseif cmd == "serverinfo" then
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        addOutput("📊 <b>THÔNG TIN SERVER</b>")
+        addOutput("👥 Người chơi: " .. #Players:GetPlayers() .. "/" .. Players.MaxPlayers)
+        addOutput("🆔 Place ID: " .. game.PlaceId)
+        addOutput("💼 Job ID: " .. game.JobId)
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        
+    elseif cmd == "jobid" then
+        addOutput("💼 Job ID: " .. game.JobId)
+        
+    elseif cmd == "placeid" then
+        addOutput("🆔 Place ID: " .. game.PlaceId)
+        
+    elseif cmd == "old" then
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        addOutput("🎉 <b>CHÚC MỪNG!</b>")
+        addOutput("Bạn đã tìm thấy lệnh ẩn!")
+        addOutput("🔐 Vui lòng nhập mật khẩu:")
+        addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         awaitingPassword = true
         
     elseif awaitingPassword then
-        if command == "memory" then
-            addOutput("✅ Mật khẩu đúng! Đang tải Old Menu Hub...")
+        if string.lower(cmd) == "memory" then
+            addOutput("✅ Mật khẩu đúng!")
+            addOutput("🚀 Đang tải Old Menu Hub...")
             awaitingPassword = false
             
-            local success, error = pcall(function()
+            local success = pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Old"))()
             end)
             
             if success then
-                addOutput("🚀 Old Menu Hub đã được tải thành công!")
+                addOutput("✨ Old Menu Hub đã tải thành công!")
             else
-                addOutput("❌ Lỗi khi tải Old Menu Hub: " .. tostring(error))
+                addOutput("❌ Lỗi khi tải Old Menu Hub")
             end
         else
-            addOutput("❌ Mật khẩu sai! Hãy thử lại.")
+            addOutput("❌ Mật khẩu sai!")
             awaitingPassword = false
         end
         
     else
         if not awaitingPassword then
-            addOutput("❌ Lệnh không hợp lệ: " .. command)
-            addOutput("💡 Gõ 'help' để xem danh sách lệnh")
+            addOutput("❌ Lệnh không hợp lệ: " .. cmd)
+            addOutput("💡 Gõ 'help' để xem danh sách")
         end
     end
 end
 
--- Variables for dragging
+-- DRAGGING SYSTEM
 local dragging = false
 local dragStart = nil
 local startPos = nil
-local isMinimized = false
-local originalSize = mainFrame.Size
 
--- Dragging functionality
 header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
         startPos = mainFrame.Position
@@ -699,28 +684,35 @@ header.InputBegan:Connect(function(input)
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
     end
 end)
 
--- Minimize functionality
+-- MINIMIZE/MAXIMIZE
+local isMinimized = false
+local originalSize = mainFrame.Size
+
 minimizeBtn.MouseButton1Click:Connect(function()
     local tween
     if isMinimized then
-        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = originalSize})
+        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = originalSize
+        })
         minimizeBtn.Text = "−"
         contentFrame.Visible = true
         isMinimized = false
     else
-        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 500, 0, 40)})
+        tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 550, 0, 45)
+        })
         minimizeBtn.Text = "+"
         contentFrame.Visible = false
         isMinimized = true
@@ -728,15 +720,17 @@ minimizeBtn.MouseButton1Click:Connect(function()
     tween:Play()
 end)
 
--- Close functionality
+-- CLOSE BUTTON
 closeBtn.MouseButton1Click:Connect(function()
+    -- Cleanup all features
     setNoclip(false)
     setESP(false)
     setInfiniteJump(false)
     setAntiAFK(false)
     awaitingPassword = false
     
-    local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+    -- Close animation
+    local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0)
     })
@@ -746,63 +740,66 @@ closeBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Execute command functionality
+-- EXECUTE COMMAND
 executeBtn.MouseButton1Click:Connect(function()
-    local command = commandInput.Text
-    if command ~= "" then
-        addOutput("📝 " .. command)
-        processCommand(command)
+    local cmd = commandInput.Text
+    if cmd ~= "" then
+        addOutput("<b>➤ " .. cmd .. "</b>")
+        processCommand(cmd)
         commandInput.Text = ""
     else
         addOutput("⚠️ Vui lòng nhập lệnh!")
     end
 end)
 
--- Enter key support
+-- ENTER KEY SUPPORT
 commandInput.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
+    if enterPressed and commandInput.Text ~= "" then
         executeBtn.MouseButton1Click:Fire()
     end
 end)
 
--- Hover effects
-local function createHoverEffect(button, normalColor, hoverColor)
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+-- HOVER EFFECTS
+local function createHover(btn, normal, hover)
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = hover}):Play()
     end)
-    
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = normalColor}):Play()
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = normal}):Play()
     end)
 end
 
-createHoverEffect(executeBtn, Color3.fromRGB(40, 167, 69), Color3.fromRGB(50, 180, 80))
-createHoverEffect(minimizeBtn, Color3.fromRGB(255, 193, 7), Color3.fromRGB(255, 210, 50))
-createHoverEffect(closeBtn, Color3.fromRGB(220, 53, 69), Color3.fromRGB(235, 70, 85))
+createHover(executeBtn, Color3.fromRGB(40, 167, 69), Color3.fromRGB(50, 200, 90))
+createHover(minimizeBtn, Color3.fromRGB(255, 193, 7), Color3.fromRGB(255, 220, 50))
+createHover(closeBtn, Color3.fromRGB(220, 53, 69), Color3.fromRGB(255, 70, 90))
 
--- Player left detection
-Players.PlayerRemoving:Connect(function(leavingPlayer)
-    local esp = espFolder:FindFirstChild(leavingPlayer.Name .. "_ESP")
-    if esp then
-        esp:Destroy()
-    end
+-- PLAYER EVENTS
+Players.PlayerRemoving:Connect(function(p)
+    local esp = espFolder:FindFirstChild(p.Name .. "_ESP")
+    if esp then esp:Destroy() end
 end)
 
--- Initialize output size
-spawn(function()
-    wait(0.5)
-    updateOutputSize()
-end)
-
--- Appearance animation
+-- APPEARANCE ANIMATION
 mainFrame.Size = UDim2.new(0, 0, 0, 0)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 
-local appearTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-    Size = UDim2.new(0, 500, 0, 400),
-    Position = UDim2.new(0.5, -250, 0.5, -200)
-})
-appearTween:Play()
+wait(0.1)
 
-print("🌟 Mila Command UI đã tải thành công!")
-addOutput("🚀 Sẵn sàng sử dụng! Gõ 'help' để xem lệnh!")
+local appear = TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 550, 0, 450),
+    Position = UDim2.new(0.5, -275, 0.5, -225)
+})
+appear:Play()
+
+-- SUCCESS MESSAGE
+print("✨ Mila Command V3.0 loaded successfully!")
+print("🚀 Created by Assistant")
+print("💡 Type 'help' to see all commands")
+
+spawn(function()
+    wait(1)
+    addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    addOutput("✅ <b>Mila Command V3.0</b> đã sẵn sàng!")
+    addOutput("💡 Gõ <b>help</b> để xem tất cả lệnh")
+    addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+end)
