@@ -204,11 +204,11 @@ actionsContainer.BackgroundTransparency = 1
 actionsContainer.Parent = topNav
 
 local actions = {
-    {id = "undo", icon = "↶", color = Theme.accent.success},
-    {id = "redo", icon = "↷", color = Theme.accent.warning},
+    {id = "undo", icon = "↩️", color = Theme.accent.success},
+    {id = "redo", icon = "🔜", color = Theme.accent.warning},
     {id = "save", icon = "💾", color = Theme.accent.primary},
     {id = "reset", icon = "🔄", color = Theme.accent.primary},
-    {id = "close", icon = "✕", color = Theme.accent.danger}
+    {id = "close", icon = "❌", color = Theme.accent.danger}
 }
 
 App.buttons = {}
@@ -262,7 +262,7 @@ local tools = {
     {id = "marker", name = "Marker", icon = "🖍️", desc = "Bold strokes"},
     {id = "spray", name = "Spray", icon = "🎨", desc = "Airbrush"},
     {id = "size", name = "Size", icon = "⚫", desc = "Brush size", special = true},
-    {id = "opacity", name = "Opacity", icon = "◐", desc = "Transparency", special = true},
+    {id = "opacity", name = "Opacity", icon = "⭕", desc = "Transparency", special = true},
     {id = "fill", name = "Fill", icon = "🪣", desc = "Fill canvas"},
     {id = "eraser", name = "Eraser", icon = "🧹", desc = "Erase"}
 }
