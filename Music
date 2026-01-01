@@ -1,6 +1,6 @@
--- 🎵 Roblox Music Player 3.0 - ULTIMATE EDITION
--- Tạo bởi Mila | Version 3.0 - Complete Overhaul
--- ✨ New: Playlist Manager, Sound Effects, Better UI, Stats
+-- 🎵 MUSIC PLAYER 3.0 - ULTIMATE EDITION - FULL CODE
+-- Tạo bởi Claude | Version 3.0 Complete
+-- ✨ Features: Visualizer, Playlist, Themes, Stats, 5 Tabs
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -9,7 +9,7 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- 🎵 Music Library
+-- Music Library
 local musicLibrary = {
     {name = "Raining 🌮", id = "142376088", category = "Chill"},
     {name = "Fart", id = "4809574295", category = "Meme"},
@@ -28,7 +28,7 @@ local musicLibrary = {
     {name = "Đám ma", id = "1845920681", category = "Việt Nam"},
 }
 
--- 💾 User Data
+-- User Data
 local userData = {
     history = {},
     playlist = {},
@@ -36,36 +36,20 @@ local userData = {
     repeatMode = "off",
     shuffleMode = false,
     totalPlays = 0,
-    favoriteCategory = "All",
     visualizerEnabled = true
 }
 
--- 🎨 Theme System
-local themes = {
-    dark = {
-        primary = Color3.fromRGB(25, 25, 35),
-        secondary = Color3.fromRGB(40, 40, 50),
-        accent = Color3.fromRGB(138, 43, 226),
-        danger = Color3.fromRGB(220, 38, 38),
-        success = Color3.fromRGB(34, 197, 94),
-        warning = Color3.fromRGB(251, 191, 36),
-        text = Color3.fromRGB(255, 255, 255),
-        textSecondary = Color3.fromRGB(156, 163, 175)
-    },
-    neon = {
-        primary = Color3.fromRGB(10, 10, 20),
-        secondary = Color3.fromRGB(20, 20, 40),
-        accent = Color3.fromRGB(0, 255, 255),
-        danger = Color3.fromRGB(255, 0, 100),
-        success = Color3.fromRGB(0, 255, 150),
-        warning = Color3.fromRGB(255, 200, 0),
-        text = Color3.fromRGB(255, 255, 255),
-        textSecondary = Color3.fromRGB(150, 200, 255)
-    }
+-- Colors
+local colors = {
+    primary = Color3.fromRGB(25, 25, 35),
+    secondary = Color3.fromRGB(40, 40, 50),
+    accent = Color3.fromRGB(138, 43, 226),
+    danger = Color3.fromRGB(220, 38, 38),
+    success = Color3.fromRGB(34, 197, 94),
+    warning = Color3.fromRGB(251, 191, 36),
+    text = Color3.fromRGB(255, 255, 255),
+    textSecondary = Color3.fromRGB(156, 163, 175)
 }
-
-local currentTheme = "dark"
-local colors = themes[currentTheme]
 
 -- Variables
 local currentSound = nil
@@ -73,17 +57,15 @@ local currentPlaying = nil
 local filteredMusic = {}
 local currentTab = 1
 local isMinimized = false
-local currentRandomSong = nil
 local visualizerConnection = nil
 
--- Create ScreenGui
+-- Create GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MusicPlayerV3"
 screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
 screenGui.Parent = playerGui
 
--- Main Frame (Larger for v3.0)
+-- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 500, 0, 450)
 mainFrame.Position = UDim2.new(0.5, -250, 0.5, -225)
@@ -94,19 +76,6 @@ mainFrame.Parent = screenGui
 local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 15)
 mainCorner.Parent = mainFrame
-
--- Gradient Background
-local gradient = Instance.new("UIGradient")
-gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, colors.primary),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(
-        math.min(255, colors.primary.R * 255 * 1.3),
-        math.min(255, colors.primary.G * 255 * 1.3),
-        math.min(255, colors.primary.B * 255 * 1.3)
-    ))
-}
-gradient.Rotation = 135
-gradient.Parent = mainFrame
 
 -- Header
 local headerFrame = Instance.new("Frame")
@@ -125,18 +94,6 @@ titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = headerFrame
 
-local versionLabel = Instance.new("TextLabel")
-versionLabel.Size = UDim2.new(0, 100, 0, 15)
-versionLabel.Position = UDim2.new(0, 20, 0, 30)
-versionLabel.BackgroundTransparency = 1
-versionLabel.Text = "ULTIMATE EDITION"
-versionLabel.TextColor3 = colors.accent
-versionLabel.TextSize = 10
-versionLabel.Font = Enum.Font.GothamBold
-versionLabel.TextXAlignment = Enum.TextXAlignment.Left
-versionLabel.Parent = headerFrame
-
--- Stats Display
 local statsLabel = Instance.new("TextLabel")
 statsLabel.Size = UDim2.new(0, 150, 0, 20)
 statsLabel.Position = UDim2.new(1, -280, 0, 15)
@@ -147,22 +104,6 @@ statsLabel.TextSize = 11
 statsLabel.Font = Enum.Font.Gotham
 statsLabel.TextXAlignment = Enum.TextXAlignment.Right
 statsLabel.Parent = headerFrame
-
--- Control Buttons
-local themeBtn = Instance.new("TextButton")
-themeBtn.Size = UDim2.new(0, 30, 0, 30)
-themeBtn.Position = UDim2.new(1, -120, 0, 15)
-themeBtn.BackgroundColor3 = colors.secondary
-themeBtn.BorderSizePixel = 0
-themeBtn.Text = "🎨"
-themeBtn.TextColor3 = colors.text
-themeBtn.TextSize = 16
-themeBtn.Font = Enum.Font.GothamBold
-themeBtn.Parent = headerFrame
-
-local themeBtnCorner = Instance.new("UICorner")
-themeBtnCorner.CornerRadius = UDim.new(0, 8)
-themeBtnCorner.Parent = themeBtn
 
 local minimizeBtn = Instance.new("TextButton")
 minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
@@ -194,7 +135,7 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 8)
 closeBtnCorner.Parent = closeBtn
 
--- Now Playing Frame (Enhanced)
+-- Now Playing
 local nowPlayingFrame = Instance.new("Frame")
 nowPlayingFrame.Size = UDim2.new(1, -30, 0, 90)
 nowPlayingFrame.Position = UDim2.new(0, 15, 0, 65)
@@ -206,7 +147,7 @@ local nowPlayingCorner = Instance.new("UICorner")
 nowPlayingCorner.CornerRadius = UDim.new(0, 12)
 nowPlayingCorner.Parent = nowPlayingFrame
 
--- Visualizer Bars
+-- Visualizer
 local visualizerFrame = Instance.new("Frame")
 visualizerFrame.Size = UDim2.new(0, 60, 0, 60)
 visualizerFrame.Position = UDim2.new(0, 15, 0, 15)
@@ -218,12 +159,11 @@ local visualizerCorner = Instance.new("UICorner")
 visualizerCorner.CornerRadius = UDim.new(0, 10)
 visualizerCorner.Parent = visualizerFrame
 
--- Visualizer bars
 local visualizerBars = {}
 for i = 1, 5 do
     local bar = Instance.new("Frame")
-    bar.Size = UDim2.new(0, 6, 0, 20)
-    bar.Position = UDim2.new(0, 7 + (i-1) * 10, 1, -25)
+    bar.Size = UDim2.new(0, 6, 0, 5)
+    bar.Position = UDim2.new(0, 7 + (i-1) * 10, 1, -10)
     bar.BackgroundColor3 = colors.accent
     bar.BorderSizePixel = 0
     bar.Parent = visualizerFrame
@@ -240,7 +180,7 @@ local nowPlayingLabel = Instance.new("TextLabel")
 nowPlayingLabel.Size = UDim2.new(1, -320, 0, 25)
 nowPlayingLabel.Position = UDim2.new(0, 85, 0, 12)
 nowPlayingLabel.BackgroundTransparency = 1
-nowPlayingLabel.Text = "Không có nhạc đang phát"
+nowPlayingLabel.Text = "No music playing"
 nowPlayingLabel.TextColor3 = colors.text
 nowPlayingLabel.TextSize = 15
 nowPlayingLabel.Font = Enum.Font.GothamBold
@@ -252,7 +192,344 @@ local categoryLabel = Instance.new("TextLabel")
 categoryLabel.Size = UDim2.new(1, -320, 0, 18)
 categoryLabel.Position = UDim2.new(0, 85, 0, 35)
 categoryLabel.BackgroundTransparency = 1
-categoryLabel.Text = "Category: historyScroll.Size = UDim2.new(1, -10, 1, -10)
+categoryLabel.Text = "Category: None"
+categoryLabel.TextColor3 = colors.textSecondary
+categoryLabel.TextSize = 11
+categoryLabel.Font = Enum.Font.Gotham
+categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+categoryLabel.Parent = nowPlayingFrame
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -320, 0, 16)
+statusLabel.Position = UDim2.new(0, 85, 0, 50)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Volume: 5 | Ready"
+statusLabel.TextColor3 = colors.textSecondary
+statusLabel.TextSize = 10
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.Parent = nowPlayingFrame
+
+-- Controls
+local controlsFrame = Instance.new("Frame")
+controlsFrame.Size = UDim2.new(0, 200, 0, 70)
+controlsFrame.Position = UDim2.new(1, -210, 0, 10)
+controlsFrame.BackgroundTransparency = 1
+controlsFrame.Parent = nowPlayingFrame
+
+local volumeLabel = Instance.new("TextLabel")
+volumeLabel.Size = UDim2.new(0, 50, 0, 18)
+volumeLabel.Position = UDim2.new(0, 5, 0, 2)
+volumeLabel.BackgroundTransparency = 1
+volumeLabel.Text = "🔊 Vol:"
+volumeLabel.TextColor3 = colors.text
+volumeLabel.TextSize = 11
+volumeLabel.Font = Enum.Font.GothamBold
+volumeLabel.TextXAlignment = Enum.TextXAlignment.Left
+volumeLabel.Parent = controlsFrame
+
+local volumeSlider = Instance.new("TextBox")
+volumeSlider.Size = UDim2.new(0, 50, 0, 22)
+volumeSlider.Position = UDim2.new(0, 55, 0, 0)
+volumeSlider.BackgroundColor3 = colors.primary
+volumeSlider.BorderSizePixel = 1
+volumeSlider.BorderColor3 = colors.accent
+volumeSlider.Text = "5"
+volumeSlider.TextColor3 = colors.text
+volumeSlider.TextSize = 12
+volumeSlider.Font = Enum.Font.GothamBold
+volumeSlider.Parent = controlsFrame
+
+local volumeCorner = Instance.new("UICorner")
+volumeCorner.CornerRadius = UDim.new(0, 6)
+volumeCorner.Parent = volumeSlider
+
+local repeatBtn = Instance.new("TextButton")
+repeatBtn.Size = UDim2.new(0, 35, 0, 25)
+repeatBtn.Position = UDim2.new(0, 5, 0, 28)
+repeatBtn.BackgroundColor3 = colors.primary
+repeatBtn.BorderSizePixel = 0
+repeatBtn.Text = "🔄"
+repeatBtn.TextColor3 = colors.textSecondary
+repeatBtn.TextSize = 14
+repeatBtn.Font = Enum.Font.Gotham
+repeatBtn.Parent = controlsFrame
+
+local repeatCorner = Instance.new("UICorner")
+repeatCorner.CornerRadius = UDim.new(0, 6)
+repeatCorner.Parent = repeatBtn
+
+local shuffleBtn = Instance.new("TextButton")
+shuffleBtn.Size = UDim2.new(0, 35, 0, 25)
+shuffleBtn.Position = UDim2.new(0, 45, 0, 28)
+shuffleBtn.BackgroundColor3 = colors.primary
+shuffleBtn.BorderSizePixel = 0
+shuffleBtn.Text = "🔀"
+shuffleBtn.TextColor3 = colors.textSecondary
+shuffleBtn.TextSize = 14
+shuffleBtn.Font = Enum.Font.Gotham
+shuffleBtn.Parent = controlsFrame
+
+local shuffleCorner = Instance.new("UICorner")
+shuffleCorner.CornerRadius = UDim.new(0, 6)
+shuffleCorner.Parent = shuffleBtn
+
+local visualizerBtn = Instance.new("TextButton")
+visualizerBtn.Size = UDim2.new(0, 35, 0, 25)
+visualizerBtn.Position = UDim2.new(0, 85, 0, 28)
+visualizerBtn.BackgroundColor3 = colors.primary
+visualizerBtn.BorderSizePixel = 0
+visualizerBtn.Text = "📊"
+visualizerBtn.TextColor3 = colors.accent
+visualizerBtn.TextSize = 14
+visualizerBtn.Font = Enum.Font.Gotham
+visualizerBtn.Parent = controlsFrame
+
+local visualizerBtnCorner = Instance.new("UICorner")
+visualizerBtnCorner.CornerRadius = UDim.new(0, 6)
+visualizerBtnCorner.Parent = visualizerBtn
+
+-- Tabs
+local tabFrame = Instance.new("Frame")
+tabFrame.Size = UDim2.new(1, -30, 0, 45)
+tabFrame.Position = UDim2.new(0, 15, 0, 165)
+tabFrame.BackgroundTransparency = 1
+tabFrame.Parent = mainFrame
+
+local tabButtons = {}
+local tabNames = {"🆔 Manual", "📋 Library", "🎲 Random", "📜 History", "⭐ Playlist"}
+
+for i, tabName in ipairs(tabNames) do
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Size = UDim2.new(0.2, -4, 1, 0)
+    tabBtn.Position = UDim2.new((i-1) * 0.2, (i-1) * 4, 0, 0)
+    tabBtn.BackgroundColor3 = i == 1 and colors.accent or colors.secondary
+    tabBtn.BorderSizePixel = 0
+    tabBtn.Text = tabName
+    tabBtn.TextColor3 = colors.text
+    tabBtn.TextSize = 11
+    tabBtn.Font = Enum.Font.GothamBold
+    tabBtn.TextScaled = true
+    tabBtn.Parent = tabFrame
+    
+    local tabCorner = Instance.new("UICorner")
+    tabCorner.CornerRadius = UDim.new(0, 8)
+    tabCorner.Parent = tabBtn
+    
+    tabButtons[i] = tabBtn
+end
+
+-- Content Area
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, -30, 1, -220)
+contentFrame.Position = UDim2.new(0, 15, 0, 215)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- TAB 1: Manual
+local manualTab = Instance.new("Frame")
+manualTab.Size = UDim2.new(1, 0, 1, 0)
+manualTab.BackgroundTransparency = 1
+manualTab.Visible = true
+manualTab.Parent = contentFrame
+
+local manualTitle = Instance.new("TextLabel")
+manualTitle.Size = UDim2.new(1, 0, 0, 25)
+manualTitle.Position = UDim2.new(0, 5, 0, 5)
+manualTitle.BackgroundTransparency = 1
+manualTitle.Text = "🎵 Manual Input - Enter Music ID"
+manualTitle.TextColor3 = colors.text
+manualTitle.TextSize = 14
+manualTitle.Font = Enum.Font.GothamBold
+manualTitle.TextXAlignment = Enum.TextXAlignment.Left
+manualTitle.Parent = manualTab
+
+local idInput = Instance.new("TextBox")
+idInput.Size = UDim2.new(1, -10, 0, 45)
+idInput.Position = UDim2.new(0, 5, 0, 35)
+idInput.BackgroundColor3 = colors.secondary
+idInput.BorderSizePixel = 1
+idInput.BorderColor3 = colors.accent
+idInput.PlaceholderText = "Enter Roblox Music ID..."
+idInput.Text = ""
+idInput.TextColor3 = colors.text
+idInput.TextSize = 14
+idInput.Font = Enum.Font.Gotham
+idInput.Parent = manualTab
+
+local idInputCorner = Instance.new("UICorner")
+idInputCorner.CornerRadius = UDim.new(0, 10)
+idInputCorner.Parent = idInput
+
+local manualControlFrame = Instance.new("Frame")
+manualControlFrame.Size = UDim2.new(1, -10, 0, 45)
+manualControlFrame.Position = UDim2.new(0, 5, 0, 90)
+manualControlFrame.BackgroundTransparency = 1
+manualControlFrame.Parent = manualTab
+
+local playManualBtn = Instance.new("TextButton")
+playManualBtn.Size = UDim2.new(0.32, 0, 1, 0)
+playManualBtn.Position = UDim2.new(0, 0, 0, 0)
+playManualBtn.BackgroundColor3 = colors.success
+playManualBtn.BorderSizePixel = 0
+playManualBtn.Text = "▶️ PLAY"
+playManualBtn.TextColor3 = colors.text
+playManualBtn.TextSize = 14
+playManualBtn.Font = Enum.Font.GothamBold
+playManualBtn.Parent = manualControlFrame
+
+local playManualCorner = Instance.new("UICorner")
+playManualCorner.CornerRadius = UDim.new(0, 8)
+playManualCorner.Parent = playManualBtn
+
+local stopBtn = Instance.new("TextButton")
+stopBtn.Size = UDim2.new(0.32, 0, 1, 0)
+stopBtn.Position = UDim2.new(0.34, 0, 0, 0)
+stopBtn.BackgroundColor3 = colors.danger
+stopBtn.BorderSizePixel = 0
+stopBtn.Text = "⏹️ STOP"
+stopBtn.TextColor3 = colors.text
+stopBtn.TextSize = 14
+stopBtn.Font = Enum.Font.GothamBold
+stopBtn.Parent = manualControlFrame
+
+local stopBtnCorner = Instance.new("UICorner")
+stopBtnCorner.CornerRadius = UDim.new(0, 8)
+stopBtnCorner.Parent = stopBtn
+
+local addPlaylistBtn = Instance.new("TextButton")
+addPlaylistBtn.Size = UDim2.new(0.32, 0, 1, 0)
+addPlaylistBtn.Position = UDim2.new(0.68, 0, 0, 0)
+addPlaylistBtn.BackgroundColor3 = colors.warning
+addPlaylistBtn.BorderSizePixel = 0
+addPlaylistBtn.Text = "⭐ ADD"
+addPlaylistBtn.TextColor3 = colors.text
+addPlaylistBtn.TextSize = 14
+addPlaylistBtn.Font = Enum.Font.GothamBold
+addPlaylistBtn.Parent = manualControlFrame
+
+local addPlaylistCorner = Instance.new("UICorner")
+addPlaylistCorner.CornerRadius = UDim.new(0, 8)
+addPlaylistCorner.Parent = addPlaylistBtn
+
+-- TAB 2: Library
+local libraryTab = Instance.new("Frame")
+libraryTab.Size = UDim2.new(1, 0, 1, 0)
+libraryTab.BackgroundTransparency = 1
+libraryTab.Visible = false
+libraryTab.Parent = contentFrame
+
+local searchBox = Instance.new("TextBox")
+searchBox.Size = UDim2.new(1, -10, 0, 35)
+searchBox.Position = UDim2.new(0, 5, 0, 5)
+searchBox.BackgroundColor3 = colors.secondary
+searchBox.BorderSizePixel = 1
+searchBox.BorderColor3 = colors.accent
+searchBox.PlaceholderText = "🔍 Search songs..."
+searchBox.Text = ""
+searchBox.TextColor3 = colors.text
+searchBox.TextSize = 12
+searchBox.Font = Enum.Font.Gotham
+searchBox.Parent = libraryTab
+
+local searchCorner = Instance.new("UICorner")
+searchCorner.CornerRadius = UDim.new(0, 8)
+searchCorner.Parent = searchBox
+
+local libraryScroll = Instance.new("ScrollingFrame")
+libraryScroll.Size = UDim2.new(1, -10, 1, -45)
+libraryScroll.Position = UDim2.new(0, 5, 0, 45)
+libraryScroll.BackgroundColor3 = colors.secondary
+libraryScroll.BorderSizePixel = 0
+libraryScroll.ScrollBarThickness = 6
+libraryScroll.ScrollBarImageColor3 = colors.accent
+libraryScroll.Parent = libraryTab
+
+local libraryScrollCorner = Instance.new("UICorner")
+libraryScrollCorner.CornerRadius = UDim.new(0, 8)
+libraryScrollCorner.Parent = libraryScroll
+
+local libraryLayout = Instance.new("UIListLayout")
+libraryLayout.SortOrder = Enum.SortOrder.LayoutOrder
+libraryLayout.Padding = UDim.new(0, 3)
+libraryLayout.Parent = libraryScroll
+
+-- TAB 3: Random
+local randomTab = Instance.new("Frame")
+randomTab.Size = UDim2.new(1, 0, 1, 0)
+randomTab.BackgroundTransparency = 1
+randomTab.Visible = false
+randomTab.Parent = contentFrame
+
+local randomBoxFrame = Instance.new("Frame")
+randomBoxFrame.Size = UDim2.new(1, -20, 0, 110)
+randomBoxFrame.Position = UDim2.new(0, 10, 0, 10)
+randomBoxFrame.BackgroundColor3 = colors.secondary
+randomBoxFrame.BorderSizePixel = 2
+randomBoxFrame.BorderColor3 = colors.accent
+randomBoxFrame.Parent = randomTab
+
+local randomBoxCorner = Instance.new("UICorner")
+randomBoxCorner.CornerRadius = UDim2.new(0, 12)
+randomBoxCorner.Parent = randomBoxFrame
+
+local mysteryIcon = Instance.new("TextLabel")
+mysteryIcon.Size = UDim2.new(0, 70, 0, 70)
+mysteryIcon.Position = UDim2.new(0, 20, 0, 20)
+mysteryIcon.BackgroundTransparency = 1
+mysteryIcon.Text = "🎁"
+mysteryIcon.TextColor3 = colors.accent
+mysteryIcon.TextSize = 45
+mysteryIcon.Font = Enum.Font.GothamBold
+mysteryIcon.Parent = randomBoxFrame
+
+local randomTitle = Instance.new("TextLabel")
+randomTitle.Size = UDim2.new(1, -110, 0, 28)
+randomTitle.Position = UDim2.new(0, 100, 0, 15)
+randomTitle.BackgroundTransparency = 1
+randomTitle.Text = "🎲 MYSTERY MUSIC BOX"
+randomTitle.TextColor3 = colors.text
+randomTitle.TextSize = 16
+randomTitle.Font = Enum.Font.GothamBold
+randomTitle.TextXAlignment = Enum.TextXAlignment.Left
+randomTitle.Parent = randomBoxFrame
+
+local randomDesc = Instance.new("TextLabel")
+randomDesc.Size = UDim2.new(1, -110, 0, 40)
+randomDesc.Position = UDim2.new(0, 100, 0, 43)
+randomDesc.BackgroundTransparency = 1
+randomDesc.Text = "Open mystery box to discover\na random song and play instantly!"
+randomDesc.TextColor3 = colors.textSecondary
+randomDesc.TextSize = 11
+randomDesc.Font = Enum.Font.Gotham
+randomDesc.TextXAlignment = Enum.TextXAlignment.Left
+randomDesc.TextWrapped = true
+randomDesc.Parent = randomBoxFrame
+
+local openBoxBtn = Instance.new("TextButton")
+openBoxBtn.Size = UDim2.new(1, -40, 0, 50)
+openBoxBtn.Position = UDim2.new(0, 20, 0, 130)
+openBoxBtn.BackgroundColor3 = colors.accent
+openBoxBtn.BorderSizePixel = 0
+openBoxBtn.Text = "🎁 OPEN MYSTERY BOX 🎁"
+openBoxBtn.TextColor3 = colors.text
+openBoxBtn.TextSize = 16
+openBoxBtn.Font = Enum.Font.GothamBold
+openBoxBtn.Parent = randomTab
+
+local openBoxCorner = Instance.new("UICorner")
+openBoxCorner.CornerRadius = UDim.new(0, 10)
+openBoxCorner.Parent = openBoxBtn
+
+-- TAB 4: History
+local historyTab = Instance.new("Frame")
+historyTab.Size = UDim2.new(1, 0, 1, 0)
+historyTab.BackgroundTransparency = 1
+historyTab.Visible = false
+historyTab.Parent = contentFrame
+
+local historyScroll = Instance.new("ScrollingFrame")
+historyScroll.Size = UDim2.new(1, -10, 1, -10)
 historyScroll.Position = UDim2.new(0, 5, 0, 5)
 historyScroll.BackgroundColor3 = colors.secondary
 historyScroll.BorderSizePixel = 0
@@ -294,7 +571,6 @@ playlistLayout.SortOrder = Enum.SortOrder.LayoutOrder
 playlistLayout.Padding = UDim.new(0, 3)
 playlistLayout.Parent = playlistScroll
 
--- Playlist Controls
 local playlistControlFrame = Instance.new("Frame")
 playlistControlFrame.Size = UDim2.new(1, -10, 0, 40)
 playlistControlFrame.Position = UDim2.new(0, 5, 1, -45)
@@ -403,15 +679,11 @@ local function showNotification(text, color, icon)
         textLabel.TextWrapped = true
         textLabel.Parent = notif
         
-        local showTween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Position = UDim2.new(1, -310, 0, 100)})
-        showTween:Play()
-        
+        TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Position = UDim2.new(1, -310, 0, 100)}):Play()
         wait(3)
         local hideTween = TweenService:Create(notif, TweenInfo.new(0.4), {Position = UDim2.new(1, 0, 0, 100)})
         hideTween:Play()
-        hideTween.Completed:Connect(function()
-            notif:Destroy()
-        end)
+        hideTween.Completed:Connect(function() notif:Destroy() end)
     end)
 end
 
@@ -421,10 +693,7 @@ end
 
 local function createSound(musicId)
     if currentSound then
-        pcall(function()
-            currentSound:Stop()
-            currentSound:Destroy()
-        end)
+        pcall(function() currentSound:Stop() currentSound:Destroy() end)
         currentSound = nil
         wait(0.1)
     end
@@ -438,52 +707,11 @@ local function createSound(musicId)
         return newSound
     end)
     
-    if success then
-        return sound
-    else
-        return nil
-    end
-end
-
-local function addToHistory(musicData)
-    for i, item in ipairs(userData.history) do
-        if item.id == musicData.id then
-            table.remove(userData.history, i)
-            break
-        end
-    end
-    
-    table.insert(userData.history, 1, {
-        name = musicData.name,
-        id = musicData.id,
-        category = musicData.category or "Unknown",
-        playTime = os.time()
-    })
-    
-    if #userData.history > 20 then
-        table.remove(userData.history, 21)
-    end
-    
-    updateHistoryTab()
-end
-
-local function addToPlaylist(musicData)
-    for _, item in ipairs(userData.playlist) do
-        if item.id == musicData.id then
-            showNotification("Already in playlist!", colors.danger, "⭐")
-            return
-        end
-    end
-    
-    table.insert(userData.playlist, musicData)
-    showNotification("Added to playlist: " .. musicData.name, colors.success, "⭐")
-    updatePlaylistTab()
+    return success and sound or nil
 end
 
 local function startVisualizer()
-    if visualizerConnection then
-        visualizerConnection:Disconnect()
-    end
+    if visualizerConnection then visualizerConnection:Disconnect() end
     
     if userData.visualizerEnabled and currentSound then
         visualizerConnection = RunService.RenderStepped:Connect(function()
@@ -511,20 +739,49 @@ local function stopVisualizer()
     end
 end
 
+local function addToHistory(musicData)
+    for i, item in ipairs(userData.history) do
+        if item.id == musicData.id then
+            table.remove(userData.history, i)
+            break
+        end
+    end
+    
+    table.insert(userData.history, 1, {
+        name = musicData.name,
+        id = musicData.id,
+        category = musicData.category or "Unknown"
+    })
+    
+    if #userData.history > 20 then table.remove(userData.history, 21) end
+    updateHistoryTab()
+end
+
+local function addToPlaylist(musicData)
+    for _, item in ipairs(userData.playlist) do
+        if item.id == musicData.id then
+            showNotification("Already in playlist!", colors.danger, "⭐")
+            return
+        end
+    end
+    
+    table.insert(userData.playlist, musicData)
+    showNotification("Added: " .. musicData.name, colors.success, "⭐")
+    updatePlaylistTab()
+end
+
 local function playMusic(musicData)
     currentSound = createSound(musicData.id)
     
     if not currentSound then
-        showNotification("Error creating sound! Invalid ID.", colors.danger, "⚠️")
+        showNotification("Error! Invalid ID.", colors.danger, "⚠️")
         return
     end
     
-    local success = pcall(function()
-        currentSound:Play()
-    end)
+    local success = pcall(function() currentSound:Play() end)
     
     if not success then
-        showNotification("Error playing music! Try again.", colors.danger, "⚠️")
+        showNotification("Error playing music!", colors.danger, "⚠️")
         return
     end
     
@@ -533,41 +790,27 @@ local function playMusic(musicData)
     
     nowPlayingLabel.Text = musicData.name
     categoryLabel.Text = "Category: " .. (musicData.category or "Unknown")
-    statusLabel.Text = "Playing - Volume: " .. userData.volume
+    statusLabel.Text = "Playing - Vol: " .. userData.volume
     
     addToHistory(musicData)
     updateStats()
     startVisualizer()
     
-    showNotification("🎵 Now Playing: " .. musicData.name, colors.success, "🎵")
+    showNotification("🎵 " .. musicData.name, colors.success, "🎵")
     
     if currentSound then
         currentSound.Ended:Connect(function()
             if userData.repeatMode == "all" then
-                local currentIndex = 1
                 local sourceList = userData.shuffleMode and userData.playlist or filteredMusic
-                
                 if #sourceList > 0 then
+                    local currentIndex = 1
                     for i, item in ipairs(sourceList) do
-                        if item.id == musicData.id then
-                            currentIndex = i
-                            break
-                        end
+                        if item.id == musicData.id then currentIndex = i break end
                     end
-                    
                     local nextIndex = currentIndex + 1
-                    if nextIndex > #sourceList then
-                        nextIndex = 1
-                    end
-                    
-                    if sourceList[nextIndex] then
-                        playMusic(sourceList[nextIndex])
-                    else
-                        stopMusic()
-                    end
-                else
-                    stopMusic()
-                end
+                    if nextIndex > #sourceList then nextIndex = 1 end
+                    if sourceList[nextIndex] then playMusic(sourceList[nextIndex]) else stopMusic() end
+                else stopMusic() end
             elseif userData.repeatMode == "one" then
                 playMusic(musicData)
             else
@@ -579,21 +822,16 @@ end
 
 local function stopMusic()
     if currentSound then
-        pcall(function()
-            currentSound:Stop()
-            currentSound:Destroy()
-        end)
+        pcall(function() currentSound:Stop() currentSound:Destroy() end)
         currentSound = nil
     end
     
     stopVisualizer()
-    
     currentPlaying = nil
     nowPlayingLabel.Text = "No music playing"
     categoryLabel.Text = "Category: None"
-    statusLabel.Text = "Volume: " .. userData.volume .. " | Ready"
-    
-    showNotification("Music stopped", colors.danger, "⏹️")
+    statusLabel.Text = "Vol: " .. userData.volume .. " | Ready"
+    showNotification("Stopped", colors.danger, "⏹️")
 end
 
 local function updateVolume(newVolume)
@@ -601,20 +839,12 @@ local function updateVolume(newVolume)
     userData.volume = newVolume
     volumeSlider.Text = tostring(newVolume)
     
-    if currentSound then
-        currentSound.Volume = newVolume
-    end
+    if currentSound then currentSound.Volume = newVolume end
     
-    if currentPlaying then
-        statusLabel.Text = "Playing - Volume: " .. newVolume
-    else
-        statusLabel.Text = "Volume: " .. newVolume .. " | Ready"
-    end
+    statusLabel.Text = currentPlaying and ("Playing - Vol: " .. newVolume) or ("Vol: " .. newVolume .. " | Ready")
     
-    local icon = newVolume == 0 and "🔇" or (newVolume <= 3 and "🔉" or "🔊")
-    volumeLabel.Text = icon .. " Vol:"
-    
-    showNotification("Volume: " .. newVolume .. "/10", colors.accent, icon)
+    volumeLabel.Text = (newVolume == 0 and "🔇" or (newVolume <= 3 and "🔉" or "🔊")) .. " Vol:"
+    showNotification("Volume: " .. newVolume .. "/10", colors.accent, volumeLabel.Text:sub(1, 4))
 end
 
 local function cycleRepeatMode()
@@ -622,12 +852,12 @@ local function cycleRepeatMode()
         userData.repeatMode = "one"
         repeatBtn.Text = "🔂"
         repeatBtn.TextColor3 = colors.accent
-        showNotification("Repeat: One Song", colors.accent, "🔂")
+        showNotification("Repeat: One", colors.accent, "🔂")
     elseif userData.repeatMode == "one" then
         userData.repeatMode = "all"
         repeatBtn.Text = "🔁"
         repeatBtn.TextColor3 = colors.accent
-        showNotification("Repeat: All Songs", colors.accent, "🔁")
+        showNotification("Repeat: All", colors.accent, "🔁")
     else
         userData.repeatMode = "off"
         repeatBtn.Text = "🔄"
@@ -635,46 +865,26 @@ local function cycleRepeatMode()
         showNotification("Repeat: Off", colors.textSecondary, "🔄")
     end
     
-    if currentSound then
-        currentSound.Looped = userData.repeatMode == "one"
-    end
+    if currentSound then currentSound.Looped = userData.repeatMode == "one" end
 end
 
 local function toggleShuffle()
     userData.shuffleMode = not userData.shuffleMode
-    
-    if userData.shuffleMode then
-        shuffleBtn.TextColor3 = colors.accent
-        showNotification("Shuffle: ON", colors.accent, "🔀")
-    else
-        shuffleBtn.TextColor3 = colors.textSecondary
-        showNotification("Shuffle: OFF", colors.textSecondary, "🔀")
-    end
+    shuffleBtn.TextColor3 = userData.shuffleMode and colors.accent or colors.textSecondary
+    showNotification("Shuffle: " .. (userData.shuffleMode and "ON" or "OFF"), colors.accent, "🔀")
 end
 
 local function toggleVisualizer()
     userData.visualizerEnabled = not userData.visualizerEnabled
+    visualizerBtn.TextColor3 = userData.visualizerEnabled and colors.accent or colors.textSecondary
     
     if userData.visualizerEnabled then
-        visualizerBtn.TextColor3 = colors.accent
         startVisualizer()
         showNotification("Visualizer: ON", colors.accent, "📊")
     else
-        visualizerBtn.TextColor3 = colors.textSecondary
         stopVisualizer()
         showNotification("Visualizer: OFF", colors.textSecondary, "📊")
     end
-end
-
-local function switchTheme()
-    currentTheme = currentTheme == "dark" and "neon" or "dark"
-    colors = themes[currentTheme]
-    
-    -- Update all UI colors (simplified - would need full implementation)
-    mainFrame.BackgroundColor3 = colors.primary
-    nowPlayingFrame.BackgroundColor3 = colors.secondary
-    
-    showNotification("Theme: " .. currentTheme:upper(), colors.accent, "🎨")
 end
 
 local function openRandomBox()
@@ -685,21 +895,14 @@ local function openRandomBox()
     spawn(function()
         for i = 1, 6 do
             wait(0.15)
-            if i % 2 == 0 then
-                mysteryIcon.Text = "📦"
-                mysteryIcon.Rotation = 15
-            else
-                mysteryIcon.Text = "🎁"
-                mysteryIcon.Rotation = -15
-            end
+            mysteryIcon.Text = i % 2 == 0 and "📦" or "🎁"
+            mysteryIcon.Rotation = i % 2 == 0 and 15 or -15
         end
         
         mysteryIcon.Rotation = 0
         mysteryIcon.Text = "✨"
         
         local randomSong = musicLibrary[math.random(1, #musicLibrary)]
-        currentRandomSong = randomSong
-        
         wait(0.5)
         playMusic(randomSong)
         
@@ -779,9 +982,7 @@ local function createMusicItem(musicData, parent, showRemove)
     playBtnCorner.CornerRadius = UDim.new(0, 8)
     playBtnCorner.Parent = playBtn
     
-    playBtn.MouseButton1Click:Connect(function()
-        playMusic(musicData)
-    end)
+    playBtn.MouseButton1Click:Connect(function() playMusic(musicData) end)
     
     if showRemove then
         local removeBtn = Instance.new("TextButton")
@@ -808,18 +1009,17 @@ local function createMusicItem(musicData, parent, showRemove)
             end
             itemFrame:Destroy()
             updatePlaylistTab()
-            showNotification("Removed from playlist", colors.danger, "🗑️")
+            showNotification("Removed", colors.danger, "🗑️")
         end)
     end
     
     local originalColor = itemFrame.BackgroundColor3
     itemFrame.MouseEnter:Connect(function()
-        local newColor = Color3.fromRGB(
+        TweenService:Create(itemFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(
             math.min(255, originalColor.R * 255 * 1.4),
             math.min(255, originalColor.G * 255 * 1.4),
             math.min(255, originalColor.B * 255 * 1.4)
-        )
-        TweenService:Create(itemFrame, TweenInfo.new(0.2), {BackgroundColor3 = newColor}):Play()
+        )}):Play()
     end)
     
     itemFrame.MouseLeave:Connect(function()
@@ -831,9 +1031,7 @@ end
 
 function updateLibraryTab()
     for _, child in pairs(libraryScroll:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
+        if child:IsA("Frame") then child:Destroy() end
     end
     
     for _, musicData in ipairs(filteredMusic) do
@@ -845,16 +1043,14 @@ end
 
 function updateHistoryTab()
     for _, child in pairs(historyScroll:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
+        if child:IsA("Frame") then child:Destroy() end
     end
     
     if #userData.history == 0 then
         local emptyLabel = Instance.new("TextLabel")
         emptyLabel.Size = UDim2.new(1, 0, 0, 100)
         emptyLabel.BackgroundTransparency = 1
-        emptyLabel.Text = "📜\n\nNo History Yet\n\nPlay music to see history here"
+        emptyLabel.Text = "📜\n\nNo History\n\nPlay music to see here"
         emptyLabel.TextColor3 = colors.textSecondary
         emptyLabel.TextSize = 14
         emptyLabel.Font = Enum.Font.Gotham
@@ -870,16 +1066,14 @@ end
 
 function updatePlaylistTab()
     for _, child in pairs(playlistScroll:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
+        if child:IsA("Frame") then child:Destroy() end
     end
     
     if #userData.playlist == 0 then
         local emptyLabel = Instance.new("TextLabel")
         emptyLabel.Size = UDim2.new(1, 0, 0, 100)
         emptyLabel.BackgroundTransparency = 1
-        emptyLabel.Text = "⭐\n\nPlaylist Empty\n\nAdd songs to your playlist!"
+        emptyLabel.Text = "⭐\n\nPlaylist Empty\n\nAdd songs!"
         emptyLabel.TextColor3 = colors.textSecondary
         emptyLabel.TextSize = 14
         emptyLabel.Font = Enum.Font.Gotham
@@ -917,25 +1111,14 @@ local function switchTab(tabIndex)
         button.BackgroundColor3 = i == tabIndex and colors.accent or colors.secondary
     end
     
-    manualTab.Visible = false
-    libraryTab.Visible = false
-    randomTab.Visible = false
-    historyTab.Visible = false
-    playlistTab.Visible = false
+    manualTab.Visible = tabIndex == 1
+    libraryTab.Visible = tabIndex == 2
+    randomTab.Visible = tabIndex == 3
+    historyTab.Visible = tabIndex == 4
+    playlistTab.Visible = tabIndex == 5
     
-    if tabIndex == 1 then
-        manualTab.Visible = true
-    elseif tabIndex == 2 then
-        libraryTab.Visible = true
-    elseif tabIndex == 3 then
-        randomTab.Visible = true
-    elseif tabIndex == 4 then
-        historyTab.Visible = true
-        updateHistoryTab()
-    elseif tabIndex == 5 then
-        playlistTab.Visible = true
-        updatePlaylistTab()
-    end
+    if tabIndex == 4 then updateHistoryTab()
+    elseif tabIndex == 5 then updatePlaylistTab() end
 end
 
 local function toggleMinimize()
@@ -951,17 +1134,13 @@ local function toggleMinimize()
     else
         mainFrame.Visible = true
         minimizedFrame.Visible = false
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Size = UDim2.new(0, 500, 0, 450)})
-        tween:Play()
+        TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Size = UDim2.new(0, 500, 0, 450)}):Play()
     end
 end
 
 local function closePlayer()
     if currentSound then
-        pcall(function()
-            currentSound:Stop()
-            currentSound:Destroy()
-        end)
+        pcall(function() currentSound:Stop() currentSound:Destroy() end)
     end
     stopVisualizer()
     screenGui:Destroy()
@@ -975,19 +1154,17 @@ updatePlaylistTab()
 updateVolume(userData.volume)
 updateStats()
 
--- EVENT CONNECTIONS
+-- Events
 for i, button in ipairs(tabButtons) do
-    button.MouseButton1Click:Connect(function()
-        switchTab(i)
-    end)
+    button.MouseButton1Click:Connect(function() switchTab(i) end)
 end
 
 playManualBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
-        playMusic({name = "Custom ID: " .. id, id = id, category = "Manual"})
+        playMusic({name = "Custom: " .. id, id = id, category = "Manual"})
     else
-        showNotification("Please enter a music ID!", colors.danger, "⚠️")
+        showNotification("Enter ID!", colors.danger, "⚠️")
     end
 end)
 
@@ -996,375 +1173,131 @@ stopBtn.MouseButton1Click:Connect(stopMusic)
 addPlaylistBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
-        addToPlaylist({name = "Custom ID: " .. id, id = id, category = "Manual"})
+        addToPlaylist({name = "Custom: " .. id, id = id, category = "Manual"})
     else
-        showNotification("Please enter a music ID!", colors.danger, "⚠️")
+        showNotification("Enter ID!", colors.danger, "⚠️")
     end
 end)
 
 idInput.FocusLost:Connect(function(enterPressed)
     if enterPressed then
         local id = idInput.Text:gsub("%s+", "")
-        if id ~= "" then
-            playMusic({name = "Custom ID: " .. id, id = id, category = "Manual"})
-        end
+        if id ~= "" then playMusic({name = "Custom: " .. id, id = id, category = "Manual"}) end
     end
 end)
 
-openBoxBtn.MouseButton1Click:Connect(openRandomBox)"
-categoryLabel.TextColor3 = colors.textSecondary
-categoryLabel.TextSize = 11
-categoryLabel.Font = Enum.Font.Gotham
-categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
-categoryLabel.Parent = nowPlayingFrame
+openBoxBtn.MouseButton1Click:Connect(openRandomBox)
+searchBox.Changed:Connect(function() filterMusic(searchBox.Text) end)
 
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -320, 0, 16)
-statusLabel.Position = UDim2.new(0, 85, 0, 50)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Volume: 5 | Ready"
-statusLabel.TextColor3 = colors.textSecondary
-statusLabel.TextSize = 10
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.Parent = nowPlayingFrame
+volumeSlider.FocusLost:Connect(function()
+    local volume = tonumber(volumeSlider.Text)
+    if volume then updateVolume(volume)
+    else volumeSlider.Text = tostring(userData.volume) showNotification("Volume 0-10!", colors.danger, "⚠️") end
+end)
 
--- Playback Controls (Right side)
-local controlsFrame = Instance.new("Frame")
-controlsFrame.Size = UDim2.new(0, 200, 0, 70)
-controlsFrame.Position = UDim2.new(1, -210, 0, 10)
-controlsFrame.BackgroundTransparency = 1
-controlsFrame.Parent = nowPlayingFrame
+volumeSlider.Changed:Connect(function()
+    if volumeSlider.Text == "+" then updateVolume(userData.volume + 1)
+    elseif volumeSlider.Text == "-" then updateVolume(userData.volume - 1) end
+end)
 
--- Volume Control
-local volumeLabel = Instance.new("TextLabel")
-volumeLabel.Size = UDim2.new(0, 50, 0, 18)
-volumeLabel.Position = UDim2.new(0, 5, 0, 2)
-volumeLabel.BackgroundTransparency = 1
-volumeLabel.Text = "🔊 Vol:"
-volumeLabel.TextColor3 = colors.text
-volumeLabel.TextSize = 11
-volumeLabel.Font = Enum.Font.GothamBold
-volumeLabel.TextXAlignment = Enum.TextXAlignment.Left
-volumeLabel.Parent = controlsFrame
+repeatBtn.MouseButton1Click:Connect(cycleRepeatMode)
+shuffleBtn.MouseButton1Click:Connect(toggleShuffle)
+visualizerBtn.MouseButton1Click:Connect(toggleVisualizer)
+minimizeBtn.MouseButton1Click:Connect(toggleMinimize)
+restoreBtn.MouseButton1Click:Connect(toggleMinimize)
+closeBtn.MouseButton1Click:Connect(closePlayer)
+minCloseBtn.MouseButton1Click:Connect(closePlayer)
 
-local volumeSlider = Instance.new("TextBox")
-volumeSlider.Size = UDim2.new(0, 50, 0, 22)
-volumeSlider.Position = UDim2.new(0, 55, 0, 0)
-volumeSlider.BackgroundColor3 = colors.primary
-volumeSlider.BorderSizePixel = 1
-volumeSlider.BorderColor3 = colors.accent
-volumeSlider.Text = "5"
-volumeSlider.TextColor3 = colors.text
-volumeSlider.TextSize = 12
-volumeSlider.Font = Enum.Font.GothamBold
-volumeSlider.Parent = controlsFrame
+playAllBtn.MouseButton1Click:Connect(function()
+    if #userData.playlist > 0 then
+        userData.repeatMode = "all"
+        repeatBtn.Text = "🔁"
+        repeatBtn.TextColor3 = colors.accent
+        playMusic(userData.playlist[1])
+        showNotification("Playing all!", colors.success, "▶️")
+    else
+        showNotification("Playlist empty!", colors.danger, "⚠️")
+    end
+end)
 
-local volumeCorner = Instance.new("UICorner")
-volumeCorner.CornerRadius = UDim.new(0, 6)
-volumeCorner.Parent = volumeSlider
+clearPlaylistBtn.MouseButton1Click:Connect(function()
+    if #userData.playlist > 0 then
+        userData.playlist = {}
+        updatePlaylistTab()
+        showNotification("Cleared!", colors.danger, "🗑️")
+    end
+end)
 
--- Mode Buttons
-local repeatBtn = Instance.new("TextButton")
-repeatBtn.Size = UDim2.new(0, 35, 0, 25)
-repeatBtn.Position = UDim2.new(0, 5, 0, 28)
-repeatBtn.BackgroundColor3 = colors.primary
-repeatBtn.BorderSizePixel = 0
-repeatBtn.Text = "🔄"
-repeatBtn.TextColor3 = colors.textSecondary
-repeatBtn.TextSize = 14
-repeatBtn.Font = Enum.Font.Gotham
-repeatBtn.Parent = controlsFrame
-
-local repeatCorner = Instance.new("UICorner")
-repeatCorner.CornerRadius = UDim.new(0, 6)
-repeatCorner.Parent = repeatBtn
-
-local shuffleBtn = Instance.new("TextButton")
-shuffleBtn.Size = UDim2.new(0, 35, 0, 25)
-shuffleBtn.Position = UDim2.new(0, 45, 0, 28)
-shuffleBtn.BackgroundColor3 = colors.primary
-shuffleBtn.BorderSizePixel = 0
-shuffleBtn.Text = "🔀"
-shuffleBtn.TextColor3 = colors.textSecondary
-shuffleBtn.TextSize = 14
-shuffleBtn.Font = Enum.Font.Gotham
-shuffleBtn.Parent = controlsFrame
-
-local shuffleCorner = Instance.new("UICorner")
-shuffleCorner.CornerRadius = UDim.new(0, 6)
-shuffleCorner.Parent = shuffleBtn
-
-local visualizerBtn = Instance.new("TextButton")
-visualizerBtn.Size = UDim2.new(0, 35, 0, 25)
-visualizerBtn.Position = UDim2.new(0, 85, 0, 28)
-visualizerBtn.BackgroundColor3 = colors.primary
-visualizerBtn.BorderSizePixel = 0
-visualizerBtn.Text = "📊"
-visualizerBtn.TextColor3 = colors.accent
-visualizerBtn.TextSize = 14
-visualizerBtn.Font = Enum.Font.Gotham
-visualizerBtn.Parent = controlsFrame
-
-local visualizerBtnCorner = Instance.new("UICorner")
-visualizerBtnCorner.CornerRadius = UDim.new(0, 6)
-visualizerBtnCorner.Parent = visualizerBtn
-
--- Quick Actions
-local quickLabel = Instance.new("TextLabel")
-quickLabel.Size = UDim2.new(1, 0, 0, 12)
-quickLabel.Position = UDim2.new(0, 5, 0, 56)
-quickLabel.BackgroundTransparency = 1
-quickLabel.Text = "Quick Actions"
-quickLabel.TextColor3 = colors.textSecondary
-quickLabel.TextSize = 9
-quickLabel.Font = Enum.Font.Gotham
-quickLabel.TextXAlignment = Enum.TextXAlignment.Left
-quickLabel.Parent = controlsFrame
-
--- Tab Navigation
-local tabFrame = Instance.new("Frame")
-tabFrame.Size = UDim2.new(1, -30, 0, 45)
-tabFrame.Position = UDim2.new(0, 15, 0, 165)
-tabFrame.BackgroundTransparency = 1
-tabFrame.Parent = mainFrame
-
--- Tab Buttons
-local tabButtons = {}
-local tabNames = {"🆔 Manual", "📋 Library", "🎲 Random", "📜 History", "⭐ Playlist"}
-
-for i, tabName in ipairs(tabNames) do
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(0.2, -4, 1, 0)
-    tabBtn.Position = UDim2.new((i-1) * 0.2, (i-1) * 4, 0, 0)
-    tabBtn.BackgroundColor3 = i == 1 and colors.accent or colors.secondary
-    tabBtn.BorderSizePixel = 0
-    tabBtn.Text = tabName
-    tabBtn.TextColor3 = colors.text
-    tabBtn.TextSize = 11
-    tabBtn.Font = Enum.Font.GothamBold
-    tabBtn.TextScaled = true
-    tabBtn.Parent = tabFrame
-    
-    local tabCorner = Instance.new("UICorner")
-    tabCorner.CornerRadius = UDim.new(0, 8)
-    tabCorner.Parent = tabBtn
-    
-    tabButtons[i] = tabBtn
+-- Hover effects
+local function addHoverEffect(button)
+    local originalColor = button.BackgroundColor3
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(
+            math.min(255, originalColor.R * 255 * 1.2),
+            math.min(255, originalColor.G * 255 * 1.2),
+            math.min(255, originalColor.B * 255 * 1.2)
+        )}):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+    end)
 end
 
--- Content Area
-local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, -30, 1, -220)
-contentFrame.Position = UDim2.new(0, 15, 0, 215)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = mainFrame
+addHoverEffect(playManualBtn)
+addHoverEffect(stopBtn)
+addHoverEffect(addPlaylistBtn)
+addHoverEffect(openBoxBtn)
+addHoverEffect(playAllBtn)
+addHoverEffect(clearPlaylistBtn)
 
--- TAB 1: Manual Input
-local manualTab = Instance.new("Frame")
-manualTab.Size = UDim2.new(1, 0, 1, 0)
-manualTab.BackgroundTransparency = 1
-manualTab.Visible = true
-manualTab.Parent = contentFrame
+-- Draggable
+local dragging, dragStart, startPos = false, nil, nil
 
-local manualTitle = Instance.new("TextLabel")
-manualTitle.Size = UDim2.new(1, 0, 0, 25)
-manualTitle.Position = UDim2.new(0, 5, 0, 5)
-manualTitle.BackgroundTransparency = 1
-manualTitle.Text = "🎵 Manual Input - Enter Music ID"
-manualTitle.TextColor3 = colors.text
-manualTitle.TextSize = 14
-manualTitle.Font = Enum.Font.GothamBold
-manualTitle.TextXAlignment = Enum.TextXAlignment.Left
-manualTitle.Parent = manualTab
+headerFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
 
-local idInput = Instance.new("TextBox")
-idInput.Size = UDim2.new(1, -10, 0, 45)
-idInput.Position = UDim2.new(0, 5, 0, 35)
-idInput.BackgroundColor3 = colors.secondary
-idInput.BorderSizePixel = 1
-idInput.BorderColor3 = colors.accent
-idInput.PlaceholderText = "Enter Roblox Music ID..."
-idInput.Text = ""
-idInput.TextColor3 = colors.text
-idInput.TextSize = 14
-idInput.Font = Enum.Font.Gotham
-idInput.Parent = manualTab
+headerFrame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
-local idInputCorner = Instance.new("UICorner")
-idInputCorner.CornerRadius = UDim.new(0, 10)
-idInputCorner.Parent = idInput
+headerFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
 
--- Manual Controls
-local manualControlFrame = Instance.new("Frame")
-manualControlFrame.Size = UDim2.new(1, -10, 0, 45)
-manualControlFrame.Position = UDim2.new(0, 5, 0, 90)
-manualControlFrame.BackgroundTransparency = 1
-manualControlFrame.Parent = manualTab
+minimizedFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = minimizedFrame.Position
+    end
+end)
 
-local playManualBtn = Instance.new("TextButton")
-playManualBtn.Size = UDim2.new(0.32, 0, 1, 0)
-playManualBtn.Position = UDim2.new(0, 0, 0, 0)
-playManualBtn.BackgroundColor3 = colors.success
-playManualBtn.BorderSizePixel = 0
-playManualBtn.Text = "▶️ PLAY"
-playManualBtn.TextColor3 = colors.text
-playManualBtn.TextSize = 14
-playManualBtn.Font = Enum.Font.GothamBold
-playManualBtn.Parent = manualControlFrame
+minimizedFrame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        minimizedFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
-local playManualCorner = Instance.new("UICorner")
-playManualCorner.CornerRadius = UDim.new(0, 8)
-playManualCorner.Parent = playManualBtn
+minimizedFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
 
-local stopBtn = Instance.new("TextButton")
-stopBtn.Size = UDim2.new(0.32, 0, 1, 0)
-stopBtn.Position = UDim2.new(0.34, 0, 0, 0)
-stopBtn.BackgroundColor3 = colors.danger
-stopBtn.BorderSizePixel = 0
-stopBtn.Text = "⏹️ STOP"
-stopBtn.TextColor3 = colors.text
-stopBtn.TextSize = 14
-stopBtn.Font = Enum.Font.GothamBold
-stopBtn.Parent = manualControlFrame
+-- Welcome
+wait(1)
+showNotification("🎉 Music Player 3.0 Ready!", colors.accent, "🎵")
 
-local stopBtnCorner = Instance.new("UICorner")
-stopBtnCorner.CornerRadius = UDim.new(0, 8)
-stopBtnCorner.Parent = stopBtn
-
-local addPlaylistBtn = Instance.new("TextButton")
-addPlaylistBtn.Size = UDim2.new(0.32, 0, 1, 0)
-addPlaylistBtn.Position = UDim2.new(0.68, 0, 0, 0)
-addPlaylistBtn.BackgroundColor3 = colors.warning
-addPlaylistBtn.BorderSizePixel = 0
-addPlaylistBtn.Text = "⭐ ADD"
-addPlaylistBtn.TextColor3 = colors.text
-addPlaylistBtn.TextSize = 14
-addPlaylistBtn.Font = Enum.Font.GothamBold
-addPlaylistBtn.Parent = manualControlFrame
-
-local addPlaylistCorner = Instance.new("UICorner")
-addPlaylistCorner.CornerRadius = UDim.new(0, 8)
-addPlaylistCorner.Parent = addPlaylistBtn
-
--- TAB 2: Library
-local libraryTab = Instance.new("Frame")
-libraryTab.Size = UDim2.new(1, 0, 1, 0)
-libraryTab.BackgroundTransparency = 1
-libraryTab.Visible = false
-libraryTab.Parent = contentFrame
-
-local searchBox = Instance.new("TextBox")
-searchBox.Size = UDim2.new(1, -10, 0, 35)
-searchBox.Position = UDim2.new(0, 5, 0, 5)
-searchBox.BackgroundColor3 = colors.secondary
-searchBox.BorderSizePixel = 1
-searchBox.BorderColor3 = colors.accent
-searchBox.PlaceholderText = "🔍 Search songs..."
-searchBox.Text = ""
-searchBox.TextColor3 = colors.text
-searchBox.TextSize = 12
-searchBox.Font = Enum.Font.Gotham
-searchBox.Parent = libraryTab
-
-local searchCorner = Instance.new("UICorner")
-searchCorner.CornerRadius = UDim.new(0, 8)
-searchCorner.Parent = searchBox
-
-local libraryScroll = Instance.new("ScrollingFrame")
-libraryScroll.Size = UDim2.new(1, -10, 1, -45)
-libraryScroll.Position = UDim2.new(0, 5, 0, 45)
-libraryScroll.BackgroundColor3 = colors.secondary
-libraryScroll.BorderSizePixel = 0
-libraryScroll.ScrollBarThickness = 6
-libraryScroll.ScrollBarImageColor3 = colors.accent
-libraryScroll.Parent = libraryTab
-
-local libraryScrollCorner = Instance.new("UICorner")
-libraryScrollCorner.CornerRadius = UDim.new(0, 8)
-libraryScrollCorner.Parent = libraryScroll
-
-local libraryLayout = Instance.new("UIListLayout")
-libraryLayout.SortOrder = Enum.SortOrder.LayoutOrder
-libraryLayout.Padding = UDim.new(0, 3)
-libraryLayout.Parent = libraryScroll
-
--- TAB 3: Random Box
-local randomTab = Instance.new("Frame")
-randomTab.Size = UDim2.new(1, 0, 1, 0)
-randomTab.BackgroundTransparency = 1
-randomTab.Visible = false
-randomTab.Parent = contentFrame
-
-local randomBoxFrame = Instance.new("Frame")
-randomBoxFrame.Size = UDim2.new(1, -20, 0, 110)
-randomBoxFrame.Position = UDim2.new(0, 10, 0, 10)
-randomBoxFrame.BackgroundColor3 = colors.secondary
-randomBoxFrame.BorderSizePixel = 2
-randomBoxFrame.BorderColor3 = colors.accent
-randomBoxFrame.Parent = randomTab
-
-local randomBoxCorner = Instance.new("UICorner")
-randomBoxCorner.CornerRadius = UDim2.new(0, 12)
-randomBoxCorner.Parent = randomBoxFrame
-
-local mysteryIcon = Instance.new("TextLabel")
-mysteryIcon.Size = UDim2.new(0, 70, 0, 70)
-mysteryIcon.Position = UDim2.new(0, 20, 0, 20)
-mysteryIcon.BackgroundTransparency = 1
-mysteryIcon.Text = "🎁"
-mysteryIcon.TextColor3 = colors.accent
-mysteryIcon.TextSize = 45
-mysteryIcon.Font = Enum.Font.GothamBold
-mysteryIcon.Parent = randomBoxFrame
-
-local randomTitle = Instance.new("TextLabel")
-randomTitle.Size = UDim2.new(1, -110, 0, 28)
-randomTitle.Position = UDim2.new(0, 100, 0, 15)
-randomTitle.BackgroundTransparency = 1
-randomTitle.Text = "🎲 MYSTERY MUSIC BOX"
-randomTitle.TextColor3 = colors.text
-randomTitle.TextSize = 16
-randomTitle.Font = Enum.Font.GothamBold
-randomTitle.TextXAlignment = Enum.TextXAlignment.Left
-randomTitle.Parent = randomBoxFrame
-
-local randomDesc = Instance.new("TextLabel")
-randomDesc.Size = UDim2.new(1, -110, 0, 40)
-randomDesc.Position = UDim2.new(0, 100, 0, 43)
-randomDesc.BackgroundTransparency = 1
-randomDesc.Text = "Open the mystery box to discover\na random song and play instantly!"
-randomDesc.TextColor3 = colors.textSecondary
-randomDesc.TextSize = 11
-randomDesc.Font = Enum.Font.Gotham
-randomDesc.TextXAlignment = Enum.TextXAlignment.Left
-randomDesc.TextWrapped = true
-randomDesc.Parent = randomBoxFrame
-
-local openBoxBtn = Instance.new("TextButton")
-openBoxBtn.Size = UDim2.new(1, -40, 0, 50)
-openBoxBtn.Position = UDim2.new(0, 20, 0, 130)
-openBoxBtn.BackgroundColor3 = colors.accent
-openBoxBtn.BorderSizePixel = 0
-openBoxBtn.Text = "🎁 OPEN MYSTERY BOX 🎁"
-openBoxBtn.TextColor3 = colors.text
-openBoxBtn.TextSize = 16
-openBoxBtn.Font = Enum.Font.GothamBold
-openBoxBtn.Parent = randomTab
-
-local openBoxCorner = Instance.new("UICorner")
-openBoxCorner.CornerRadius = UDim.new(0, 10)
-openBoxCorner.Parent = openBoxBtn
-
--- TAB 4: History
-local historyTab = Instance.new("Frame")
-historyTab.Size = UDim2.new(1, 0, 1, 0)
-historyTab.BackgroundTransparency = 1
-historyTab.Visible = false
-historyTab.Parent = contentFrame
-
-local historyScroll = Instance.new("ScrollingFrame")
-historyScroll.Size = UDim2.new(1, -10, 1, -10)
-historyScroll.Position = UDim2.new(0, 5, 0, 5)
-historyScroll.BackgroundColor3 = colors.secondary
-historyScroll.BorderSizePixel =
+print("═══════════════════════════════════")
+print("🎵 MUSIC PLAYER 3.0 LOADED! 🎵")
+print("═══════════════════════════════════")
+print("✨ Visualizer | ⭐ Playlist | 🎲 Random")
+print("🔀 Shuffle | 🔄 Repeat | 📊 Stats")
+print("🎵 Enjoy your music! 🎵")
