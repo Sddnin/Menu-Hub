@@ -1,5 +1,5 @@
 -- 🎵 MUSIC PLAYER 3.0 - ULTIMATE EDITION - FULL CODE
--- Tạo bởi Claude | Version 3.0 Complete
+-- Tạo bởi Mila | Version 3.0 Complete
 -- ✨ Features: Visualizer, Playlist, Themes, Stats, 5 Tabs
 
 local Players = game:GetService("Players")
