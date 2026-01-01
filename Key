@@ -81,7 +81,7 @@ local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 20, 0, 20)
 closeBtn.Position = UDim2.new(1, -25, 0, 5)
 closeBtn.BackgroundColor3 = Color3.new(0.9, 0.4, 0.4)
-closeBtn.Text = "❌"
+closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.TextSize = 12
 closeBtn.Font = Enum.Font.GothamBold
@@ -90,6 +90,10 @@ closeBtn.Parent = innerFrame
 local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(1, 0)
 closeBtnCorner.Parent = closeBtn
+
+-- Top bar (removed)
+-- Logo (removed)
+-- Close buttons (removed)
 
 -- Toggle Button (when minimized)
 local toggleButton = Instance.new("TextButton")
@@ -152,7 +156,7 @@ homeContent.ScrollBarThickness = 4
 homeContent.CanvasSize = UDim2.new(0, 0, 0, 250)
 homeContent.Parent = contentArea
 
--- Script Tab Content
+-- Other Tab Contents (placeholder)
 local scriptContent = Instance.new("ScrollingFrame")
 scriptContent.Name = "ScriptContent"
 scriptContent.Size = UDim2.new(1, 0, 1, 0)
@@ -280,6 +284,7 @@ local musicCorner = Instance.new("UICorner")
 musicCorner.CornerRadius = UDim.new(0, 8)
 musicCorner.Parent = musicFrame
 
+-- Music Icon and Title
 local musicIcon = Instance.new("TextLabel")
 musicIcon.Size = UDim2.new(0, 30, 0, 30)
 musicIcon.Position = UDim2.new(0, 10, 0, 10)
@@ -312,6 +317,7 @@ musicDesc.Font = Enum.Font.Gotham
 musicDesc.TextXAlignment = Enum.TextXAlignment.Left
 musicDesc.Parent = musicFrame
 
+-- Music Button
 local musicButton = Instance.new("TextButton")
 musicButton.Size = UDim2.new(0, 100, 0, 25)
 musicButton.Position = UDim2.new(0, 45, 0, 50)
@@ -326,6 +332,26 @@ local musicBtnCorner = Instance.new("UICorner")
 musicBtnCorner.CornerRadius = UDim.new(0, 5)
 musicBtnCorner.Parent = musicButton
 
+-- Music Button Events
+musicButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Music Player")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))()
+    end)
+end)
+
+-- Music Button Hover Effects
+musicButton.MouseEnter:Connect(function()
+    musicButton.BackgroundColor3 = Color3.new(0.5, 0.3, 0.7)
+end)
+
+musicButton.MouseLeave:Connect(function()
+    musicButton.BackgroundColor3 = Color3.new(0.6, 0.4, 0.8)
+end)
+
 -- Graphics Feature
 local graphicsFrame = Instance.new("Frame")
 graphicsFrame.Size = UDim2.new(1, -10, 0, 80)
@@ -338,6 +364,7 @@ local graphicsCorner = Instance.new("UICorner")
 graphicsCorner.CornerRadius = UDim.new(0, 8)
 graphicsCorner.Parent = graphicsFrame
 
+-- Graphics Icon and Title
 local graphicsIcon = Instance.new("TextLabel")
 graphicsIcon.Size = UDim2.new(0, 30, 0, 30)
 graphicsIcon.Position = UDim2.new(0, 10, 0, 10)
@@ -370,6 +397,7 @@ graphicsDesc.Font = Enum.Font.Gotham
 graphicsDesc.TextXAlignment = Enum.TextXAlignment.Left
 graphicsDesc.Parent = graphicsFrame
 
+-- Graphics Button
 local graphicsButton = Instance.new("TextButton")
 graphicsButton.Size = UDim2.new(0, 100, 0, 25)
 graphicsButton.Position = UDim2.new(0, 45, 0, 50)
@@ -384,6 +412,26 @@ local graphicsBtnCorner = Instance.new("UICorner")
 graphicsBtnCorner.CornerRadius = UDim.new(0, 5)
 graphicsBtnCorner.Parent = graphicsButton
 
+-- Graphics Button Events
+graphicsButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Graphics Settings")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))()
+    end)
+end)
+
+-- Graphics Button Hover Effects
+graphicsButton.MouseEnter:Connect(function()
+    graphicsButton.BackgroundColor3 = Color3.new(0.3, 0.5, 0.9)
+end)
+
+graphicsButton.MouseLeave:Connect(function()
+    graphicsButton.BackgroundColor3 = Color3.new(0.4, 0.6, 1)
+end)
+
 -- Paint-Alpha Feature
 local paintFrame = Instance.new("Frame")
 paintFrame.Size = UDim2.new(1, -10, 0, 80)
@@ -396,6 +444,7 @@ local paintCorner = Instance.new("UICorner")
 paintCorner.CornerRadius = UDim.new(0, 8)
 paintCorner.Parent = paintFrame
 
+-- Paint Icon and Title
 local paintIcon = Instance.new("TextLabel")
 paintIcon.Size = UDim2.new(0, 30, 0, 30)
 paintIcon.Position = UDim2.new(0, 10, 0, 10)
@@ -428,6 +477,7 @@ paintDesc.Font = Enum.Font.Gotham
 paintDesc.TextXAlignment = Enum.TextXAlignment.Left
 paintDesc.Parent = paintFrame
 
+-- Paint Button
 local paintButton = Instance.new("TextButton")
 paintButton.Size = UDim2.new(0, 100, 0, 25)
 paintButton.Position = UDim2.new(0, 45, 0, 50)
@@ -442,6 +492,26 @@ local paintBtnCorner = Instance.new("UICorner")
 paintBtnCorner.CornerRadius = UDim.new(0, 5)
 paintBtnCorner.Parent = paintButton
 
+-- Paint Button Events
+paintButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Paint-Alpha")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))()
+    end)
+end)
+
+-- Paint Button Hover Effects
+paintButton.MouseEnter:Connect(function()
+    paintButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.5)
+end)
+
+paintButton.MouseLeave:Connect(function()
+    paintButton.BackgroundColor3 = Color3.new(0.9, 0.3, 0.6)
+end)
+
 -- Client Feature
 local clientFrame = Instance.new("Frame")
 clientFrame.Size = UDim2.new(1, -10, 0, 80)
@@ -454,6 +524,7 @@ local clientCorner = Instance.new("UICorner")
 clientCorner.CornerRadius = UDim.new(0, 8)
 clientCorner.Parent = clientFrame
 
+-- Client Icon and Title
 local clientIcon = Instance.new("TextLabel")
 clientIcon.Size = UDim2.new(0, 30, 0, 30)
 clientIcon.Position = UDim2.new(0, 10, 0, 10)
@@ -486,6 +557,7 @@ clientDesc.Font = Enum.Font.Gotham
 clientDesc.TextXAlignment = Enum.TextXAlignment.Left
 clientDesc.Parent = clientFrame
 
+-- Client Button
 local clientButton = Instance.new("TextButton")
 clientButton.Size = UDim2.new(0, 100, 0, 25)
 clientButton.Position = UDim2.new(0, 45, 0, 50)
@@ -500,48 +572,73 @@ local clientBtnCorner = Instance.new("UICorner")
 clientBtnCorner.CornerRadius = UDim.new(0, 5)
 clientBtnCorner.Parent = clientButton
 
--- Player List
+-- Client Button Events
+clientButton.MouseButton1Click:Connect(function()
+    spawn(function()
+        showLoadingAnimation("Client Settings")
+    end)
+    
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Cilent"))()
+    end)
+end)
+
+-- Client Button Hover Effects
+clientButton.MouseEnter:Connect(function()
+    clientButton.BackgroundColor3 = Color3.new(0.2, 0.7, 0.2)
+end)
+
+clientButton.MouseLeave:Connect(function()
+    clientButton.BackgroundColor3 = Color3.new(0.3, 0.8, 0.3)
+end)
+
+-- Coming Soon Feature (moved down)
+local comingSoonFrame = Instance.new("Frame")
+comingSoonFrame.Size = UDim2.new(1, -10, 0, 60)
+comingSoonFrame.Position = UDim2.new(0, 5, 0, 400)
+comingSoonFrame.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
+comingSoonFrame.BorderSizePixel = 0
+comingSoonFrame.Parent = otherContent
+
+local comingSoonCorner = Instance.new("UICorner")
+comingSoonCorner.CornerRadius = UDim.new(0, 8)
+comingSoonCorner.Parent = comingSoonFrame
+
+local comingSoonText = Instance.new("TextLabel")
+comingSoonText.Size = UDim2.new(1, 0, 1, 0)
+comingSoonText.BackgroundTransparency = 1
+comingSoonText.Text = "🚀 More features coming soon..."
+comingSoonText.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+comingSoonText.TextSize = 12
+comingSoonText.Font = Enum.Font.Gotham
+comingSoonText.Parent = comingSoonFrame
+
+-- Player List (small, integrated)
 local playerFrame = Instance.new("Frame")
 playerFrame.Name = "PlayerFrame"
-playerFrame.Size = UDim2.new(0, 160, 0, 200)
+playerFrame.Size = UDim2.new(0, 180, 0, 200)
 playerFrame.Position = UDim2.new(1, 10, 0, 0)
-playerFrame.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
+playerFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
 playerFrame.BorderSizePixel = 0
 playerFrame.Visible = false
-playerFrame.Parent = innerFrame
+playerFrame.Parent = mainFrame
 
 local playerFrameCorner = Instance.new("UICorner")
 playerFrameCorner.CornerRadius = UDim.new(0, 10)
 playerFrameCorner.Parent = playerFrame
 
 local playerTitle = Instance.new("TextLabel")
-playerTitle.Size = UDim2.new(1, 0, 0, 20)
+playerTitle.Size = UDim2.new(1, 0, 0, 25)
 playerTitle.BackgroundTransparency = 1
 playerTitle.Text = "👥 Players"
 playerTitle.TextColor3 = Color3.new(0.3, 0.3, 0.3)
-playerTitle.TextSize = 11
+playerTitle.TextSize = 12
 playerTitle.Font = Enum.Font.GothamBold
 playerTitle.Parent = playerFrame
 
--- Player Search Box
-local playerSearchBox = Instance.new("TextBox")
-playerSearchBox.Size = UDim2.new(1, -10, 0, 20)
-playerSearchBox.Position = UDim2.new(0, 5, 0, 25)
-playerSearchBox.BackgroundColor3 = Color3.new(1, 1, 1)
-playerSearchBox.Text = ""
-playerSearchBox.PlaceholderText = "🔍 Search players..."
-playerSearchBox.TextColor3 = Color3.new(0, 0, 0)
-playerSearchBox.TextSize = 9
-playerSearchBox.Font = Enum.Font.Gotham
-playerSearchBox.Parent = playerFrame
-
-local playerSearchCorner = Instance.new("UICorner")
-playerSearchCorner.CornerRadius = UDim.new(0, 3)
-playerSearchCorner.Parent = playerSearchBox
-
 local playerList = Instance.new("ScrollingFrame")
-playerList.Size = UDim2.new(1, -10, 1, -50)
-playerList.Position = UDim2.new(0, 5, 0, 50)
+playerList.Size = UDim2.new(1, -10, 1, -30)
+playerList.Position = UDim2.new(0, 5, 0, 25)
 playerList.BackgroundColor3 = Color3.new(1, 1, 1)
 playerList.ScrollBarThickness = 3
 playerList.Parent = playerFrame
@@ -560,7 +657,7 @@ local function createButton(name, text, position, callback, parent)
     
     local button = Instance.new("TextButton")
     button.Name = name
-    button.Size = UDim2.new(0, 95, 0, 25)
+    button.Size = UDim2.new(0, 100, 0, 25)
     button.Position = position
     button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
     button.Text = text
@@ -646,6 +743,585 @@ local function showLoadingAnimation(scriptName)
     spinConnection = RunService.Heartbeat:Connect(function()
         if not loadingFrame.Visible then
             spinConnection:Disconnect()
+            return
+        end
+        loadingSpinner.Rotation = loadingSpinner.Rotation + 5
+    end)
+    
+    wait(2)
+    TweenService:Create(loadingFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+    wait(0.3)
+    loadingFrame.Visible = false
+    if spinConnection then
+        spinConnection:Disconnect()
+    end
+end
+
+local function createScriptButton(scriptData, position)
+    local scriptFrame = Instance.new("Frame")
+    scriptFrame.Size = UDim2.new(0, 165, 0, 60)
+    scriptFrame.Position = position
+    scriptFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+    scriptFrame.BackgroundTransparency = 0.3
+    scriptFrame.BorderSizePixel = 0
+    scriptFrame.Parent = scriptsContainer
+    
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 12)
+    frameCorner.Parent = scriptFrame
+    
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, -10, 0, 25)
+    nameLabel.Position = UDim2.new(0, 5, 0, 5)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = scriptData.name
+    nameLabel.TextColor3 = Color3.new(1, 1, 1)
+    nameLabel.TextSize = 11
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = scriptFrame
+    
+    local executeBtn = Instance.new("TextButton")
+    executeBtn.Size = UDim2.new(0, 120, 0, 25)
+    executeBtn.Position = UDim2.new(0, 22, 0, 30)
+    executeBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    executeBtn.BackgroundTransparency = 0.2
+    executeBtn.Text = "▶ Execute"
+    executeBtn.TextColor3 = Color3.new(1, 1, 1)
+    executeBtn.TextSize = 11
+    executeBtn.Font = Enum.Font.GothamBold
+    executeBtn.Parent = scriptFrame
+    
+    local executeCorner = Instance.new("UICorner")
+    executeCorner.CornerRadius = UDim.new(0, 8)
+    executeCorner.Parent = executeBtn
+    
+    executeBtn.MouseButton1Click:Connect(function()
+        spawn(function()
+            showLoadingAnimation(scriptData.name)
+        end)
+        pcall(function()
+            loadstring(scriptData.code)()
+        end)
+    end)
+    
+    executeBtn.MouseEnter:Connect(function()
+        TweenService:Create(executeBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+    end)
+    
+    executeBtn.MouseLeave:Connect(function()
+        TweenService:Create(executeBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+    end)
+    
+    return scriptFrame
+end
+
+local function updateScriptList(searchTerm)
+    for _, child in pairs(scriptsContainer:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    searchTerm = searchTerm:lower()
+    local row, col = 0, 0
+    local totalHeight = 0
+    
+    for _, scriptData in ipairs(scriptsData) do
+        if searchTerm == "" or scriptData.name:lower():find(searchTerm) then
+            local position = UDim2.new(0, col * 175, 0, row * 65)
+            createScriptButton(scriptData, position)
+            
+            col = col + 1
+            if col >= 2 then
+                col = 0
+                row = row + 1
+            end
+            totalHeight = (row + 1) * 65
+        end
+    end
+    
+    scriptContent.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 50)
+end
+
+local function updatePlayerList(searchTerm)
+    searchTerm = searchTerm or ""
+    searchTerm = searchTerm:lower()
+    
+    for _, child in pairs(playerList:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    local visiblePlayers = 0
+    
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= player then
+            if searchTerm == "" or targetPlayer.Name:lower():find(searchTerm) then
+                local playerContainer = Instance.new("Frame")
+                playerContainer.Size = UDim2.new(1, 0, 0, 35)
+                playerContainer.BackgroundColor3 = Color3.new(1, 1, 1)
+                playerContainer.BackgroundTransparency = 0.6
+                playerContainer.Parent = playerList
+                
+                local containerCorner = Instance.new("UICorner")
+                containerCorner.CornerRadius = UDim.new(0, 6)
+                containerCorner.Parent = playerContainer
+                
+                local playerName = Instance.new("TextLabel")
+                playerName.Size = UDim2.new(1, 0, 0, 15)
+                playerName.Position = UDim2.new(0, 5, 0, 2)
+                playerName.BackgroundTransparency = 1
+                playerName.Text = targetPlayer.Name
+                playerName.TextSize = 9
+                playerName.Font = Enum.Font.Gotham
+                playerName.TextColor3 = Color3.new(1, 1, 1)
+                playerName.TextXAlignment = Enum.TextXAlignment.Left
+                playerName.Parent = playerContainer
+                
+                local tpBtn = Instance.new("TextButton")
+                tpBtn.Size = UDim2.new(0, 35, 0, 15)
+                tpBtn.Position = UDim2.new(0, 5, 0, 17)
+                tpBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+                tpBtn.BackgroundTransparency = 0.2
+                tpBtn.Text = "TP"
+                tpBtn.TextSize = 8
+                tpBtn.Font = Enum.Font.GothamBold
+                tpBtn.TextColor3 = Color3.new(1, 1, 1)
+                tpBtn.Parent = playerContainer
+                
+                local viewBtn = Instance.new("TextButton")
+                viewBtn.Size = UDim2.new(0, 35, 0, 15)
+                viewBtn.Position = UDim2.new(0, 45, 0, 17)
+                viewBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 100)
+                viewBtn.BackgroundTransparency = 0.2
+                viewBtn.Text = "View"
+                viewBtn.TextSize = 8
+                viewBtn.Font = Enum.Font.GothamBold
+                viewBtn.TextColor3 = Color3.new(1, 1, 1)
+                viewBtn.Parent = playerContainer
+                
+                local tpCorner = Instance.new("UICorner")
+                tpCorner.CornerRadius = UDim.new(0, 4)
+                tpCorner.Parent = tpBtn
+                
+                local viewCorner = Instance.new("UICorner")
+                viewCorner.CornerRadius = UDim.new(0, 4)
+                viewCorner.Parent = viewBtn
+                
+                tpBtn.MouseButton1Click:Connect(function()
+                    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+                    end
+                end)
+                
+                viewBtn.MouseButton1Click:Connect(function()
+                    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+                        workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
+                    end
+                end)
+                
+                visiblePlayers = visiblePlayers + 1
+            end
+        end
+    end
+    
+    playerList.CanvasSize = UDim2.new(0, 0, 0, visiblePlayers * 38)
+end
+
+local function switchTab(tabName)
+    currentTab = tabName
+    
+    for name, tabData in pairs(tabButtons) do
+        if name == tabName then
+            TweenService:Create(tabData.button, TweenInfo.new(0.3), {
+                BackgroundTransparency = 0.2,
+                TextColor3 = Color3.new(1, 1, 1)
+            }):Play()
+        else
+            TweenService:Create(tabData.button, TweenInfo.new(0.3), {
+                BackgroundTransparency = 0.5,
+                TextColor3 = Color3.new(0.7, 0.7, 0.7)
+            }):Play()
+        end
+    end
+    
+    homeContent.Visible = tabName == "Home"
+    scriptContent.Visible = tabName == "Script"
+    editorContent.Visible = tabName == "Editor"
+    otherContent.Visible = tabName == "Other"
+end
+
+local function toggleNoclip()
+    noclip = not noclip
+    if noclip then
+        local connection
+        connection = RunService.Stepped:Connect(function()
+            if not noclip then
+                connection:Disconnect()
+                return
+            end
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    else
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+local function toggleInfiniteJump()
+    infiniteJump = not infiniteJump
+    if infiniteJump then
+        jumpConnection = UserInputService.JumpRequest:Connect(function()
+            if character and character:FindFirstChild("Humanoid") then
+                character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+        end
+    end
+end
+
+local function resetCamera()
+    workspace.CurrentCamera.CameraSubject = character.Humanoid
+end
+
+local function loadFlyScript()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
+    end)
+end
+
+local function toggleAntiAFK()
+    antiAFK = true
+    
+    afkConnection = game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+    end)
+    
+    spawn(function()
+        while antiAFK do
+            wait(60)
+            if antiAFK then
+                local camera = workspace.CurrentCamera
+                if camera then
+                    camera.CFrame = camera.CFrame * CFrame.Angles(0, math.rad(0.1), 0)
+                    wait(0.1)
+                    camera.CFrame = camera.CFrame * CFrame.Angles(0, math.rad(-0.1), 0)
+                end
+            end
+        end
+    end)
+end
+
+-- Create Home Buttons
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 5, 0, 58), function()
+    local speed = tonumber(speedSlider.Text) or 16
+    humanoid.WalkSpeed = speed
+    speedLabel.Text = "Speed: " .. speed
+end)
+
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 120, 0, 58), function()
+    local jump = tonumber(jumpSlider.Text) or 50
+    humanoid.JumpPower = jump
+    jumpLabel.Text = "Jump: " .. jump
+end)
+
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 235, 0, 58), function()
+    toggleNoclip()
+end)
+
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 5, 0, 93), function()
+    loadFlyScript()
+end)
+
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 120, 0, 93), function()
+    toggleInfiniteJump()
+end)
+
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 235, 0, 93), function()
+    playerFrame.Visible = not playerFrame.Visible
+    if playerFrame.Visible then
+        updatePlayerList("")
+    end
+end)
+
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 5, 0, 128), function()
+    resetCamera()
+end)
+
+createButton("AntiAFKButton", "⚡ Anti-AFK", UDim2.new(0, 120, 0, 128), function()
+    toggleAntiAFK()
+    local btn = homeContent:FindFirstChild("AntiAFKButton")
+    if btn then
+        TweenService:Create(btn, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+        }):Play()
+        btn.Text = "✅ Anti-AFK ON"
+    end
+end)
+
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 235, 0, 128), function()
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+    noclip = false
+    infiniteJump = false
+    antiAFK = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    if afkConnection then
+        afkConnection:Disconnect()
+        afkConnection = nil
+    end
+    speedSlider.Text = "16"
+    jumpSlider.Text = "50"
+    speedLabel.Text = "Speed: 16"
+    jumpLabel.Text = "Jump: 50"
+    playerFrame.Visible = false
+    resetCamera()
+    
+    local btn = homeContent:FindFirstChild("AntiAFKButton")
+    if btn then
+        btn.Text = "⚡ Anti-AFK"
+        TweenService:Create(btn, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.new(1, 1, 1)
+        }):Play()
+    end
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = true
+        end
+    end
+end)
+
+-- Create Other Tab Features
+local otherHeader = Instance.new("TextLabel")
+otherHeader.Size = UDim2.new(1, 0, 0, 25)
+otherHeader.Position = UDim2.new(0, 0, 0, 5)
+otherHeader.BackgroundTransparency = 1
+otherHeader.Text = "🔧 Other Features"
+otherHeader.TextColor3 = Color3.new(1, 1, 1)
+otherHeader.TextSize = 14
+otherHeader.Font = Enum.Font.GothamBold
+otherHeader.Parent = otherContent
+
+local function createFeatureCard(name, icon, desc, yPos, color, callback)
+    local card = Instance.new("Frame")
+    card.Size = UDim2.new(1, -10, 0, 70)
+    card.Position = UDim2.new(0, 5, 0, yPos)
+    card.BackgroundColor3 = color
+    card.BackgroundTransparency = 0.3
+    card.BorderSizePixel = 0
+    card.Parent = otherContent
+    
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 12)
+    cardCorner.Parent = card
+    
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 30, 0, 30)
+    iconLabel.Position = UDim2.new(0, 10, 0, 10)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = icon
+    iconLabel.TextSize = 20
+    iconLabel.Parent = card
+    
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -50, 0, 20)
+    titleLabel.Position = UDim2.new(0, 45, 0, 8)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = name
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
+    titleLabel.TextSize = 12
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = card
+    
+    local descLabel = Instance.new("TextLabel")
+    descLabel.Size = UDim2.new(1, -50, 0, 15)
+    descLabel.Position = UDim2.new(0, 45, 0, 28)
+    descLabel.BackgroundTransparency = 1
+    descLabel.Text = desc
+    descLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    descLabel.TextSize = 9
+    descLabel.Font = Enum.Font.Gotham
+    descLabel.TextXAlignment = Enum.TextXAlignment.Left
+    descLabel.Parent = card
+    
+    local openBtn = Instance.new("TextButton")
+    openBtn.Size = UDim2.new(0, 90, 0, 22)
+    openBtn.Position = UDim2.new(0, 45, 0, 43)
+    openBtn.BackgroundColor3 = Color3.new(1, 1, 1)
+    openBtn.BackgroundTransparency = 0.2
+    openBtn.Text = "Open"
+    openBtn.TextColor3 = Color3.new(1, 1, 1)
+    openBtn.TextSize = 10
+    openBtn.Font = Enum.Font.GothamBold
+    openBtn.Parent = card
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = openBtn
+    
+    openBtn.MouseButton1Click:Connect(callback)
+    
+    openBtn.MouseEnter:Connect(function()
+        TweenService:Create(openBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+    end)
+    
+    openBtn.MouseLeave:Connect(function()
+        TweenService:Create(openBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+    end)
+end
+
+createFeatureCard("Music Player", "🎵", "Play music with ID system", 35, Color3.fromRGB(150, 100, 200), function()
+    spawn(function() showLoadingAnimation("Music Player") end)
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))()
+    end)
+end)
+
+createFeatureCard("Graphics Settings", "🎮", "Enhance visual quality", 110, Color3.fromRGB(100, 150, 250), function()
+    spawn(function() showLoadingAnimation("Graphics") end)
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))()
+    end)
+end)
+
+createFeatureCard("Paint-Alpha", "🎨", "Draw and create art", 185, Color3.fromRGB(250, 100, 150), function()
+    spawn(function() showLoadingAnimation("Paint-Alpha") end)
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))()
+    end)
+end)
+
+createFeatureCard("Client Settings", "⚙️", "Advanced configurations", 260, Color3.fromRGB(100, 200, 100), function()
+    spawn(function() showLoadingAnimation("Client") end)
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))()
+    end)
+end)
+
+-- Editor Functions
+executeEditorBtn.MouseButton1Click:Connect(function()
+    local code = editorBox.Text
+    pcall(function()
+        loadstring(code)()
+    end)
+    TweenService:Create(executeEditorBtn, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(80, 180, 80)
+    }):Play()
+    wait(0.3)
+    TweenService:Create(executeEditorBtn, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    }):Play()
+end)
+
+clearEditorBtn.MouseButton1Click:Connect(function()
+    editorBox.Text = "-- Write your Lua script here\n"
+end)
+
+-- Tab Events
+for tabName, tabData in pairs(tabButtons) do
+    tabData.button.MouseButton1Click:Connect(function()
+        switchTab(tabName)
+        if tabName == "Script" then
+            updateScriptList("")
+        end
+    end)
+end
+
+-- Search Events
+searchBox.Changed:Connect(function(property)
+    if property == "Text" then
+        updateScriptList(searchBox.Text)
+    end
+end)
+
+playerSearchBox.Changed:Connect(function(property)
+    if property == "Text" then
+        updatePlayerList(playerSearchBox.Text)
+    end
+end)
+
+-- Close/Toggle
+closeBtn.MouseButton1Click:Connect(function()
+    TweenService:Create(mainFrame, TweenInfo.new(0.3), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0)
+    }):Play()
+    wait(0.3)
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
+    mainFrame.Size = UDim2.new(0, 380, 0, 270)
+    mainFrame.Position = UDim2.new(0.5, -190, 0.5, -135)
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    toggleButton.Visible = false
+    mainFrame.Size = UDim2.new(0, 0, 0, 0)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
+        Size = UDim2.new(0, 380, 0, 270),
+        Position = UDim2.new(0.5, -190, 0.5, -135)
+    }):Play()
+end)
+
+-- Keyboard Shortcut
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        if mainFrame.Visible then
+            closeBtn.MouseButton1Click()
+        else
+            toggleButton.MouseButton1Click()
+        end
+    end
+end)
+
+-- Character Respawn
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+    noclip = false
+    infiniteJump = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    wait(1)
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+end)
+
+-- Initial fade in
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+wait(0.1)
+TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
+    Size = UDim2.new(0, 380, 0, 270),
+    Position = UDim2.new(0.5, -190, 0.5, -135)
+}):Play()
+
+print("💎 Mila UI V3.0 - Glass Edition loaded successfully!")
+print("✨ Press Right Shift to toggle UI"))
             return
         end
         loadingSpinner.Rotation = loadingSpinner.Rotation + 5
@@ -1058,7 +1734,7 @@ paintButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Draw"))()
     end)
 end)
 
@@ -1076,7 +1752,7 @@ clientButton.MouseButton1Click:Connect(function()
     end)
     
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin4/Mila/refs/heads/main/Cilent"))()
     end)
 end)
 
@@ -1154,6 +1830,457 @@ player.CharacterAdded:Connect(function(newCharacter)
     noclip = false
     infiniteJump = false
     -- Keep anti-AFK running after respawn
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    wait(1)
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+end)
+
+print("Mila UI (Tab Design) đã được tải thành công! 💖")
+print("Nhấn Right Shift để bật/tắt UI") UDim.new(0, 5)
+    buttonCorner.Parent = button
+    
+    button.MouseButton1Click:Connect(callback)
+    
+    -- Hover effect
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.new(0.8, 0.85, 1)
+    end)
+    
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = Color3.new(0.85, 0.9, 1)
+    end)
+    
+    return button
+end
+
+-- Speed/Jump Controls
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(0, 150, 0, 15)
+speedLabel.Position = UDim2.new(0, 10, 0, 10)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed: 16"
+speedLabel.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+speedLabel.TextSize = 10
+speedLabel.Font = Enum.Font.Gotham
+speedLabel.Parent = homeContent
+
+local speedSlider = Instance.new("TextBox")
+speedSlider.Size = UDim2.new(0, 60, 0, 20)
+speedSlider.Position = UDim2.new(0, 10, 0, 30)
+speedSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+speedSlider.Text = "16"
+speedSlider.TextColor3 = Color3.new(0, 0, 0)
+speedSlider.TextSize = 10
+speedSlider.PlaceholderText = "16"
+speedSlider.Parent = homeContent
+
+local speedCorner = Instance.new("UICorner")
+speedCorner.CornerRadius = UDim.new(0, 3)
+speedCorner.Parent = speedSlider
+
+local jumpLabel = Instance.new("TextLabel")
+jumpLabel.Size = UDim2.new(0, 150, 0, 15)
+jumpLabel.Position = UDim2.new(0, 200, 0, 10)
+jumpLabel.BackgroundTransparency = 1
+jumpLabel.Text = "Jump: 50"
+jumpLabel.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+jumpLabel.TextSize = 10
+jumpLabel.Font = Enum.Font.Gotham
+jumpLabel.Parent = homeContent
+
+local jumpSlider = Instance.new("TextBox")
+jumpSlider.Size = UDim2.new(0, 60, 0, 20)
+jumpSlider.Position = UDim2.new(0, 200, 0, 30)
+jumpSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+jumpSlider.Text = "50"
+jumpSlider.TextColor3 = Color3.new(0, 0, 0)
+jumpSlider.TextSize = 10
+jumpSlider.PlaceholderText = "50"
+jumpSlider.Parent = homeContent
+
+local jumpCorner = Instance.new("UICorner")
+jumpCorner.CornerRadius = UDim.new(0, 3)
+jumpCorner.Parent = jumpSlider
+
+-- Functions
+local function showLoadingAnimation(scriptName)
+    loadingText.Text = "Loading " .. scriptName .. "..."
+    loadingFrame.Visible = true
+    
+    -- Spinning animation
+    local spinConnection
+    spinConnection = RunService.Heartbeat:Connect(function()
+        if not loadingFrame.Visible then
+            spinConnection:Disconnect()
+            return
+        end
+        loadingSpinner.Rotation = loadingSpinner.Rotation + 5
+    end)
+    
+    -- Hide after 2 seconds
+    wait(2)
+    loadingFrame.Visible = false
+    if spinConnection then
+        spinConnection:Disconnect()
+    end
+end
+
+local function createScriptButton(scriptData, position)
+    local scriptFrame = Instance.new("Frame")
+    scriptFrame.Name = scriptData.name:gsub("%s", "")
+    scriptFrame.Size = UDim2.new(0, 180, 0, 60)
+    scriptFrame.Position = position
+    scriptFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.98)
+    scriptFrame.BorderSizePixel = 0
+    scriptFrame.Parent = scriptsContainer
+    
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 8)
+    frameCorner.Parent = scriptFrame
+    
+    -- Script Name
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, -10, 0, 25)
+    nameLabel.Position = UDim2.new(0, 5, 0, 5)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = scriptData.name
+    nameLabel.TextColor3 = Color3.new(0.2, 0.2, 0.2)
+    nameLabel.TextSize = 12
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = scriptFrame
+    
+    -- Execute Button (centered)
+    local executeBtn = Instance.new("TextButton")
+    executeBtn.Size = UDim2.new(0, 120, 0, 25)
+    executeBtn.Position = UDim2.new(0, 30, 0, 30)
+    executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
+    executeBtn.Text = "▶ Execute"
+    executeBtn.TextColor3 = Color3.new(1, 1, 1)
+    executeBtn.TextSize = 11
+    executeBtn.Font = Enum.Font.Gotham
+    executeBtn.Parent = scriptFrame
+    
+    local executeCorner = Instance.new("UICorner")
+    executeCorner.CornerRadius = UDim.new(0, 5)
+    executeCorner.Parent = executeBtn
+    
+    -- Button Events
+    executeBtn.MouseButton1Click:Connect(function()
+        spawn(function()
+            showLoadingAnimation(scriptData.name)
+        end)
+        
+        pcall(function()
+            loadstring(scriptData.code)()
+        end)
+    end)
+    
+    -- Hover effects
+    executeBtn.MouseEnter:Connect(function()
+        executeBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
+    end)
+    
+    executeBtn.MouseLeave:Connect(function()
+        executeBtn.BackgroundColor3 = Color3.new(0.4, 0.8, 0.4)
+    end)
+    
+    return scriptFrame
+end
+
+local function updateScriptList(searchTerm)
+    -- Clear existing scripts
+    for _, child in pairs(scriptsContainer:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    searchTerm = searchTerm:lower()
+    local row, col = 0, 0
+    local totalHeight = 0
+    
+    for _, scriptData in ipairs(scriptsData) do
+        if searchTerm == "" or scriptData.name:lower():find(searchTerm) then
+            local position = UDim2.new(0, col * 190, 0, row * 70)
+            createScriptButton(scriptData, position)
+            
+            col = col + 1
+            if col >= 2 then
+                col = 0
+                row = row + 1
+            end
+            totalHeight = (row + 1) * 70
+        end
+    end
+    
+    scriptsContainer.Size = UDim2.new(1, 0, 0, math.max(totalHeight, 400))
+    scriptContent.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 50)
+end
+local function updatePlayerList()
+    for _, child in pairs(playerList:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= player then
+            local playerContainer = Instance.new("Frame")
+            playerContainer.Size = UDim2.new(1, 0, 0, 35)
+            playerContainer.BackgroundColor3 = Color3.new(0.98, 0.98, 0.98)
+            playerContainer.Parent = playerList
+            
+            local containerCorner = Instance.new("UICorner")
+            containerCorner.CornerRadius = UDim.new(0, 3)
+            containerCorner.Parent = playerContainer
+            
+            local playerName = Instance.new("TextLabel")
+            playerName.Size = UDim2.new(1, 0, 0, 15)
+            playerName.Position = UDim2.new(0, 5, 0, 2)
+            playerName.BackgroundTransparency = 1
+            playerName.Text = targetPlayer.Name
+            playerName.TextSize = 9
+            playerName.Font = Enum.Font.Gotham
+            playerName.TextColor3 = Color3.new(0.2, 0.2, 0.2)
+            playerName.TextXAlignment = Enum.TextXAlignment.Left
+            playerName.Parent = playerContainer
+            
+            local tpBtn = Instance.new("TextButton")
+            tpBtn.Size = UDim2.new(0, 35, 0, 15)
+            tpBtn.Position = UDim2.new(0, 5, 0, 17)
+            tpBtn.BackgroundColor3 = Color3.new(0.7, 0.9, 1)
+            tpBtn.Text = "TP"
+            tpBtn.TextSize = 8
+            tpBtn.Font = Enum.Font.Gotham
+            tpBtn.TextColor3 = Color3.new(0, 0.3, 0.6)
+            tpBtn.Parent = playerContainer
+            
+            local viewBtn = Instance.new("TextButton")
+            viewBtn.Size = UDim2.new(0, 35, 0, 15)
+            viewBtn.Position = UDim2.new(0, 45, 0, 17)
+            viewBtn.BackgroundColor3 = Color3.new(1, 0.9, 0.7)
+            viewBtn.Text = "View"
+            viewBtn.TextSize = 8
+            viewBtn.Font = Enum.Font.Gotham
+            viewBtn.TextColor3 = Color3.new(0.6, 0.3, 0)
+            viewBtn.Parent = playerContainer
+            
+            local tpCorner = Instance.new("UICorner")
+            tpCorner.CornerRadius = UDim.new(0, 2)
+            tpCorner.Parent = tpBtn
+            
+            local viewCorner = Instance.new("UICorner")
+            viewCorner.CornerRadius = UDim.new(0, 2)
+            viewCorner.Parent = viewBtn
+            
+            tpBtn.MouseButton1Click:Connect(function()
+                if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+                end
+            end)
+            
+            viewBtn.MouseButton1Click:Connect(function()
+                if targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+                    workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
+                end
+            end)
+        end
+    end
+    
+    playerList.CanvasSize = UDim2.new(0, 0, 0, (#Players:GetPlayers() - 1) * 37)
+end
+
+local function switchTab(tabName)
+    currentTab = tabName
+    
+    -- Update tab buttons
+    for name, tabData in pairs(tabButtons) do
+        if name == tabName then
+            tabData.button.TextColor3 = Color3.new(0.2, 0.4, 0.8)
+            tabData.underline.Visible = true
+        else
+            tabData.button.TextColor3 = Color3.new(0.5, 0.5, 0.5)
+            tabData.underline.Visible = false
+        end
+    end
+    
+    -- Update content visibility
+    homeContent.Visible = tabName == "Home"
+    scriptContent.Visible = tabName == "Script"
+    notifContent.Visible = tabName == "Notifications"
+    otherContent.Visible = tabName == "Other"
+end
+
+local function toggleNoclip()
+    noclip = not noclip
+    if noclip then
+        local connection
+        connection = RunService.Stepped:Connect(function()
+            if not noclip then
+                connection:Disconnect()
+                return
+            end
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    else
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+local function toggleInfiniteJump()
+    infiniteJump = not infiniteJump
+    if infiniteJump then
+        jumpConnection = UserInputService.JumpRequest:Connect(function()
+            if character and character:FindFirstChild("Humanoid") then
+                character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+        end
+    end
+end
+
+local function resetCamera()
+    workspace.CurrentCamera.CameraSubject = character.Humanoid
+end
+
+local function loadFlyScript()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
+    end)
+end
+
+-- Create Home Tab Buttons (2x3 grid)
+createButton("SpeedButton", "🏃 Speed", UDim2.new(0, 10, 0, 60), function()
+    local speed = tonumber(speedSlider.Text) or 16
+    humanoid.WalkSpeed = speed
+    speedLabel.Text = "Speed: " .. speed
+end)
+
+createButton("JumpButton", "🦘 Jump", UDim2.new(0, 120, 0, 60), function()
+    local jump = tonumber(jumpSlider.Text) or 50
+    humanoid.JumpPower = jump
+    jumpLabel.Text = "Jump: " .. jump
+end)
+
+createButton("NoclipButton", "👻 Noclip", UDim2.new(0, 230, 0, 60), function()
+    toggleNoclip()
+end)
+
+createButton("FlyButton", "🕊️ Fly", UDim2.new(0, 10, 0, 95), function()
+    loadFlyScript()
+end)
+
+createButton("InfiniteJumpButton", "♾️ Inf Jump", UDim2.new(0, 120, 0, 95), function()
+    toggleInfiniteJump()
+end)
+
+createButton("TeleportButton", "📍 Players", UDim2.new(0, 230, 0, 95), function()
+    playerFrame.Visible = not playerFrame.Visible
+    if playerFrame.Visible then
+        updatePlayerList()
+    end
+end)
+
+createButton("CameraButton", "📷 Reset Cam", UDim2.new(0, 10, 0, 130), function()
+    resetCamera()
+end)
+
+createButton("ResetButton", "🔄 Reset All", UDim2.new(0, 120, 0, 130), function()
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+    noclip = false
+    infiniteJump = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    speedSlider.Text = "16"
+    jumpSlider.Text = "50"
+    speedLabel.Text = "Speed: 16"
+    jumpLabel.Text = "Jump: 50"
+    playerFrame.Visible = false
+    resetCamera()
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = true
+        end
+    end
+end)
+
+-- Tab button events
+for tabName, tabData in pairs(tabButtons) do
+    tabData.button.MouseButton1Click:Connect(function()
+        switchTab(tabName)
+        if tabName == "Script" then
+            updateScriptList("")
+        end
+    end)
+end
+
+-- Search functionality
+searchBox.Changed:Connect(function(property)
+    if property == "Text" then
+        updateScriptList(searchBox.Text)
+    end
+end)
+
+-- Close/Toggle functionality
+closeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
+end)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    toggleButton.Visible = true
+    playerFrame.Visible = false
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    toggleButton.Visible = false
+end)
+
+-- Keyboard shortcut
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        if mainFrame.Visible then
+            mainFrame.Visible = false
+            toggleButton.Visible = true
+            playerFrame.Visible = false
+        else
+            mainFrame.Visible = true
+            toggleButton.Visible = false
+        end
+    end
+end)
+
+-- Character respawn handling
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+    noclip = false
+    infiniteJump = false
     if jumpConnection then
         jumpConnection:Disconnect()
         jumpConnection = nil
