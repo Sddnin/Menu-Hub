@@ -1,5 +1,5 @@
 -- Mila UI V2.0 - Stable Version
--- Tạo bởi: Assistant
+-- Tạo bởi: Mila
 -- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump, Anti-AFK
 
 local Players = game:GetService("Players")
@@ -226,24 +226,92 @@ loadingSpinner.Parent = loadingFrame
 
 -- Scripts Data
 local scriptsData = {
+    -- Admin Scripts
     {name = "Infinity Yield", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()"},
-    {name = "Airflow", code = "loadstring(game:HttpGet(\"https://api.luarmor.net/files/v3/loaders/255ac567ced3dcb9e69aa7e44c423f19.lua\"))()"},
-    {name = "H4X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/H4xScripts/Loader/refs/heads/main/loader.lua\", true))()"},
-    {name = "R15 Emote", code = "loadstring(game:HttpGetAsync(\"https://gist.githubusercontent.com/RedZenXYZ/3da6af1961efa275de6c3c2a6dbace03/raw/bb027f99cec0ea48ef9c5eabfb9116ddff20633d/FE%2520Emotes%2520Gui\"))()"},
-    {name = "Skull Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/hungquan99/SkullHub/main/loader.lua'))()"},
-    {name = "Nameless Admin", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-nameless-admin-15646\"))()"},
-    {name = "NatHub", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua\"))()"},
+    {name = "Nameless Admin", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()"},
+    {name = "CMD-X", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source'))()"},
+    {name = "Reviz Admin", code = "loadstring(game:HttpGet('https://pastebin.com/raw/Caniwq2N'))()"},
+    {name = "Fates Admin", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua'))()"},
+    {name = "Pendulum Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Tescalus/Pendulum-Hubs-Source/main/Pendulum%20Hub%20V5.lua'))()"},
+    
+    -- Universal Hubs
+    {name = "Owl Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/CriShoux/OwlHub/master/OwlHub.txt'))()"},
+    {name = "Delta Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/gclich/Delta-Hub/main/Delta'))()"},
+    {name = "Vynixu Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Loader.lua'))()"},
     {name = "Arceus X", code = "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3\"))()"},
-    {name = "Shader", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))()"},
-    {name = "Native", code = "loadstring(game:HttpGet(\"https://getnative.cc/script/loader\"))()"},
-    {name = "Nolag", code = "loadstring(game:HttpGetAsync(\"https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua\"))()"},
-    {name = "Limit Hub", code = "loadstring(game:HttpGet(('https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua')))()"},
-    {name = "Speed Hub X", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Grow-a-Garden-Speed-Hub-X-Keyless-38062\"))()"},
-    {name = "Lunor", code = "loadstring(game:HttpGet(\"https://lunor.dev/loader\"))()"},
-    {name = "ThunderZ", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()"},
-    {name = "AFEM-Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-AFEM-14048\"))()"},
+    {name = "Speed Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ahmadsgamer2/Speed-Hub-X/main/SpeedHubX.lua'))()"},
+    {name = "Quick Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/SkireScripts/Ouxie/main/Projects/QuickHub.lua'))()"},
+    {name = "Universal Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Cloudastrr/Nexus-Hub/main/Loader.lua'))()"},
+    {name = "Neko Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Nekodex/Scripts/main/Neko-Hub.lua'))()"},
+    {name = "Fluxus Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/BINjamin13/Scripts/main/Fluxus.lua'))()"},
+    
+    -- ESP/Aimbot/Combat
+    {name = "Universal ESP", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ic3w0lf22/Unnamed-ESP/master/UnnamedESP.lua'))()"},
+    {name = "Aimbot V3", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Exunys/Aimbot-V3/main/Main.lua'))()"},
+    {name = "ESP Pro", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Sirius/request/library/ui/esp/pro'))()"},
+    {name = "Silent Aim", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Stefanuk12/ROBLOX/master/Universal/Experimental%20Silent%20Aim%20Module.lua'))()"},
+    {name = "Triggerbot", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/tbao143/thaibao/main/TriggerBot'))()"},
+    
+    -- Animation Scripts
+    {name = "R15 Animations", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Gi7331/scripts/main/R15%20GUI'))()"},
+    {name = "AFEM Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-AFEM-14048\"))()"},
     {name = "R6 Animation", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-Fe-R6-Animations-37331\"))()"},
-    {name = "Farm Diamond 99 Night", code = "loadstring(game:HttpGet(\"https://rawscripts.net/raw/99-Nights-in-the-Forest-Farm-diamond-v2-50169\"))()"}
+    {name = "Animation Changer", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ncarr20/AnimationsGUI/main/AnimationsGUI'))()"},
+    {name = "FE Emotes", code = "loadstring(game:HttpGet('https://pastebin.com/raw/eCpipCTH'))()"},
+    {name = "Dance GUI", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/l0ckerV5/dances/main/dances.txt'))()"},
+    
+    -- Visual/Graphics
+    {name = "Shader", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))()"},
+    {name = "RTX Graphics", code = "loadstring(game:HttpGet('https://pastebin.com/raw/vmXw38iJ'))()"},
+    {name = "Future Lighting", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Herrtt/Future-Lighting/main/Future.lua'))()"},
+    {name = "Better Lighting", code = "loadstring(game:HttpGet('https://pastebin.com/raw/jHBfJYmS'))()"},
+    {name = "Fullbright", code = "loadstring(game:HttpGet('https://pastebin.com/raw/06iG6YkT'))()"},
+    
+    -- Fun Scripts
+    {name = "Keyboard Script", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/advxzivhsjjdhxhsidifvsh/mobkeyboard/main/main.txt'))()"},
+    {name = "Telekinesis", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/0Ben1/fe/main/obf_11l7Y1gZ858dSFSNzk8546DS8ysf8s9S38XjLz6278A4W0FhA8w2825O9b06ig2B.lua'))()"},
+    {name = "Neptunian V", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Neptunianu/Scripts/main/Neptunian_V'))()"},
+    {name = "Shattervast", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Vcsk/RobloxScripts/main/Shattervast.lua'))()"},
+    {name = "Fe Trolling GUI", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/yofriendfromschool1/Sky-Hub/main/FE%20Trolling%20GUI.luau'))()"},
+    {name = "Emote Player", code = "loadstring(game:HttpGet('https://pastebin.com/raw/eCpipCTH'))()"},
+    {name = "Audio Player", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/KxGOATESQUE/SoundPlayer/main/SoundPlayer.lua'))()"},
+    
+    -- Performance/Optimization
+    {name = "FPS Booster", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/gclich/FPS-Booster/main/FPSBooster'))()"},
+    {name = "Lag Reducer", code = "loadstring(game:HttpGet('https://pastebin.com/raw/j91asLM8'))()"},
+    {name = "Performance+", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/boronboro/Scripts/main/FPSBoost.lua'))()"},
+    {name = "Graphics Optimizer", code = "loadstring(game:HttpGet('https://pastebin.com/raw/gqFHHfyv'))()"},
+    {name = "Ping Reducer", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/StealthModeEnabled/Anti-Lag/main/Anti-Lag.lua'))()"},
+    
+    -- Tools/Exploits
+    {name = "Dark Dex V3", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua'))()"},
+    {name = "Remote Spy", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua'))()"},
+    {name = "Script Searcher", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/ScriptSearcher.lua'))()"},
+    {name = "Hydroxide", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/init.lua'))()"},
+    {name = "Dex Explorer", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()"},
+    {name = "UniversalSpy", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/exxtremestuffs/SimpleSpySource/master/SimpleSpyBeta.lua'))()"},
+    
+    -- Fly/Movement/Speed
+    {name = "Fly V3", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt'))()"},
+    {name = "Infinite Jump", code = "loadstring(game:HttpGet('https://pastebin.com/raw/V5PQy3ey'))()"},
+    {name = "Super Speed", code = "loadstring(game:HttpGet('https://pastebin.com/raw/5P6Kh1fk'))()"},
+    {name = "Noclip", code = "loadstring(game:HttpGet('https://pastebin.com/raw/c5NpcpaK'))()"},
+    {name = "Teleport GUI", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()"},
+    
+    -- Misc/Other Hubs
+    {name = "Proton Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ProtronHub/Proton/main/Main.lua'))()"},
+    {name = "Solaris", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Sidhsksjsjsh/Solaris/main/solaris.lua'))()"},
+    {name = "BetterBypasser", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Synergy-Networks/products/main/BetterBypasser/loader.lua'))()"},
+    {name = "ZenHub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Zenhubtop/zen_hub/main/zenhub.lua'))()"},
+    {name = "Nebula Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/AltsegoD/script/main/Nebula.lua'))()"},
+    {name = "Phantom Hub", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/sannin9000/main/main/phantom.lua'))()"},
+    
+    -- Game-Specific Popular
+    {name = "Arsenal Silent", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubArsenal'))()"},
+    {name = "Blox Fruits", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ZaqueHub/Script/main/Loader'))()"},
+    {name = "Adopt Me", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/rouxhaver/roblox-scripts/main/adoptme.lua'))()"},
+    {name = "Brookhaven", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/IceMael/NewIceHub/main/Brookhaven'))()"},
+    {name = "MM2", code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/Ethanoj1/Eclipse-Hub/master/MM2%20Script'))()"}
 }
 
 -- Other Tab Content
