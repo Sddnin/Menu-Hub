@@ -1,5 +1,5 @@
 -- 🎵 Roblox Music Player 2.0+ - Random Box Edition (FIXED)
--- Tạo bởi Mila | Version 2.0+ Random Box Fixed
+-- Tạo bởi Claude | Version 2.0+ Random Box Fixed
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -26,12 +26,100 @@ local musicLibrary = {
     {name = "Đám ma", id = "1845920681"},
     
     -- More working songs
+    {name = "Megalovania", id = "2996427130"},
+    {name = "Giorno Theme", id = "3621670787"},
+    {name = "Astronomia (Coffin Dance)", id = "4965456608"},
+    {name = "Baka Mitai", id = "5863626637"},
+    {name = "Never Gonna Give You Up", id = "6565332301"},
+    {name = "Caramelldansen", id = "2303479371"},
+    {name = "Nyan Cat", id = "130768805"},
+    {name = "Stonks", id = "5410085091"},
     {name = "Omae Wa Mou", id = "5816432987"},
+    {name = "Wii Shop Channel", id = "3237386824"},
+    {name = "Kahoot Lobby Music", id = "1280414809"},
+    {name = "Windows XP Startup", id = "6108299249"},
     {name = "Coconut Mall", id = "1843404009"},
-   {name = "Bruh Sound Effect #2", id = "4578740568"},
+    {name = "Pumped Up Kicks", id = "130768799"},
+    {name = "All Star - Smash Mouth", id = "4590452789"},
+    {name = "Cradles", id = "2863038409"},
+    {name = "Tokyo Drift", id = "4773133041"},
+    {name = "Bad Guy - Billie Eilish", id = "3168155230"},
+    {name = "Sicko Mode", id = "2568799493"},
+    {name = "Oof", id = "6565556783"},
+    {name = "Sad Violin", id = "1524543084"},
+    {name = "Bruh Sound Effect #2", id = "4578740568"},
+    {name = "OOOOH", id = "130776739"},
+    {name = "Jojo Pillar Men Theme", id = "2873726542"},
+    {name = "Sans Voice", id = "1280463619"},
+    {name = "Ali-A Intro", id = "2906450841"},
+    {name = "Wii Theme", id = "2633316967"},
+    {name = "Club Penguin Pizza Parlor", id = "1837857758"},
+    {name = "Ducktales Moon Theme", id = "2648593879"},
+    {name = "Fallen Kingdom", id = "155801735"},
+    {name = "Sweden - C418", id = "1837888883"},
+    {name = "Stal - C418", id = "1837902959"},
+    {name = "Mario Theme", id = "1280397456"},
+    {name = "Tetris Theme", id = "130776331"},
+    {name = "Take On Me", id = "154664102"},
+    {name = "Africa - Toto", id = "1840354615"},
+    {name = "Despacito", id = "952856364"},
+    {name = "All I Want for Christmas", id = "1837864393"},
+    {name = "Spooky Scary Skeletons", id = "160442087"},
+    {name = "Stal Earrape", id = "5614795688"},
+    {name = "Windows Error Sound", id = "5816432763"},
+    {name = "Troll Song", id = "142353945"},
+    {name = "We Are Number One", id = "697281377"},
+    {name = "Shooting Stars", id = "662824084"},
+    {name = "Running in the 90s", id = "152745539"},
+    {name = "Gas Gas Gas", id = "919231299"},
     {name = "Deja Vu", id = "616594208"},
+    {name = "Fireflies", id = "155778714"},
+    {name = "Pompeii", id = "142353945"},
+    {name = "Revenge - Creeper Aww Man", id = "3196719656"},
     {name = "Hallelujah", id = "255679373"},
-    
+    {name = "Somebody I Used to Know", id = "148573273"},
+    {name = "Poker Face", id = "142318719"},
+    {name = "Beautiful Girls", id = "215252181"},
+    {name = "Old Town Road", id = "2862170886"},
+    {name = "Baby Shark", id = "2590490779"},
+    {name = "Gangnam Style", id = "130777688"},
+    {name = "Harlem Shake", id = "142319875"},
+    {name = "Happy - Pharrell", id = "159029331"},
+    {name = "Uptown Funk", id = "235594610"},
+    {name = "Lean On", id = "293344085"},
+    {name = "See You Again", id = "337823508"},
+    {name = "Closer", id = "557708135"},
+    {name = "Shape of You", id = "661079869"},
+    {name = "Blinding Lights", id = "4578635578"},
+    {name = "Dance Monkey", id = "4504000797"},
+    {name = "Someone You Loved", id = "3376706199"},
+    {name = "Sunflower", id = "2681042940"},
+    {name = "Memories", id = "4056433476"},
+    {name = "Senorita", id = "3553149289"},
+    {name = "Bad Habits", id = "7066067766"},
+    {name = "Levitating", id = "5911823320"},
+    {name = "Peaches", id = "6562389593"},
+    {name = "Stay", id = "7193013069"},
+    {name = "Heat Waves", id = "6907763814"},
+    {name = "Industry Baby", id = "7101049439"},
+    {name = "Good 4 U", id = "6864965721"},
+    {name = "Montero", id = "6690291185"},
+    {name = "Save Your Tears", id = "6407814875"},
+    {name = "Drivers License", id = "6326339583"},
+    {name = "Deja Vu - Olivia Rodrigo", id = "6734092292"},
+    {name = "Kiss Me More", id = "6632947720"},
+    {name = "Butter - BTS", id = "6829046951"},
+    {name = "Dynamite - BTS", id = "5622599741"},
+    {name = "Leave The Door Open", id = "6471372283"},
+    {name = "Positions", id = "5917742350"},
+    {name = "Mood", id = "5822795409"},
+    {name = "Savage Love", id = "5616677150"},
+    {name = "Watermelon Sugar", id = "4873100782"},
+    {name = "Blueberry Faygo", id = "4871012412"},
+    {name = "Rockstar", id = "4771022832"},
+    {name = "Gooba", id = "5105580425"},
+    {name = "Laugh Now Cry Later", id = "5733845552"},
+}
 
 -- 💾 User Data
 local userData = {
@@ -101,7 +189,7 @@ minimizeBtn.Size = UDim2.new(0, 30, 0, 25)
 minimizeBtn.Position = UDim2.new(1, -70, 0, 12)
 minimizeBtn.BackgroundColor3 = colors.secondary
 minimizeBtn.BorderSizePixel = 0
-minimizeBtn.Text = "💫"
+minimizeBtn.Text = "▢"
 minimizeBtn.TextColor3 = colors.text
 minimizeBtn.TextSize = 14
 minimizeBtn.Font = Enum.Font.GothamBold
@@ -116,7 +204,7 @@ closeBtn.Size = UDim2.new(0, 30, 0, 25)
 closeBtn.Position = UDim2.new(1, -35, 0, 12)
 closeBtn.BackgroundColor3 = colors.danger
 closeBtn.BorderSizePixel = 0
-closeBtn.Text = "❌"
+closeBtn.Text = "✕"
 closeBtn.TextColor3 = colors.text
 closeBtn.TextSize = 14
 closeBtn.Font = Enum.Font.GothamBold
