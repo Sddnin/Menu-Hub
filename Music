@@ -32,93 +32,67 @@ local musicLibrary = {
     {name = "Winning The Soul", id = "74809614967972"},
     {name = "Bloody! Funk", id = "136350225160627"},
     {name = "2000", id = "88900228893875"},
-    {name = "Nyan Cat", id = "130768805"},
-    {name = "Stonks", id = "5410085091"},
-    {name = "Omae Wa Mou", id = "5816432987"},
-    {name = "Wii Shop Channel", id = "3237386824"},
-    {name = "Kahoot Lobby Music", id = "1280414809"},
-    {name = "Windows XP Startup", id = "6108299249"},
-    {name = "Coconut Mall", id = "1843404009"},
-    {name = "Pumped Up Kicks", id = "130768799"},
-    {name = "All Star - Smash Mouth", id = "4590452789"},
-    {name = "Cradles", id = "2863038409"},
-    {name = "Tokyo Drift", id = "4773133041"},
-    {name = "Bad Guy - Billie Eilish", id = "3168155230"},
-    {name = "Sicko Mode", id = "2568799493"},
-    {name = "Oof", id = "6565556783"},
-    {name = "Sad Violin", id = "1524543084"},
-    {name = "Bruh Sound Effect #2", id = "4578740568"},
-    {name = "OOOOH", id = "130776739"},
-    {name = "Jojo Pillar Men Theme", id = "2873726542"},
-    {name = "Sans Voice", id = "1280463619"},
-    {name = "Ali-A Intro", id = "2906450841"},
-    {name = "Wii Theme", id = "2633316967"},
-    {name = "Club Penguin Pizza Parlor", id = "1837857758"},
-    {name = "Ducktales Moon Theme", id = "2648593879"},
-    {name = "Fallen Kingdom", id = "155801735"},
-    {name = "Sweden - C418", id = "1837888883"},
-    {name = "Stal - C418", id = "1837902959"},
-    {name = "Mario Theme", id = "1280397456"},
-    {name = "Tetris Theme", id = "130776331"},
-    {name = "Take On Me", id = "154664102"},
-    {name = "Africa - Toto", id = "1840354615"},
-    {name = "Despacito", id = "952856364"},
-    {name = "All I Want for Christmas", id = "1837864393"},
-    {name = "Spooky Scary Skeletons", id = "160442087"},
-    {name = "Stal Earrape", id = "5614795688"},
-    {name = "Windows Error Sound", id = "5816432763"},
-    {name = "Troll Song", id = "142353945"},
-    {name = "We Are Number One", id = "697281377"},
-    {name = "Shooting Stars", id = "662824084"},
-    {name = "Running in the 90s", id = "152745539"},
-    {name = "Gas Gas Gas", id = "919231299"},
-    {name = "Deja Vu", id = "616594208"},
-    {name = "Fireflies", id = "155778714"},
-    {name = "Pompeii", id = "142353945"},
-    {name = "Revenge - Creeper Aww Man", id = "3196719656"},
-    {name = "Hallelujah", id = "255679373"},
-    {name = "Somebody I Used to Know", id = "148573273"},
-    {name = "Poker Face", id = "142318719"},
-    {name = "Beautiful Girls", id = "215252181"},
-    {name = "Old Town Road", id = "2862170886"},
-    {name = "Baby Shark", id = "2590490779"},
-    {name = "Gangnam Style", id = "130777688"},
-    {name = "Harlem Shake", id = "142319875"},
-    {name = "Happy - Pharrell", id = "159029331"},
-    {name = "Uptown Funk", id = "235594610"},
-    {name = "Lean On", id = "293344085"},
-    {name = "See You Again", id = "337823508"},
-    {name = "Closer", id = "557708135"},
-    {name = "Shape of You", id = "661079869"},
-    {name = "Blinding Lights", id = "4578635578"},
-    {name = "Dance Monkey", id = "4504000797"},
-    {name = "Someone You Loved", id = "3376706199"},
-    {name = "Sunflower", id = "2681042940"},
-    {name = "Memories", id = "4056433476"},
-    {name = "Senorita", id = "3553149289"},
-    {name = "Bad Habits", id = "7066067766"},
-    {name = "Levitating", id = "5911823320"},
-    {name = "Peaches", id = "6562389593"},
-    {name = "Stay", id = "7193013069"},
-    {name = "Heat Waves", id = "6907763814"},
-    {name = "Industry Baby", id = "7101049439"},
-    {name = "Good 4 U", id = "6864965721"},
-    {name = "Montero", id = "6690291185"},
-    {name = "Save Your Tears", id = "6407814875"},
-    {name = "Drivers License", id = "6326339583"},
-    {name = "Deja Vu - Olivia Rodrigo", id = "6734092292"},
-    {name = "Kiss Me More", id = "6632947720"},
-    {name = "Butter - BTS", id = "6829046951"},
-    {name = "Dynamite - BTS", id = "5622599741"},
-    {name = "Leave The Door Open", id = "6471372283"},
-    {name = "Positions", id = "5917742350"},
-    {name = "Mood", id = "5822795409"},
-    {name = "Savage Love", id = "5616677150"},
-    {name = "Watermelon Sugar", id = "4873100782"},
-    {name = "Blueberry Faygo", id = "4871012412"},
-    {name = "Rockstar", id = "4771022832"},
-    {name = "Gooba", id = "5105580425"},
-    {name = "Laugh Now Cry Later", id = "5733845552"},
+    
+    -- New songs section
+    {name = "残酷な天使のテーゼ", id = "89217564030597"},
+    {name = "Under Your Spell", id = "91007045451630"},
+    {name = "Jingle Bells", id = "1839945406"},
+    {name = "MONTAGEM REBOLA", id = "74258284867725"},
+    {name = "All I Want For Christmas Is You", id = "103870757830875"},
+    {name = "Title Theme R&B Version", id = "72697308378715"},
+    {name = "montagem xonade", id = "131841589009936"},
+    {name = "Montagem miau", id = "99034537604129"},
+    {name = "PRACE", id = "116312125574357"},
+    {name = "Montagem Jesus Slowed Phonk", id = "72219510094703"},
+    {name = "OMGF-Hello", id = "110788401793874"},
+    {name = "Tick-Tack ILLIT", id = "122708070570064"},
+    {name = "Sahara", id = "130437050908450"},
+    {name = "FUNK CRIMINAL", id = "124688308713895"},
+    {name = "Stray wav", id = "120102995443063"},
+    {name = "Whispers of the Ancient Willow", id = "137954899587949"},
+    {name = "MENTE MÁ SLOWED", id = "98337901681441"},
+    {name = "RITMO DE VERAO", id = "118507373399694"},
+    {name = "My Ordinary Life", id = "93754318832545"},
+    {name = "Ice Coffee", id = "120434905732212"},
+    {name = "Uma Musume", id = "128897638945367"},
+    {name = "Hide - Slow Dark Fantasy", id = "123584554132464"},
+    {name = "MONTAGEM HOG RIDER", id = "96721518885225"},
+    {name = "Compass Limbus Company OST", id = "115877769571526"},
+    {name = "I REALLY WANT TO STAY AT YOUR HOUSE", id = "117687256335187"},
+    {name = "I Thought I Saw Your Face Today", id = "128718282071249"},
+    {name = "Through Patches of Violet", id = "76760458012018"},
+    {name = "Lobby Theme Science Mysteries", id = "1840776993"},
+    {name = "Undertale", id = "110802429266681"},
+    {name = "Death Is No More BLESSED MANE", id = "16831108393"},
+    {name = "snowfall Remix", id = "115925172742147"},
+    {name = "Yoasobi", id = "84376069097324"},
+    {name = "RJ Pasin - Isekai Breakcore", id = "131874270028720"},
+    {name = "green to blue Remix", id = "106450715751781"},
+    {name = "Want To Love Just Raw", id = "104846670980072"},
+    {name = "Tình Hồng", id = "135022697557208"},
+    {name = "Marimba Paradise", id = "1837465056"},
+    {name = "Squid Game Wake Up Song", id = "1843536434"},
+    {name = "Ghost", id = "82143627098754"},
+    {name = "Morning Mood", id = "1846088038"},
+    {name = "Relaxed Scene", id = "1848354536"},
+    {name = "Thefatrat", id = "108531350726198"},
+    {name = "ERROR 264", id = "140009716850576"},
+    {name = "Kerosene", id = "17647322226"},
+    {name = "Party Anthem", id = "70879716541062"},
+    {name = "READY OR NOT", id = "119731837417100"},
+    {name = "Brooklyn Bloodpop", id = "102361460070057"},
+    {name = "CUTEMAKMAKFUNK Slowed", id = "120871403922972"},
+    {name = "F-L-Y Hatsune Miku", id = "76819270320985"},
+    {name = "Piano", id = "1835719159"},
+    {name = "Backrooms", id = "120817494107898"},
+    {name = "There is something wrong Sped Up", id = "75544352326610"},
+    {name = "Intro", id = "131022201482638"},
+    {name = "Wake Up Speed Up", id = "90181598141325"},
+    {name = "Liminal Oceans", id = "78168688842055"},
+    {name = "Lack of snow", id = "121413847350536"},
+    {name = "Echoes of the Liminal", id = "118588167376171"},
+    {name = "Liminal Space", id = "101237405638411"},
+    {name = "7- Liminal Snow 006", id = "114956777024346"},
 }
 
 -- 💾 User Data
@@ -1293,12 +1267,12 @@ spawn(function()
 end)
 
 print("🎵 MUSIC PLAYER 2.0+ - RANDOM BOX EDITION LOADED! 🎵")
-print("✅ ALL BUGS FIXED + 100 SONGS LIBRARY!")
+print("✅ UPDATED SONG LIBRARY!")
 print("")
 print("🆕 FEATURES:")
 print("   🎲 RANDOM BOX: Mystery music discovery!")
 print("   ✨ 4 tabs: Manual, Library, Random Box, History")
-print("   🎵 100+ WORKING SONGS in library!")
+print("   🎵 80+ SONGS including new additions!")
 print("   🔊 Volume Control (0-10) with shortcuts")
 print("   📜 History of 20 recent songs")
 print("   🔄 Repeat modes: Off/One/All")
@@ -1308,29 +1282,21 @@ print("   🎉 Beautiful notifications & animations")
 print("")
 print("💡 HOW TO USE:")
 print("   🆔 Manual: Enter ID → Play")
-print("   📋 Library: Search & play 100+ songs")
+print("   📋 Library: Search & play songs")
 print("   🎲 Random Box: Open for instant random music!")
 print("   📜 History: Recently played songs")
 print("")
-print("🎲 RANDOM BOX FEATURE:")
-print("   • Click 'MỞ HỘP NGẪU NHIÊN' for instant music!")
-print("   • Beautiful opening animation with celebrations")
-print("   • Auto-plays random song from 100+ library")
-print("   • No need to click play - music starts automatically!")
-print("   • Perfect for instant music discovery!")
-print("")
-print("🎵 100+ SONGS CATEGORIES:")
-print("   • Memes & Viral: Megalovania, Coffin Dance, Rickroll")
-print("   • Gaming: Minecraft, Mario, Wii, Club Penguin")
-print("   • Pop Hits: Billie Eilish, BTS, Olivia Rodrigo")
-print("   • Classics: Africa, Take On Me, Fireflies")
-print("   • Trending: Heat Waves, Stay, Industry Baby")
-print("   • Vietnamese: Bình Bucu, Anh bạn à, Cải Lương")
+print("🎵 NEW SONGS ADDED:")
+print("   • Anime: 残酷な天使のテーゼ, Yoasobi, Uma Musume")
+print("   • Christmas: Jingle Bells, All I Want For Christmas")
+print("   • Phonk/Funk: Multiple Montagem tracks, FUNK CRIMINAL")
+print("   • Liminal/Ambient: Liminal Space, Echoes, Backrooms")
+print("   • Gaming: Undertale, Squid Game")
+print("   • Many more unique tracks!")
 print("")
 print("🔊 VOLUME CONTROL:")
 print("   • Type number 0-10 in volume box")
 print("   • Type + to increase, - to decrease")
 print("   • 🔇 Mute, 🔉 Low, 🔊 High icons")
-print("   • Real-time volume adjustment")
 print("")
-print("🎁 Discover from 100+ songs with Random Box! 🎲")
+print("🎁 Discover 80+ songs with Random Box! 🎲🎵")
