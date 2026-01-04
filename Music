@@ -1,5 +1,5 @@
 -- 🎵 Roblox Music Player 2.0+ - Random Box Edition (FIXED)
--- Tạo bởi Claude | Version 2.0+ Random Box Fixed
+-- Tạo bởi Mila | Version 2.0+ Random Box Fixed
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -28,7 +28,7 @@ local musicLibrary = {
     -- More working songs
     {name = "Bumble bee (speed)", id = "135711376668715"},
     {name = "Funk Espia", id = "124688308713895"},
-    {name "Flash Funk", id = "137418251592578"},
+    {name = "Flash Funk", id = "137418251592578"},
     {name = "Winning The Soul", id = "74809614967972"},
     {name = "Bloody! Funk", id = "136350225160627"},
     {name = "2000", id = "88900228893875"},
@@ -189,7 +189,7 @@ minimizeBtn.Size = UDim2.new(0, 30, 0, 25)
 minimizeBtn.Position = UDim2.new(1, -70, 0, 12)
 minimizeBtn.BackgroundColor3 = colors.secondary
 minimizeBtn.BorderSizePixel = 0
-minimizeBtn.Text = "🔽"
+minimizeBtn.Text = "▢"
 minimizeBtn.TextColor3 = colors.text
 minimizeBtn.TextSize = 14
 minimizeBtn.Font = Enum.Font.GothamBold
@@ -204,7 +204,7 @@ closeBtn.Size = UDim2.new(0, 30, 0, 25)
 closeBtn.Position = UDim2.new(1, -35, 0, 12)
 closeBtn.BackgroundColor3 = colors.danger
 closeBtn.BorderSizePixel = 0
-closeBtn.Text = "❌"
+closeBtn.Text = "✕"
 closeBtn.TextColor3 = colors.text
 closeBtn.TextSize = 14
 closeBtn.Font = Enum.Font.GothamBold
