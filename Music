@@ -1,8 +1,9 @@
--- 🎵 Roblox Music Player 2.0+ - Random Box Edition (FIXED)
--- Tạo bởi Mila | Version 2.0+ Random Box Fixed
+-- 🎵 Roblox Music Player 3.0 - Ultimate Edition
+-- Tạo bởi Mila | Version 3.0 with Visualizer + Shuffle + Progress Bar
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -100,7 +101,8 @@ local userData = {
     history = {},
     theme = "dark",
     repeatMode = "off",
-    volume = 5
+    volume = 5,
+    shuffleMode = false -- NEW: Shuffle mode
 }
 
 -- 🎨 Colors
@@ -111,7 +113,8 @@ local colors = {
     danger = Color3.fromRGB(244, 67, 54),
     warning = Color3.fromRGB(255, 193, 7),
     text = Color3.fromRGB(255, 255, 255),
-    textSecondary = Color3.fromRGB(200, 200, 200)
+    textSecondary = Color3.fromRGB(200, 200, 200),
+    visualizer = Color3.fromRGB(100, 200, 255) -- NEW: Visualizer color
 }
 
 -- Variables
@@ -121,17 +124,20 @@ local filteredMusic = {}
 local currentTab = 1
 local isMinimized = false
 local currentRandomSong = nil
+local visualizerConnection = nil -- NEW: For visualizer animation
+local progressConnection = nil -- NEW: For progress bar update
+local shuffleQueue = {} -- NEW: Shuffle queue
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MusicPlayerRandomBox"
+screenGui.Name = "MusicPlayerV3"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Main Frame
+-- Main Frame (INCREASED HEIGHT for new features)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 450, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -225, 0.5, -200)
+mainFrame.Size = UDim2.new(0, 450, 0, 480) -- Increased from 400 to 480
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -240)
 mainFrame.BackgroundColor3 = colors.primary
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -150,7 +156,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(0, 200, 1, 0)
 titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "🎵 Music Player 2.0+"
+titleLabel.Text = "🎵 Music Player 3.0"
 titleLabel.TextColor3 = colors.text
 titleLabel.TextSize = 18
 titleLabel.Font = Enum.Font.GothamBold
@@ -188,10 +194,51 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 4)
 closeBtnCorner.Parent = closeBtn
 
--- Now Playing
+-- ===== NEW: VISUALIZER SECTION =====
+local visualizerFrame = Instance.new("Frame")
+visualizerFrame.Size = UDim2.new(1, -20, 0, 60)
+visualizerFrame.Position = UDim2.new(0, 10, 0, 55)
+visualizerFrame.BackgroundColor3 = colors.secondary
+visualizerFrame.BorderSizePixel = 0
+visualizerFrame.Parent = mainFrame
+
+local visualizerCorner = Instance.new("UICorner")
+visualizerCorner.CornerRadius = UDim.new(0, 8)
+visualizerCorner.Parent = visualizerFrame
+
+-- Create 20 visualizer bars
+local visualizerBars = {}
+for i = 1, 20 do
+    local bar = Instance.new("Frame")
+    bar.Size = UDim2.new(0, 15, 0, 5)
+    bar.Position = UDim2.new(0, 10 + (i-1) * 20, 1, -10)
+    bar.AnchorPoint = Vector2.new(0, 1)
+    bar.BackgroundColor3 = colors.visualizer
+    bar.BorderSizePixel = 0
+    bar.Parent = visualizerFrame
+    
+    local barCorner = Instance.new("UICorner")
+    barCorner.CornerRadius = UDim.new(0, 3)
+    barCorner.Parent = bar
+    
+    table.insert(visualizerBars, bar)
+end
+
+-- Visualizer label
+local visualizerLabel = Instance.new("TextLabel")
+visualizerLabel.Size = UDim2.new(1, 0, 0, 15)
+visualizerLabel.Position = UDim2.new(0, 0, 0, 5)
+visualizerLabel.BackgroundTransparency = 1
+visualizerLabel.Text = "🎶 Audio Visualizer"
+visualizerLabel.TextColor3 = colors.textSecondary
+visualizerLabel.TextSize = 10
+visualizerLabel.Font = Enum.Font.Gotham
+visualizerLabel.Parent = visualizerFrame
+
+-- Now Playing (MOVED DOWN)
 local nowPlayingFrame = Instance.new("Frame")
 nowPlayingFrame.Size = UDim2.new(1, -20, 0, 60)
-nowPlayingFrame.Position = UDim2.new(0, 10, 0, 55)
+nowPlayingFrame.Position = UDim2.new(0, 10, 0, 125) -- Changed from 55 to 125
 nowPlayingFrame.BackgroundColor3 = colors.secondary
 nowPlayingFrame.BorderSizePixel = 0
 nowPlayingFrame.Parent = mainFrame
@@ -297,10 +344,113 @@ local repeatBtnCorner = Instance.new("UICorner")
 repeatBtnCorner.CornerRadius = UDim.new(0, 4)
 repeatBtnCorner.Parent = repeatBtn
 
--- Tab Navigation
+-- ===== NEW: PROGRESS BAR SECTION =====
+local progressFrame = Instance.new("Frame")
+progressFrame.Size = UDim2.new(1, -20, 0, 50)
+progressFrame.Position = UDim2.new(0, 10, 0, 195) -- Below now playing
+progressFrame.BackgroundColor3 = colors.secondary
+progressFrame.BorderSizePixel = 0
+progressFrame.Parent = mainFrame
+
+local progressCorner = Instance.new("UICorner")
+progressCorner.CornerRadius = UDim.new(0, 8)
+progressCorner.Parent = progressFrame
+
+-- Time labels
+local currentTimeLabel = Instance.new("TextLabel")
+currentTimeLabel.Size = UDim2.new(0, 50, 0, 20)
+currentTimeLabel.Position = UDim2.new(0, 10, 0, 8)
+currentTimeLabel.BackgroundTransparency = 1
+currentTimeLabel.Text = "0:00"
+currentTimeLabel.TextColor3 = colors.text
+currentTimeLabel.TextSize = 11
+currentTimeLabel.Font = Enum.Font.GothamBold
+currentTimeLabel.Parent = progressFrame
+
+local totalTimeLabel = Instance.new("TextLabel")
+totalTimeLabel.Size = UDim2.new(0, 50, 0, 20)
+totalTimeLabel.Position = UDim2.new(1, -60, 0, 8)
+totalTimeLabel.BackgroundTransparency = 1
+totalTimeLabel.Text = "0:00"
+totalTimeLabel.TextColor3 = colors.text
+totalTimeLabel.TextSize = 11
+totalTimeLabel.Font = Enum.Font.GothamBold
+totalTimeLabel.Parent = progressFrame
+
+-- Progress bar background
+local progressBarBg = Instance.new("Frame")
+progressBarBg.Size = UDim2.new(1, -130, 0, 8)
+progressBarBg.Position = UDim2.new(0, 65, 0, 10)
+progressBarBg.BackgroundColor3 = colors.primary
+progressBarBg.BorderSizePixel = 0
+progressBarBg.Parent = progressFrame
+
+local progressBarBgCorner = Instance.new("UICorner")
+progressBarBgCorner.CornerRadius = UDim.new(0, 4)
+progressBarBgCorner.Parent = progressBarBg
+
+-- Progress bar fill
+local progressBarFill = Instance.new("Frame")
+progressBarFill.Size = UDim2.new(0, 0, 1, 0)
+progressBarFill.BackgroundColor3 = colors.accent
+progressBarFill.BorderSizePixel = 0
+progressBarFill.Parent = progressBarBg
+
+local progressBarFillCorner = Instance.new("UICorner")
+progressBarFillCorner.CornerRadius = UDim.new(0, 4)
+progressBarFillCorner.Parent = progressBarFill
+
+-- NEW: Shuffle Button
+local shuffleBtn = Instance.new("TextButton")
+shuffleBtn.Size = UDim2.new(0, 60, 0, 22)
+shuffleBtn.Position = UDim2.new(0, 10, 0, 28)
+shuffleBtn.BackgroundColor3 = colors.primary
+shuffleBtn.BorderSizePixel = 0
+shuffleBtn.Text = "🔀 OFF"
+shuffleBtn.TextColor3 = colors.textSecondary
+shuffleBtn.TextSize = 10
+shuffleBtn.Font = Enum.Font.GothamBold
+shuffleBtn.Parent = progressFrame
+
+local shuffleBtnCorner = Instance.new("UICorner")
+shuffleBtnCorner.CornerRadius = UDim.new(0, 4)
+shuffleBtnCorner.Parent = shuffleBtn
+
+-- Previous/Next buttons
+local prevBtn = Instance.new("TextButton")
+prevBtn.Size = UDim2.new(0, 50, 0, 22)
+prevBtn.Position = UDim2.new(0.5, -60, 0, 28)
+prevBtn.BackgroundColor3 = colors.primary
+prevBtn.BorderSizePixel = 0
+prevBtn.Text = "⏮️ Prev"
+prevBtn.TextColor3 = colors.text
+prevBtn.TextSize = 10
+prevBtn.Font = Enum.Font.GothamBold
+prevBtn.Parent = progressFrame
+
+local prevBtnCorner = Instance.new("UICorner")
+prevBtnCorner.CornerRadius = UDim.new(0, 4)
+prevBtnCorner.Parent = prevBtn
+
+local nextBtn = Instance.new("TextButton")
+nextBtn.Size = UDim2.new(0, 50, 0, 22)
+nextBtn.Position = UDim2.new(0.5, 10, 0, 28)
+nextBtn.BackgroundColor3 = colors.primary
+nextBtn.BorderSizePixel = 0
+nextBtn.Text = "Next ⏭️"
+nextBtn.TextColor3 = colors.text
+nextBtn.TextSize = 10
+nextBtn.Font = Enum.Font.GothamBold
+nextBtn.Parent = progressFrame
+
+local nextBtnCorner = Instance.new("UICorner")
+nextBtnCorner.CornerRadius = UDim.new(0, 4)
+nextBtnCorner.Parent = nextBtn
+
+-- Tab Navigation (MOVED DOWN)
 local tabFrame = Instance.new("Frame")
 tabFrame.Size = UDim2.new(1, -20, 0, 40)
-tabFrame.Position = UDim2.new(0, 10, 0, 125)
+tabFrame.Position = UDim2.new(0, 10, 0, 255) -- Changed from 125 to 255
 tabFrame.BackgroundTransparency = 1
 tabFrame.Parent = mainFrame
 
@@ -328,10 +478,10 @@ for i, tabName in ipairs(tabNames) do
     tabButtons[i] = tabBtn
 end
 
--- Content Area
+-- Content Area (MOVED DOWN and RESIZED)
 local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, -20, 1, -175)
-contentFrame.Position = UDim2.new(0, 10, 0, 170)
+contentFrame.Size = UDim2.new(1, -20, 1, -305) -- Changed from -175 to -305
+contentFrame.Position = UDim2.new(0, 10, 0, 300) -- Changed from 170 to 300
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
@@ -458,8 +608,8 @@ randomTab.Parent = contentFrame
 
 -- Random Box UI
 local randomBoxFrame = Instance.new("Frame")
-randomBoxFrame.Size = UDim2.new(1, -20, 0, 120)
-randomBoxFrame.Position = UDim2.new(0, 10, 0, 20)
+randomBoxFrame.Size = UDim2.new(1, -20, 0, 90) -- Reduced height
+randomBoxFrame.Position = UDim2.new(0, 10, 0, 10)
 randomBoxFrame.BackgroundColor3 = colors.secondary
 randomBoxFrame.BorderSizePixel = 2
 randomBoxFrame.BorderColor3 = colors.warning
@@ -471,34 +621,34 @@ randomBoxCorner.Parent = randomBoxFrame
 
 -- Mystery box icon
 local mysteryIcon = Instance.new("TextLabel")
-mysteryIcon.Size = UDim2.new(0, 80, 0, 80)
-mysteryIcon.Position = UDim2.new(0, 20, 0, 20)
+mysteryIcon.Size = UDim2.new(0, 60, 0, 60)
+mysteryIcon.Position = UDim2.new(0, 15, 0, 15)
 mysteryIcon.BackgroundTransparency = 1
 mysteryIcon.Text = "🎁"
 mysteryIcon.TextColor3 = colors.warning
-mysteryIcon.TextSize = 50
+mysteryIcon.TextSize = 40
 mysteryIcon.Font = Enum.Font.GothamBold
 mysteryIcon.Parent = randomBoxFrame
 
 -- Random box title and description
 local randomTitle = Instance.new("TextLabel")
-randomTitle.Size = UDim2.new(1, -120, 0, 30)
-randomTitle.Position = UDim2.new(0, 110, 0, 15)
+randomTitle.Size = UDim2.new(1, -90, 0, 25)
+randomTitle.Position = UDim2.new(0, 85, 0, 15)
 randomTitle.BackgroundTransparency = 1
 randomTitle.Text = "🎲 MYSTERY MUSIC BOX"
 randomTitle.TextColor3 = colors.text
-randomTitle.TextSize = 16
+randomTitle.TextSize = 14
 randomTitle.Font = Enum.Font.GothamBold
 randomTitle.TextXAlignment = Enum.TextXAlignment.Left
 randomTitle.Parent = randomBoxFrame
 
 local randomDesc = Instance.new("TextLabel")
-randomDesc.Size = UDim2.new(1, -120, 0, 40)
-randomDesc.Position = UDim2.new(0, 110, 0, 45)
+randomDesc.Size = UDim2.new(1, -90, 0, 30)
+randomDesc.Position = UDim2.new(0, 85, 0, 40)
 randomDesc.BackgroundTransparency = 1
-randomDesc.Text = "Mở hộp để nhận một bài hát\nngẫu nhiên bất ngờ!"
+randomDesc.Text = "Mở hộp để nhận bài hát ngẫu nhiên!"
 randomDesc.TextColor3 = colors.textSecondary
-randomDesc.TextSize = 12
+randomDesc.TextSize = 11
 randomDesc.Font = Enum.Font.Gotham
 randomDesc.TextXAlignment = Enum.TextXAlignment.Left
 randomDesc.TextWrapped = true
@@ -506,86 +656,19 @@ randomDesc.Parent = randomBoxFrame
 
 -- Open box button
 local openBoxBtn = Instance.new("TextButton")
-openBoxBtn.Size = UDim2.new(1, -40, 0, 50)
-openBoxBtn.Position = UDim2.new(0, 20, 0, 150)
+openBoxBtn.Size = UDim2.new(1, -40, 0, 40)
+openBoxBtn.Position = UDim2.new(0, 20, 0, 110)
 openBoxBtn.BackgroundColor3 = colors.warning
 openBoxBtn.BorderSizePixel = 0
 openBoxBtn.Text = "🎁 MỞ HỘP NGẪU NHIÊN 🎁"
 openBoxBtn.TextColor3 = colors.text
-openBoxBtn.TextSize = 16
+openBoxBtn.TextSize = 14
 openBoxBtn.Font = Enum.Font.GothamBold
 openBoxBtn.Parent = randomTab
 
 local openBoxCorner = Instance.new("UICorner")
 openBoxCorner.CornerRadius = UDim.new(0, 8)
 openBoxCorner.Parent = openBoxBtn
-
--- Result display
-local resultFrame = Instance.new("Frame")
-resultFrame.Size = UDim2.new(1, -20, 0, 80)
-resultFrame.Position = UDim2.new(0, 10, 0, 210)
-resultFrame.BackgroundColor3 = colors.primary
-resultFrame.BorderSizePixel = 1
-resultFrame.BorderColor3 = colors.accent
-resultFrame.Visible = false
-resultFrame.Parent = randomTab
-
-local resultCorner = Instance.new("UICorner")
-resultCorner.CornerRadius = UDim.new(0, 8)
-resultCorner.Parent = resultFrame
-
-local resultIcon = Instance.new("TextLabel")
-resultIcon.Size = UDim2.new(0, 60, 0, 60)
-resultIcon.Position = UDim2.new(0, 10, 0, 10)
-resultIcon.BackgroundColor3 = colors.accent
-resultIcon.BorderSizePixel = 0
-resultIcon.Text = "🎵"
-resultIcon.TextColor3 = colors.text
-resultIcon.TextSize = 30
-resultIcon.Font = Enum.Font.GothamBold
-resultIcon.Parent = resultFrame
-
-local resultIconCorner = Instance.new("UICorner")
-resultIconCorner.CornerRadius = UDim.new(0, 8)
-resultIconCorner.Parent = resultIcon
-
-local resultTitle = Instance.new("TextLabel")
-resultTitle.Size = UDim2.new(1, -160, 0, 25)
-resultTitle.Position = UDim2.new(0, 80, 0, 8)
-resultTitle.BackgroundTransparency = 1
-resultTitle.Text = "Kết quả sẽ hiện ở đây"
-resultTitle.TextColor3 = colors.text
-resultTitle.TextSize = 14
-resultTitle.Font = Enum.Font.GothamBold
-resultTitle.TextXAlignment = Enum.TextXAlignment.Left
-resultTitle.TextTruncate = Enum.TextTruncate.AtEnd
-resultTitle.Parent = resultFrame
-
-local resultId = Instance.new("TextLabel")
-resultId.Size = UDim2.new(1, -160, 0, 20)
-resultId.Position = UDim2.new(0, 80, 0, 30)
-resultId.BackgroundTransparency = 1
-resultId.Text = "ID: ..."
-resultId.TextColor3 = colors.textSecondary
-resultId.TextSize = 11
-resultId.Font = Enum.Font.Gotham
-resultId.TextXAlignment = Enum.TextXAlignment.Left
-resultId.Parent = resultFrame
-
-local playResultBtn = Instance.new("TextButton")
-playResultBtn.Size = UDim2.new(0, 80, 0, 30)
-playResultBtn.Position = UDim2.new(1, -90, 0, 25)
-playResultBtn.BackgroundColor3 = colors.accent
-playResultBtn.BorderSizePixel = 0
-playResultBtn.Text = "▶️ PLAY"
-playResultBtn.TextColor3 = colors.text
-playResultBtn.TextSize = 12
-playResultBtn.Font = Enum.Font.GothamBold
-playResultBtn.Parent = resultFrame
-
-local playResultCorner = Instance.new("UICorner")
-playResultCorner.CornerRadius = UDim.new(0, 6)
-playResultCorner.Parent = playResultBtn
 
 -- TAB 4: History
 local historyTab = Instance.new("Frame")
@@ -628,7 +711,7 @@ minimizedCorner.Parent = minimizedFrame
 local restoreBtn = Instance.new("TextButton")
 restoreBtn.Size = UDim2.new(1, -35, 1, 0)
 restoreBtn.BackgroundTransparency = 1
-restoreBtn.Text = "🎵 Music Player 2.0+"
+restoreBtn.Text = "🎵 Music Player 3.0"
 restoreBtn.TextColor3 = colors.text
 restoreBtn.TextSize = 12
 restoreBtn.Font = Enum.Font.GothamBold
@@ -649,7 +732,198 @@ local minCloseBtnCorner = Instance.new("UICorner")
 minCloseBtnCorner.CornerRadius = UDim.new(0, 6)
 minCloseBtnCorner.Parent = minCloseBtn
 
--- FUNCTIONS
+-- ===== NEW FUNCTIONS =====
+
+-- Format time helper
+local function formatTime(seconds)
+    if seconds <= 0 then return "0:00" end
+    local mins = math.floor(seconds / 60)
+    local secs = math.floor(seconds % 60)
+    return string.format("%d:%02d", mins, secs)
+end
+
+-- Start visualizer animation
+local function startVisualizer()
+    if visualizerConnection then
+        visualizerConnection:Disconnect()
+    end
+    
+    local time = 0
+    visualizerConnection = RunService.RenderStepped:Connect(function(dt)
+        time = time + dt
+        
+        if currentSound and currentSound.IsPlaying then
+            -- Animate bars based on sound
+            for i, bar in ipairs(visualizerBars) do
+                local offset = (i - 1) * 0.5
+                local wave = math.sin(time * 5 + offset) * 0.5 + 0.5
+                local randomFactor = math.random(50, 100) / 100
+                local height = 5 + wave * 45 * randomFactor
+                
+                bar.Size = UDim2.new(0, 15, 0, height)
+                
+                -- Color fade effect
+                local hue = (time * 0.5 + offset * 0.1) % 1
+                bar.BackgroundColor3 = Color3.fromHSV(hue, 0.8, 0.9)
+            end
+        else
+            -- Idle animation - small waves
+            for i, bar in ipairs(visualizerBars) do
+                local offset = (i - 1) * 0.3
+                local wave = math.sin(time * 2 + offset) * 0.3 + 0.5
+                local height = 5 + wave * 10
+                
+                bar.Size = UDim2.new(0, 15, 0, height)
+                bar.BackgroundColor3 = colors.textSecondary
+            end
+        end
+    end)
+end
+
+-- Stop visualizer
+local function stopVisualizer()
+    if visualizerConnection then
+        visualizerConnection:Disconnect()
+        visualizerConnection = nil
+    end
+    
+    -- Reset bars
+    for _, bar in ipairs(visualizerBars) do
+        bar.Size = UDim2.new(0, 15, 0, 5)
+        bar.BackgroundColor3 = colors.visualizer
+    end
+end
+
+-- Update progress bar
+local function startProgressUpdate()
+    if progressConnection then
+        progressConnection:Disconnect()
+    end
+    
+    progressConnection = RunService.Heartbeat:Connect(function()
+        if currentSound and currentSound.IsPlaying then
+            local timePos = currentSound.TimePosition
+            local timeLen = currentSound.TimeLength
+            
+            if timeLen > 0 then
+                local progress = timePos / timeLen
+                progressBarFill.Size = UDim2.new(progress, 0, 1, 0)
+                currentTimeLabel.Text = formatTime(timePos)
+                totalTimeLabel.Text = formatTime(timeLen)
+            end
+        end
+    end)
+end
+
+-- Stop progress update
+local function stopProgressUpdate()
+    if progressConnection then
+        progressConnection:Disconnect()
+        progressConnection = nil
+    end
+    
+    progressBarFill.Size = UDim2.new(0, 0, 1, 0)
+    currentTimeLabel.Text = "0:00"
+    totalTimeLabel.Text = "0:00"
+end
+
+-- Generate shuffle queue
+local function generateShuffleQueue()
+    shuffleQueue = {}
+    local tempLibrary = {}
+    
+    -- Copy library
+    for _, song in ipairs(musicLibrary) do
+        table.insert(tempLibrary, song)
+    end
+    
+    -- Fisher-Yates shuffle
+    for i = #tempLibrary, 2, -1 do
+        local j = math.random(i)
+        tempLibrary[i], tempLibrary[j] = tempLibrary[j], tempLibrary[i]
+    end
+    
+    shuffleQueue = tempLibrary
+end
+
+-- Toggle shuffle mode
+local function toggleShuffle()
+    userData.shuffleMode = not userData.shuffleMode
+    
+    if userData.shuffleMode then
+        shuffleBtn.Text = "🔀 ON"
+        shuffleBtn.TextColor3 = colors.accent
+        shuffleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        generateShuffleQueue()
+        showNotification("Shuffle: BẬT", colors.accent, "🔀")
+    else
+        shuffleBtn.Text = "🔀 OFF"
+        shuffleBtn.TextColor3 = colors.textSecondary
+        shuffleBtn.BackgroundColor3 = colors.primary
+        shuffleQueue = {}
+        showNotification("Shuffle: TẮT", colors.textSecondary, "🔀")
+    end
+end
+
+-- Play next song (shuffle or normal)
+local function playNextSong()
+    if userData.shuffleMode then
+        if #shuffleQueue > 0 then
+            local nextSong = table.remove(shuffleQueue, 1)
+            playMusic(nextSong)
+            
+            -- Regenerate queue if empty
+            if #shuffleQueue == 0 then
+                generateShuffleQueue()
+            end
+        end
+    else
+        -- Normal next song logic
+        if currentPlaying then
+            local currentIndex = 1
+            for i, song in ipairs(filteredMusic) do
+                if song.id == currentPlaying.id then
+                    currentIndex = i
+                    break
+                end
+            end
+            
+            local nextIndex = currentIndex + 1
+            if nextIndex > #filteredMusic then
+                nextIndex = 1
+            end
+            
+            if filteredMusic[nextIndex] then
+                playMusic(filteredMusic[nextIndex])
+            end
+        end
+    end
+end
+
+-- Play previous song
+local function playPreviousSong()
+    if currentPlaying then
+        local currentIndex = 1
+        for i, song in ipairs(filteredMusic) do
+            if song.id == currentPlaying.id then
+                currentIndex = i
+                break
+            end
+        end
+        
+        local prevIndex = currentIndex - 1
+        if prevIndex < 1 then
+            prevIndex = #filteredMusic
+        end
+        
+        if filteredMusic[prevIndex] then
+            playMusic(filteredMusic[prevIndex])
+        end
+    end
+end
+
+-- ===== ORIGINAL FUNCTIONS (UPDATED) =====
+
 local function showNotification(text, color, icon)
     spawn(function()
         local notif = Instance.new("Frame")
@@ -743,7 +1017,11 @@ local function addToHistory(musicData)
     updateHistoryTab()
 end
 
-local function playMusic(musicData)
+function playMusic(musicData)
+    -- Stop previous sound
+    stopVisualizer()
+    stopProgressUpdate()
+    
     currentSound = createSound(musicData.id)
     
     if not currentSound then
@@ -768,27 +1046,14 @@ local function playMusic(musicData)
     addToHistory(musicData)
     showNotification("🎵 Đang phát: " .. musicData.name, colors.accent, "🎵")
     
+    -- NEW: Start visualizer and progress bar
+    startVisualizer()
+    startProgressUpdate()
+    
     if currentSound then
         currentSound.Ended:Connect(function()
-            if userData.repeatMode == "all" then
-                local currentIndex = 1
-                for i, item in ipairs(filteredMusic) do
-                    if item.id == musicData.id then
-                        currentIndex = i
-                        break
-                    end
-                end
-                
-                local nextIndex = currentIndex + 1
-                if nextIndex > #filteredMusic then
-                    nextIndex = 1
-                end
-                
-                if filteredMusic[nextIndex] then
-                    playMusic(filteredMusic[nextIndex])
-                else
-                    stopMusic()
-                end
+            if userData.repeatMode == "all" or userData.shuffleMode then
+                playNextSong()
             elseif userData.repeatMode == "one" then
                 playMusic(musicData)
             else
@@ -807,6 +1072,10 @@ local function stopMusic()
         currentSound = nil
     end
     
+    -- NEW: Stop visualizer and progress
+    stopVisualizer()
+    stopProgressUpdate()
+    
     currentPlaying = nil
     nowPlayingLabel.Text = "Không có nhạc nào đang phát"
     statusLabel.Text = "Volume: " .. userData.volume .. " | Sẵn sàng phát nhạc"
@@ -820,7 +1089,6 @@ local function updateVolume(newVolume)
     userData.volume = newVolume
     volumeSlider.Text = tostring(newVolume)
     
-    -- Update volume icon based on level
     if newVolume == 0 then
         volumeIcon.Text = "🔇"
     elseif newVolume <= 3 then
@@ -829,12 +1097,10 @@ local function updateVolume(newVolume)
         volumeIcon.Text = "🔊"
     end
     
-    -- Update current sound volume
     if currentSound then
         currentSound.Volume = newVolume
     end
     
-    -- Update status
     if currentPlaying then
         statusLabel.Text = "Đang phát - Volume: " .. newVolume
     else
@@ -868,12 +1134,10 @@ local function cycleRepeatMode()
 end
 
 local function openRandomBox()
-    -- Show opening animation
     mysteryIcon.Text = "🎁"
     openBoxBtn.Text = "🎁 ĐANG MỞ... 🎁"
     openBoxBtn.BackgroundColor3 = colors.textSecondary
     
-    -- Animate mystery box
     spawn(function()
         for i = 1, 6 do
             wait(0.2)
@@ -886,24 +1150,15 @@ local function openRandomBox()
             end
         end
         
-        -- Reset rotation and show result
         mysteryIcon.Rotation = 0
         mysteryIcon.Text = "✨"
         
-        -- Get random song
         local randomSong = musicLibrary[math.random(1, #musicLibrary)]
         currentRandomSong = randomSong
         
-        -- Show result
-        resultFrame.Visible = true
-        resultTitle.Text = randomSong.name
-        resultId.Text = "ID: " .. randomSong.id
-        
-        -- Auto play the random song
-        wait(1)
+        wait(0.5)
         playMusic(randomSong)
         
-        -- Celebrate animation
         spawn(function()
             local celebrations = {"🎉", "✨", "🎊", "🌟", "💫"}
             for i = 1, 10 do
@@ -913,7 +1168,6 @@ local function openRandomBox()
             mysteryIcon.Text = "🎁"
         end)
         
-        -- Reset button
         wait(2)
         openBoxBtn.Text = "🎁 MỞ HỘP NGẪU NHIÊN 🎁"
         openBoxBtn.BackgroundColor3 = colors.warning
@@ -933,7 +1187,6 @@ local function createMusicItem(musicData, parent)
     itemCorner.CornerRadius = UDim.new(0, 6)
     itemCorner.Parent = itemFrame
     
-    -- Song name
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, -50, 0, 25)
     nameLabel.Position = UDim2.new(0, 10, 0, 5)
@@ -946,7 +1199,6 @@ local function createMusicItem(musicData, parent)
     nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
     nameLabel.Parent = itemFrame
     
-    -- ID info
     local idLabel = Instance.new("TextLabel")
     idLabel.Size = UDim2.new(1, -50, 0, 15)
     idLabel.Position = UDim2.new(0, 10, 0, 25)
@@ -959,7 +1211,6 @@ local function createMusicItem(musicData, parent)
     idLabel.TextTruncate = Enum.TextTruncate.AtEnd
     idLabel.Parent = itemFrame
     
-    -- Play button
     local playBtn = Instance.new("TextButton")
     playBtn.Size = UDim2.new(0, 35, 0, 35)
     playBtn.Position = UDim2.new(1, -40, 0, 7)
@@ -979,7 +1230,6 @@ local function createMusicItem(musicData, parent)
         playMusic(musicData)
     end)
     
-    -- Hover effects
     local originalColor = itemFrame.BackgroundColor3
     itemFrame.MouseEnter:Connect(function()
         local newColor = Color3.fromRGB(
@@ -997,7 +1247,6 @@ local function createMusicItem(musicData, parent)
     return itemFrame
 end
 
--- Update Functions
 local function updateLibraryTab()
     for _, child in pairs(libraryScroll:GetChildren()) do
         if child:IsA("Frame") then
@@ -1012,7 +1261,7 @@ local function updateLibraryTab()
     libraryScroll.CanvasSize = UDim2.new(0, 0, 0, #filteredMusic * 53)
 end
 
-local function updateHistoryTab()
+function updateHistoryTab()
     for _, child in pairs(historyScroll:GetChildren()) do
         if child:IsA("Frame") then
             child:Destroy()
@@ -1062,18 +1311,15 @@ end
 local function switchTab(tabIndex)
     currentTab = tabIndex
     
-    -- Update tab buttons
     for i, button in ipairs(tabButtons) do
         button.BackgroundColor3 = i == tabIndex and colors.accent or colors.secondary
     end
     
-    -- Hide all tabs
     manualTab.Visible = false
     libraryTab.Visible = false
     randomTab.Visible = false
     historyTab.Visible = false
     
-    -- Show selected tab
     if tabIndex == 1 then
         manualTab.Visible = true
     elseif tabIndex == 2 then
@@ -1099,12 +1345,15 @@ local function toggleMinimize()
     else
         mainFrame.Visible = true
         minimizedFrame.Visible = false
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {Size = UDim2.new(0, 450, 0, 400)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {Size = UDim2.new(0, 450, 0, 480)})
         tween:Play()
     end
 end
 
 local function closePlayer()
+    stopVisualizer()
+    stopProgressUpdate()
+    
     if currentSound then
         pcall(function()
             currentSound:Stop()
@@ -1119,17 +1368,16 @@ filteredMusic = musicLibrary
 updateLibraryTab()
 updateHistoryTab()
 updateVolume(userData.volume)
+startVisualizer() -- NEW: Start visualizer on load
 
 -- EVENT CONNECTIONS
 
--- Tab switching
 for i, button in ipairs(tabButtons) do
     button.MouseButton1Click:Connect(function()
         switchTab(i)
     end)
 end
 
--- Manual tab
 playManualBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
@@ -1152,23 +1400,14 @@ idInput.FocusLost:Connect(function(enterPressed)
     end
 end)
 
--- Random Box
 openBoxBtn.MouseButton1Click:Connect(function()
     openRandomBox()
 end)
 
-playResultBtn.MouseButton1Click:Connect(function()
-    if currentRandomSong then
-        playMusic(currentRandomSong)
-    end
-end)
-
--- Search
 searchBox.Changed:Connect(function()
     filterMusic(searchBox.Text)
 end)
 
--- Volume control
 volumeSlider.FocusLost:Connect(function()
     local volume = tonumber(volumeSlider.Text)
     if volume then
@@ -1179,7 +1418,6 @@ volumeSlider.FocusLost:Connect(function()
     end
 end)
 
--- Volume shortcuts with + and - keys
 volumeSlider.Changed:Connect(function()
     if volumeSlider.Text == "+" then
         updateVolume(userData.volume + 1)
@@ -1188,14 +1426,21 @@ volumeSlider.Changed:Connect(function()
     end
 end)
 
--- Control buttons
 repeatBtn.MouseButton1Click:Connect(cycleRepeatMode)
+
+-- NEW: Shuffle button
+shuffleBtn.MouseButton1Click:Connect(toggleShuffle)
+
+-- NEW: Previous/Next buttons
+prevBtn.MouseButton1Click:Connect(playPreviousSong)
+nextBtn.MouseButton1Click:Connect(playNextSong)
+
 minimizeBtn.MouseButton1Click:Connect(toggleMinimize)
 restoreBtn.MouseButton1Click:Connect(toggleMinimize)
 closeBtn.MouseButton1Click:Connect(closePlayer)
 minCloseBtn.MouseButton1Click:Connect(closePlayer)
 
--- Hover effects for buttons
+-- Hover effects
 local function addHoverEffect(button, hoverMultiplier)
     local originalColor = button.BackgroundColor3
     
@@ -1213,18 +1458,19 @@ local function addHoverEffect(button, hoverMultiplier)
     end)
 end
 
--- Apply hover effects
 addHoverEffect(playManualBtn)
 addHoverEffect(stopBtn)
 addHoverEffect(openBoxBtn)
-addHoverEffect(playResultBtn)
 addHoverEffect(repeatBtn)
+addHoverEffect(shuffleBtn)
+addHoverEffect(prevBtn)
+addHoverEffect(nextBtn)
 addHoverEffect(minimizeBtn)
 addHoverEffect(closeBtn)
 addHoverEffect(minCloseBtn)
 addHoverEffect(volumeSlider, 1.1)
 
--- Draggable functionality
+-- Draggable
 local dragging = false
 local dragStart = nil
 local startPos = nil
@@ -1260,43 +1506,55 @@ end
 makeDraggable(headerFrame)
 makeDraggable(minimizedFrame)
 
--- Welcome notification
+-- Welcome
 spawn(function()
     wait(1)
-    showNotification("🎉 Music Player Random Box đã sẵn sàng!", colors.accent, "🎵")
+    showNotification("🎉 Music Player 3.0 đã sẵn sàng!", colors.accent, "🎵")
+    wait(2)
+    showNotification("✨ NEW: Visualizer + Shuffle + Progress!", colors.warning, "🆕")
 end)
 
-print("🎵 MUSIC PLAYER 2.0+ - RANDOM BOX EDITION LOADED! 🎵")
-print("✅ UPDATED SONG LIBRARY!")
+print("🎵 ===== MUSIC PLAYER 3.0 - ULTIMATE EDITION ===== 🎵")
+print("✅ LOADED SUCCESSFULLY!")
 print("")
-print("🆕 FEATURES:")
-print("   🎲 RANDOM BOX: Mystery music discovery!")
-print("   ✨ 4 tabs: Manual, Library, Random Box, History")
-print("   🎵 80+ SONGS including new additions!")
-print("   🔊 Volume Control (0-10) with shortcuts")
-print("   📜 History of 20 recent songs")
-print("   🔄 Repeat modes: Off/One/All")
-print("   🔍 Search in library")
-print("   📱 Drag & drop, minimize")
-print("   🎉 Beautiful notifications & animations")
+print("🆕 VERSION 3.0 NEW FEATURES:")
+print("   🎨 VISUALIZER: 20 animated audio bars with color effects!")
+print("   🔀 SHUFFLE MODE: Random playback with smart queue system")
+print("   ⏱️ PROGRESS BAR: Real-time playback with time display")
+print("   ⏮️⏭️ PREV/NEXT: Navigate through songs easily")
 print("")
-print("💡 HOW TO USE:")
-print("   🆔 Manual: Enter ID → Play")
-print("   📋 Library: Search & play songs")
-print("   🎲 Random Box: Open for instant random music!")
-print("   📜 History: Recently played songs")
+print("📊 VISUALIZER:")
+print("   • 20 animated bars that react to music")
+print("   • Rainbow color effects when playing")
+print("   • Smooth wave animation when idle")
 print("")
-print("🎵 NEW SONGS ADDED:")
-print("   • Anime: 残酷な天使のテーゼ, Yoasobi, Uma Musume")
-print("   • Christmas: Jingle Bells, All I Want For Christmas")
-print("   • Phonk/Funk: Multiple Montagem tracks, FUNK CRIMINAL")
-print("   • Liminal/Ambient: Liminal Space, Echoes, Backrooms")
-print("   • Gaming: Undertale, Squid Game")
-print("   • Many more unique tracks!")
+print("🔀 SHUFFLE MODE:")
+print("   • Click 🔀 button to toggle ON/OFF")
+print("   • Smart queue system prevents repeats")
+print("   • Auto-regenerates queue when empty")
+print("   • Works with all 80+ songs!")
 print("")
-print("🔊 VOLUME CONTROL:")
-print("   • Type number 0-10 in volume box")
-print("   • Type + to increase, - to decrease")
-print("   • 🔇 Mute, 🔉 Low, 🔊 High icons")
+print("⏱️ PROGRESS BAR:")
+print("   • Real-time progress tracking")
+print("   • Current time / Total time display")
+print("   • Smooth progress animation")
+print("   • Shows exact playback position")
 print("")
-print("🎁 Discover 80+ songs with Random Box! 🎲🎵")
+print("🎵 ALL PREVIOUS FEATURES INCLUDED:")
+print("   • 80+ songs library")
+print("   • Random Box mystery music")
+print("   • Volume control (0-10)")
+print("   • Repeat modes (Off/One/All)")
+print("   • History tracking (20 songs)")
+print("   • Search functionality")
+print("   • Beautiful UI with animations")
+print("")
+print("🎮 CONTROLS:")
+print("   ⏮️ Previous: Play previous song")
+print("   ⏭️ Next: Play next song")
+print("   🔀 Shuffle: Toggle random playback")
+print("   🔄🔂🔁 Repeat: Cycle repeat modes")
+print("   🔊 Volume: Adjust 0-10")
+print("")
+print("🎉 ENJOY MUSIC PLAYER 3.0! 🎵")
+    
