@@ -1,5 +1,5 @@
 -- Mila Command V3.0 - Roblox UI
--- Created by Assistant
+-- Created by Mila
 -- Full featured, optimized, and bug-free
 
 local Players = game:GetService("Players")
