@@ -27,7 +27,7 @@ local musicLibrary = {
     
     -- More working songs
     {name = "Bumble bee (speed)", id = "135711376668715"},
-    {name = "Giorno Theme", id = "3621670787"},
+    {name = "Funk Espia", id = "124688308713895"},
     {name = "Astronomia (Coffin Dance)", id = "4965456608"},
     {name = "Baka Mitai", id = "5863626637"},
     {name = "Never Gonna Give You Up", id = "6565332301"},
