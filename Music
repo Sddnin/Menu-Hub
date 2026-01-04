@@ -26,7 +26,7 @@ local musicLibrary = {
     {name = "Đám ma", id = "1845920681"},
     
     -- More working songs
-    {name = "Megalovania", id = "2996427130"},
+    {name = "Bumble bee (speed)", id = "135711376668715"},
     {name = "Giorno Theme", id = "3621670787"},
     {name = "Astronomia (Coffin Dance)", id = "4965456608"},
     {name = "Baka Mitai", id = "5863626637"},
