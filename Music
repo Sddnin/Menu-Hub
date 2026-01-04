@@ -1,5 +1,5 @@
 -- 🎵 Roblox Music Player 2.0+ - Random Box Edition (FIXED)
--- Tạo bởi Mila | Version 2.0+ Random Box Fixed
+-- Tạo bởi Claude | Version 2.0+ Random Box Fixed
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
