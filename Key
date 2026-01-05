@@ -214,7 +214,7 @@ otherContent.BackgroundTransparency = 1
 otherContent.ScrollBarThickness = 4
 otherContent.ScrollBarImageColor3 = Color3.fromRGB(70, 130, 255)
 otherContent.BorderSizePixel = 0
-otherContent.CanvasSize = UDim2.new(0, 0, 0, 350)
+otherContent.CanvasSize = UDim2.new(0, 0, 0, 500)
 otherContent.Visible = false
 otherContent.Parent = contentArea
 otherContent.ZIndex = 51
@@ -691,7 +691,7 @@ local function switchTab(tabName)
     elseif tabName == "Script" then
         updateScriptList("")
     elseif tabName == "Other" then
-        contentArea.CanvasSize = UDim2.new(0, 0, 0, 350)
+        otherContent.CanvasSize = UDim2.new(0, 0, 0, 500)
     end
 end
 
