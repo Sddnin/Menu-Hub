@@ -1,5 +1,5 @@
--- 🎵 Roblox Music Player 3.0 - Optimized UI Edition
--- Tạo bởi Mila | Version 3.0 with Optimized Sizing
+-- 🎵 Roblox Music Player 3.1 - With Loading Screen
+-- Tạo bởi Mila | Version 3.1 - Added Loading Animation
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -110,7 +110,9 @@ local colors = {
     warning = Color3.fromRGB(255, 193, 7),
     text = Color3.fromRGB(255, 255, 255),
     textSecondary = Color3.fromRGB(200, 200, 200),
-    visualizer = Color3.fromRGB(100, 200, 255)
+    visualizer = Color3.fromRGB(100, 200, 255),
+    loadingBg = Color3.fromRGB(20, 20, 20, 0.95),
+    loadingAccent = Color3.fromRGB(100, 200, 255)
 }
 
 -- Variables
@@ -124,6 +126,8 @@ local visualizerConnection = nil
 local progressConnection = nil
 local miniProgressConnection = nil
 local shuffleQueue = {}
+local loadingFrame = nil
+local loadingSpinnerConnection = nil
 
 -- UI References
 local minimizedSongLabel
@@ -133,7 +137,7 @@ local minimizedPlayPauseBtn
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MusicPlayerV3"
+screenGui.Name = "MusicPlayerV3_1"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
@@ -159,7 +163,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(0, 200, 1, 0)
 titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "🎵 Music Player 3.0"
+titleLabel.Text = "🎵 Music Player 3.1"
 titleLabel.TextColor3 = colors.text
 titleLabel.TextSize = 16
 titleLabel.Font = Enum.Font.GothamBold
@@ -473,7 +477,7 @@ for i, tabName in ipairs(tabNames) do
     tabButtons[i] = tabBtn
 end
 
--- Content Area (INCREASED HEIGHT)
+-- Content Area
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, -24, 1, -280)
 contentFrame.Position = UDim2.new(0, 12, 0, 270)
@@ -496,7 +500,7 @@ manualLabel.TextColor3 = colors.text
 manualLabel.TextSize = 15
 manualLabel.Font = Enum.Font.GothamBold
 manualLabel.TextXAlignment = Enum.TextXAlignment.Left
-manualLabel.Parent = manualTab
+manualTab.Parent = manualTab
 
 local idInput = Instance.new("TextBox")
 idInput.Size = UDim2.new(1, -10, 0, 45)
@@ -685,7 +689,7 @@ historyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 historyLayout.Padding = UDim.new(0, 4)
 historyLayout.Parent = historyScroll
 
--- ===== MINIMIZED FRAME (OPTIMIZED) =====
+-- ===== MINIMIZED FRAME =====
 local minimizedFrame = Instance.new("Frame")
 minimizedFrame.Size = UDim2.new(0, 380, 0, 75)
 minimizedFrame.Position = UDim2.new(0.5, -190, 0, 20)
@@ -698,7 +702,6 @@ local minimizedCorner = Instance.new("UICorner")
 minimizedCorner.CornerRadius = UDim.new(0, 12)
 minimizedCorner.Parent = minimizedFrame
 
--- Top section
 local miniTopFrame = Instance.new("Frame")
 miniTopFrame.Size = UDim2.new(1, 0, 0, 28)
 miniTopFrame.BackgroundTransparency = 1
@@ -707,7 +710,7 @@ miniTopFrame.Parent = minimizedFrame
 local restoreBtn = Instance.new("TextButton")
 restoreBtn.Size = UDim2.new(1, -35, 1, 0)
 restoreBtn.BackgroundTransparency = 1
-restoreBtn.Text = "🎵 Music Player 3.0"
+restoreBtn.Text = "🎵 Music Player 3.1"
 restoreBtn.TextColor3 = colors.text
 restoreBtn.TextSize = 14
 restoreBtn.Font = Enum.Font.GothamBold
@@ -733,7 +736,6 @@ local minCloseBtnCorner = Instance.new("UICorner")
 minCloseBtnCorner.CornerRadius = UDim.new(0, 6)
 minCloseBtnCorner.Parent = minCloseBtn
 
--- Song info
 local miniInfoFrame = Instance.new("Frame")
 miniInfoFrame.Size = UDim2.new(1, -16, 0, 18)
 miniInfoFrame.Position = UDim2.new(0, 8, 0, 30)
@@ -762,7 +764,6 @@ minimizedTimeLabel.Font = Enum.Font.Gotham
 minimizedTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
 minimizedTimeLabel.Parent = miniInfoFrame
 
--- Progress bar
 local miniProgressBg = Instance.new("Frame")
 miniProgressBg.Size = UDim2.new(1, -16, 0, 4)
 miniProgressBg.Position = UDim2.new(0, 8, 0, 50)
@@ -784,7 +785,6 @@ local miniProgressFillCorner = Instance.new("UICorner")
 miniProgressFillCorner.CornerRadius = UDim.new(0, 2)
 miniProgressFillCorner.Parent = minimizedProgressBar
 
--- Control buttons
 local miniControlFrame = Instance.new("Frame")
 miniControlFrame.Size = UDim2.new(0, 130, 0, 26)
 miniControlFrame.Position = UDim2.new(0.5, -65, 1, -30)
@@ -850,6 +850,146 @@ miniStopBtn.Parent = miniControlFrame
 local miniStopCorner = Instance.new("UICorner")
 miniStopCorner.CornerRadius = UDim.new(0, 6)
 miniStopCorner.Parent = miniStopBtn
+
+-- ===== 🆕 LOADING SCREEN =====
+local function createLoadingScreen()
+    if loadingFrame then
+        loadingFrame:Destroy()
+    end
+
+    loadingFrame = Instance.new("Frame")
+    loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+    loadingFrame.Position = UDim2.new(0, 0, 0, 0)
+    loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    loadingFrame.BackgroundTransparency = 0.3
+    loadingFrame.BorderSizePixel = 0
+    loadingFrame.ZIndex = 1000
+    loadingFrame.Parent = screenGui
+
+    local loadingContainer = Instance.new("Frame")
+    loadingContainer.Size = UDim2.new(0, 300, 0, 200)
+    loadingContainer.Position = UDim2.new(0.5, -150, 0.5, -100)
+    loadingContainer.BackgroundColor3 = colors.primary
+    loadingContainer.BorderSizePixel = 0
+    loadingContainer.Parent = loadingFrame
+
+    local containerCorner = Instance.new("UICorner")
+    containerCorner.CornerRadius = UDim.new(0, 16)
+    containerCorner.Parent = loadingContainer
+
+    -- Animated music note icon
+    local musicNoteIcon = Instance.new("TextLabel")
+    musicNoteIcon.Size = UDim2.new(0, 80, 0, 80)
+    musicNoteIcon.Position = UDim2.new(0.5, -40, 0, 25)
+    musicNoteIcon.BackgroundTransparency = 1
+    musicNoteIcon.Text = "🎵"
+    musicNoteIcon.TextColor3 = colors.loadingAccent
+    musicNoteIcon.TextSize = 60
+    musicNoteIcon.Font = Enum.Font.GothamBold
+    musicNoteIcon.Parent = loadingContainer
+
+    -- Loading text
+    local loadingText = Instance.new("TextLabel")
+    loadingText.Size = UDim2.new(1, -40, 0, 30)
+    loadingText.Position = UDim2.new(0, 20, 0, 110)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Text = "Đang tải nhạc..."
+    loadingText.TextColor3 = colors.text
+    loadingText.TextSize = 16
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.Parent = loadingContainer
+
+    -- Spinning circle loader
+    local spinnerFrame = Instance.new("Frame")
+    spinnerFrame.Size = UDim2.new(0, 50, 0, 50)
+    spinnerFrame.Position = UDim2.new(0.5, -25, 0, 145)
+    spinnerFrame.BackgroundTransparency = 1
+    spinnerFrame.Parent = loadingContainer
+
+    -- Create 8 dots for spinner
+    local spinnerDots = {}
+    for i = 1, 8 do
+        local dot = Instance.new("Frame")
+        dot.Size = UDim2.new(0, 8, 0, 8)
+        dot.BackgroundColor3 = colors.loadingAccent
+        dot.BorderSizePixel = 0
+        dot.AnchorPoint = Vector2.new(0.5, 0.5)
+        
+        local angle = (i - 1) * (math.pi * 2 / 8)
+        local radius = 18
+        dot.Position = UDim2.new(
+            0.5, math.cos(angle) * radius,
+            0.5, math.sin(angle) * radius
+        )
+        
+        dot.Parent = spinnerFrame
+        
+        local dotCorner = Instance.new("UICorner")
+        dotCorner.CornerRadius = UDim.new(1, 0)
+        dotCorner.Parent = dot
+        
+        table.insert(spinnerDots, dot)
+    end
+
+    -- Animate music note bounce
+    spawn(function()
+        while loadingFrame and loadingFrame.Parent do
+            TweenService:Create(musicNoteIcon, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), 
+                {Position = UDim2.new(0.5, -40, 0, 20)}):Play()
+            wait(0.5)
+            TweenService:Create(musicNoteIcon, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), 
+                {Position = UDim2.new(0.5, -40, 0, 30)}):Play()
+            wait(0.5)
+        end
+    end)
+
+    -- Animate loading text dots
+    spawn(function()
+        local dots = 0
+        while loadingFrame and loadingFrame.Parent do
+            dots = (dots % 3) + 1
+            loadingText.Text = "Đang tải nhạc" .. string.rep(".", dots)
+            wait(0.4)
+        end
+    end)
+
+    -- Animate spinner rotation
+    if loadingSpinnerConnection then
+        loadingSpinnerConnection:Disconnect()
+    end
+
+    local time = 0
+    loadingSpinnerConnection = RunService.RenderStepped:Connect(function(dt)
+        time = time + dt * 3
+        
+        for i, dot in ipairs(spinnerDots) do
+            local delay = (i - 1) * 0.125
+            local opacity = (math.sin(time + delay * math.pi * 2) + 1) / 2
+            dot.BackgroundTransparency = 1 - opacity
+            
+            local scale = 0.7 + opacity * 0.3
+            dot.Size = UDim2.new(0, 8 * scale, 0, 8 * scale)
+        end
+    end)
+
+    return loadingFrame
+end
+
+local function hideLoadingScreen()
+    if loadingSpinnerConnection then
+        loadingSpinnerConnection:Disconnect()
+        loadingSpinnerConnection = nil
+    end
+
+    if loadingFrame then
+        local fadeOut = TweenService:Create(loadingFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            loadingFrame:Destroy()
+            loadingFrame = nil
+        end)
+    end
+end
 
 -- ===== FUNCTIONS =====
 
@@ -1165,52 +1305,71 @@ local function addToHistory(musicData)
 end
 
 function playMusic(musicData)
+    -- 🆕 Show loading screen
+    createLoadingScreen()
+    
     stopVisualizer()
     stopProgressUpdate()
     stopMiniProgressUpdate()
 
-    currentSound = createSound(musicData.id)
+    spawn(function()
+        -- Simulate network delay
+        wait(0.5)
+        
+        currentSound = createSound(musicData.id)
 
-    if not currentSound then
-        showNotification("Lỗi tạo âm thanh! ID không hợp lệ.", colors.danger, "⚠️")
-        return
-    end
+        if not currentSound then
+            hideLoadingScreen()
+            showNotification("Lỗi tạo âm thanh! ID không hợp lệ.", colors.danger, "⚠️")
+            return
+        end
 
-    local success = pcall(function()
-        currentSound:Play()
-    end)
+        -- Wait for sound to load
+        local loadTimeout = 0
+        while currentSound.TimeLength == 0 and loadTimeout < 5 do
+            wait(0.1)
+            loadTimeout = loadTimeout + 0.1
+        end
 
-    if not success then
-        showNotification("Lỗi phát nhạc! Thử lại sau.", colors.danger, "⚠️")
-        return
-    end
-
-    currentPlaying = musicData
-    nowPlayingLabel.Text = musicData.name
-    statusLabel.Text = "Đang phát - Volume: " .. userData.volume
-    musicIcon.Text = "🎵"
-
-    minimizedSongLabel.Text = musicData.name
-    minimizedPlayPauseBtn.Text = "⏸️"
-
-    addToHistory(musicData)
-    showNotification("🎵 Đang phát: " .. musicData.name, colors.accent, "🎵")
-
-    startVisualizer()
-    startProgressUpdate()
-    startMiniProgressUpdate()
-
-    if currentSound then
-        currentSound.Ended:Connect(function()
-            if userData.repeatMode == "all" or userData.shuffleMode then
-                playNextSong()
-            elseif userData.repeatMode == "one" then
-                playMusic(musicData)
-            else
-                stopMusic()
-            end
+        local success = pcall(function()
+            currentSound:Play()
         end)
-    end
+
+        -- 🆕 Hide loading screen
+        hideLoadingScreen()
+
+        if not success then
+            showNotification("Lỗi phát nhạc! Thử lại sau.", colors.danger, "⚠️")
+            return
+        end
+
+        currentPlaying = musicData
+        nowPlayingLabel.Text = musicData.name
+        statusLabel.Text = "Đang phát - Volume: " .. userData.volume
+        musicIcon.Text = "🎵"
+
+        minimizedSongLabel.Text = musicData.name
+        minimizedPlayPauseBtn.Text = "⏸️"
+
+        addToHistory(musicData)
+        showNotification("🎵 Đang phát: " .. musicData.name, colors.accent, "🎵")
+
+        startVisualizer()
+        startProgressUpdate()
+        startMiniProgressUpdate()
+
+        if currentSound then
+            currentSound.Ended:Connect(function()
+                if userData.repeatMode == "all" or userData.shuffleMode then
+                    playNextSong()
+                elseif userData.repeatMode == "one" then
+                    playMusic(musicData)
+                else
+                    stopMusic()
+                end
+            end)
+        end
+    end)
 end
 
 local function stopMusic()
@@ -1225,6 +1384,7 @@ local function stopMusic()
     stopVisualizer()
     stopProgressUpdate()
     stopMiniProgressUpdate()
+    hideLoadingScreen()
 
     currentPlaying = nil
     nowPlayingLabel.Text = "Không có nhạc nào đang phát"
@@ -1507,6 +1667,7 @@ local function closePlayer()
     stopVisualizer()
     stopProgressUpdate()
     stopMiniProgressUpdate()
+    hideLoadingScreen()
 
     if currentSound then
         pcall(function()
@@ -1526,14 +1687,12 @@ startVisualizer()
 
 -- ===== EVENT CONNECTIONS =====
 
--- Tab buttons
 for i, button in ipairs(tabButtons) do
     button.MouseButton1Click:Connect(function()
         switchTab(i)
     end)
 end
 
--- Manual tab
 playManualBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
@@ -1556,17 +1715,14 @@ idInput.FocusLost:Connect(function(enterPressed)
     end
 end)
 
--- Random box
 openBoxBtn.MouseButton1Click:Connect(function()
     openRandomBox()
 end)
 
--- Search
 searchBox.Changed:Connect(function()
     filterMusic(searchBox.Text)
 end)
 
--- Volume
 volumeSlider.FocusLost:Connect(function()
     local volume = tonumber(volumeSlider.Text)
     if volume then
@@ -1585,17 +1741,14 @@ volumeSlider.Changed:Connect(function()
     end
 end)
 
--- Controls
 repeatBtn.MouseButton1Click:Connect(cycleRepeatMode)
 shuffleBtn.MouseButton1Click:Connect(toggleShuffle)
 prevBtn.MouseButton1Click:Connect(playPreviousSong)
 nextBtn.MouseButton1Click:Connect(playNextSong)
 
--- Main window controls
 minimizeBtn.MouseButton1Click:Connect(toggleMinimize)
 closeBtn.MouseButton1Click:Connect(closePlayer)
 
--- Minimized window controls
 restoreBtn.MouseButton1Click:Connect(toggleMinimize)
 minCloseBtn.MouseButton1Click:Connect(closePlayer)
 miniPrevBtn.MouseButton1Click:Connect(playPreviousSong)
@@ -1603,7 +1756,6 @@ miniNextBtn.MouseButton1Click:Connect(playNextSong)
 miniStopBtn.MouseButton1Click:Connect(stopMusic)
 minimizedPlayPauseBtn.MouseButton1Click:Connect(togglePlayPause)
 
--- Hover effects
 local function addHoverEffect(button, hoverMultiplier)
     local originalColor = button.BackgroundColor3
 
@@ -1621,7 +1773,6 @@ local function addHoverEffect(button, hoverMultiplier)
     end)
 end
 
--- Main window hover effects
 addHoverEffect(playManualBtn)
 addHoverEffect(stopBtn)
 addHoverEffect(openBoxBtn)
@@ -1633,14 +1784,12 @@ addHoverEffect(minimizeBtn)
 addHoverEffect(closeBtn)
 addHoverEffect(volumeSlider, 1.1)
 
--- Minimized window hover effects
 addHoverEffect(miniPrevBtn)
 addHoverEffect(miniNextBtn)
 addHoverEffect(miniStopBtn)
 addHoverEffect(minimizedPlayPauseBtn)
 addHoverEffect(minCloseBtn)
 
--- Draggable functionality
 local dragging = false
 local dragStart = nil
 local startPos = nil
@@ -1676,31 +1825,20 @@ end
 makeDraggable(headerFrame)
 makeDraggable(minimizedFrame)
 
--- Welcome messages
 spawn(function()
     wait(1)
-    showNotification("🎉 Music Player 3.0 đã sẵn sàng!", colors.accent, "🎵")
+    showNotification("🎉 Music Player 3.1 - Với Loading Screen!", colors.accent, "🎵")
     wait(2)
-    showNotification("✨ UI đã được tối ưu hóa!", colors.warning, "🆕")
+    showNotification("✨ Thử phát nhạc để xem hiệu ứng loading!", colors.warning, "🆕")
 end)
 
--- Console output
-print("🎵 ===== MUSIC PLAYER 3.0 - OPTIMIZED UI ===== 🎵")
+print("🎵 ===== MUSIC PLAYER 3.1 - WITH LOADING SCREEN ===== 🎵")
 print("✅ LOADED SUCCESSFULLY!")
 print("")
-print("🆕 OPTIMIZED FEATURES:")
-print("   📐 Perfect size: 420x480 (main) | 380x75 (mini)")
-print("   🎨 18 visualizer bars with rainbow effects")
-print("   📜 Scrollable library - hiển thị đủ 80+ bài hát")
-print("   🔀 Shuffle mode with smart queue")
-print("   ⏱️ Real-time progress tracking")
-print("   🎮 Enhanced minimized controls")
+print("🆕 NEW FEATURES:")
+print("   ⏳ Animated loading screen khi tải nhạc")
+print("   🎵 Bouncing music note animation")
+print("   ⭕ Spinning dot loader")
+print("   ✨ Smooth fade in/out transitions")
 print("")
-print("🎵 80+ SONGS LIBRARY")
-print("🎲 MYSTERY RANDOM BOX")
-print("📜 HISTORY TRACKING (20 songs)")
-print("🔊 VOLUME CONTROL (0-10)")
-print("🔄🔂🔁 REPEAT MODES")
-print("🔍 SEARCH FUNCTIONALITY")
-print("")
-print("🎉 ENJOY THE OPTIMIZED MUSIC PLAYER! 🎵")
+print("🎉 ENJOY THE ENHANCED MUSIC PLAYER! 🎵")
