@@ -12,7 +12,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 local musicLibrary = {
     {name = "Raining 🌮", id = "142376088"},
     {name = "Fart", id = "4809574295"},
-    {name = "Get out!", id = "18900008907"},
+    {name = "Not Cute Anymore", id = "127469192882657"},
     {name = "Dare", id = "139188421510869"},
     {name = "The World", id = "1836847994"},
     {name = "Turks and CaiCos", id = "105615035181825"},
@@ -20,7 +20,7 @@ local musicLibrary = {
     {name = "Clash Royale", id = "109699229726518"},
     {name = "Holiday", id = "1836006159"},
     {name = "Metamorphosis Remix", id = "15689451063"},
-    {name = "🫡", id = "1845922899"},
+    {name = "🛠️", id = "1845922899"},
     {name = "Bình Bucu", id = "7000891754"},
     {name = "Anh bạn à!", id = "7108789306"},
     {name = "Cải Lương", id = "1843400900"},
