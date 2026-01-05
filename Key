@@ -1,5 +1,5 @@
--- Mila UI V3.0 - Stable Version
--- Tạo bởi: Mila
+-- Mila UI V2.0 - Stable Version
+-- Tạo bởi: Assistant
 -- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump, Anti-AFK
 
 local Players = game:GetService("Players")
@@ -1068,8 +1068,16 @@ musicButton.MouseButton1Click:Connect(function()
         showLoadingAnimation("Music Player")
     end)
     
+    -- Random giữa 2 scripts
+    local musicScripts = {
+        "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music",
+        "https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Old"
+    }
+    
+    local randomScript = musicScripts[math.random(1, #musicScripts)]
+    
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))()
+        loadstring(game:HttpGet(randomScript))()
     end)
 end)
 
