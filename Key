@@ -69,8 +69,8 @@ islandText.ZIndex = 102
 -- Expanded Panel
 local expandedPanel = Instance.new("Frame")
 expandedPanel.Name = "ExpandedPanel"
-expandedPanel.Size = UDim2.new(0, 420, 0, 500)
-expandedPanel.Position = UDim2.new(0.5, -210, 0, 10)
+expandedPanel.Size = UDim2.new(0, 380, 0, 420)
+expandedPanel.Position = UDim2.new(0.5, -190, 0, 10)
 expandedPanel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 expandedPanel.BorderSizePixel = 0
 expandedPanel.Visible = false
@@ -160,14 +160,14 @@ contentArea.BackgroundTransparency = 1
 contentArea.ScrollBarThickness = 4
 contentArea.ScrollBarImageColor3 = Color3.fromRGB(70, 130, 255)
 contentArea.BorderSizePixel = 0
-contentArea.CanvasSize = UDim2.new(0, 0, 0, 300)
+contentArea.CanvasSize = UDim2.new(0, 0, 0, 220)
 contentArea.Parent = expandedPanel
 contentArea.ZIndex = 51
 
 -- Home Content
 local homeContent = Instance.new("Frame")
 homeContent.Name = "HomeContent"
-homeContent.Size = UDim2.new(1, 0, 0, 300)
+homeContent.Size = UDim2.new(1, 0, 0, 220)
 homeContent.BackgroundTransparency = 1
 homeContent.Parent = contentArea
 homeContent.ZIndex = 51
@@ -175,7 +175,7 @@ homeContent.ZIndex = 51
 -- Script Content
 local scriptContent = Instance.new("Frame")
 scriptContent.Name = "ScriptContent"
-scriptContent.Size = UDim2.new(1, 0, 0, 800)
+scriptContent.Size = UDim2.new(1, 0, 0, 600)
 scriptContent.BackgroundTransparency = 1
 scriptContent.Visible = false
 scriptContent.Parent = contentArea
@@ -214,7 +214,7 @@ otherContent.BackgroundTransparency = 1
 otherContent.ScrollBarThickness = 4
 otherContent.ScrollBarImageColor3 = Color3.fromRGB(70, 130, 255)
 otherContent.BorderSizePixel = 0
-otherContent.CanvasSize = UDim2.new(0, 0, 0, 500)
+otherContent.CanvasSize = UDim2.new(0, 0, 0, 380)
 otherContent.Visible = false
 otherContent.Parent = contentArea
 otherContent.ZIndex = 51
@@ -354,8 +354,8 @@ local function expandIsland()
     local expandTween = TweenService:Create(expandedPanel, 
         TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), 
         {
-            Size = UDim2.new(0, 420, 0, 500),
-            Position = UDim2.new(0.5, -210, 0, 10)
+            Size = UDim2.new(0, 380, 0, 420),
+            Position = UDim2.new(0.5, -190, 0, 10)
         }
     )
     expandTween:Play()
@@ -687,11 +687,11 @@ local function switchTab(tabName)
     otherContent.Visible = tabName == "Other"
 
     if tabName == "Home" then
-        contentArea.CanvasSize = UDim2.new(0, 0, 0, 300)
+        contentArea.CanvasSize = UDim2.new(0, 0, 0, 220)
     elseif tabName == "Script" then
         updateScriptList("")
     elseif tabName == "Other" then
-        otherContent.CanvasSize = UDim2.new(0, 0, 0, 500)
+        otherContent.CanvasSize = UDim2.new(0, 0, 0, 380)
     end
 end
 
@@ -741,7 +741,7 @@ end
 
 local function loadFlyScript()
     pcall(function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt'))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Vehicle%20Fly%20Gui"))()
     end)
 end
 
