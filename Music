@@ -500,7 +500,7 @@ manualLabel.TextColor3 = colors.text
 manualLabel.TextSize = 15
 manualLabel.Font = Enum.Font.GothamBold
 manualLabel.TextXAlignment = Enum.TextXAlignment.Left
-manualTab.Parent = manualTab
+manualLabel.Parent = manualTab
 
 local idInput = Instance.new("TextBox")
 idInput.Size = UDim2.new(1, -10, 0, 45)
