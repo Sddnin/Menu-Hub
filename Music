@@ -1,5 +1,5 @@
--- 🎵 Roblox Music Player 3.0 - Ultimate Edition (Enhanced Minimized)
--- Tạo bởi Mila | Version 3.0 with Enhanced Minimized Controls
+-- 🎵 Roblox Music Player 3.0 - Optimized UI Edition
+-- Tạo bởi Mila | Version 3.0 with Optimized Sizing
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -122,10 +122,10 @@ local isMinimized = false
 local currentRandomSong = nil
 local visualizerConnection = nil
 local progressConnection = nil
-local miniProgressConnection = nil -- NEW: For minimized progress
+local miniProgressConnection = nil
 local shuffleQueue = {}
 
--- UI References (will be set later)
+-- UI References
 local minimizedSongLabel
 local minimizedTimeLabel
 local minimizedProgressBar
@@ -137,10 +137,10 @@ screenGui.Name = "MusicPlayerV3"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Main Frame (SMALLER SIZE)
+-- Main Frame (OPTIMIZED SIZE - 420x480)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 380, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -190, 0.5, -210)
+mainFrame.Size = UDim2.new(0, 420, 0, 480)
+mainFrame.Position = UDim2.new(0.5, -210, 0.5, -240)
 mainFrame.BackgroundColor3 = colors.primary
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
@@ -149,72 +149,72 @@ local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 12)
 mainCorner.Parent = mainFrame
 
--- Header (SMALLER)
+-- Header
 local headerFrame = Instance.new("Frame")
-headerFrame.Size = UDim2.new(1, 0, 0, 40)
+headerFrame.Size = UDim2.new(1, 0, 0, 45)
 headerFrame.BackgroundTransparency = 1
 headerFrame.Parent = mainFrame
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(0, 180, 1, 0)
-titleLabel.Position = UDim2.new(0, 12, 0, 0)
+titleLabel.Size = UDim2.new(0, 200, 1, 0)
+titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "🎵 Music Player 3.0"
 titleLabel.TextColor3 = colors.text
-titleLabel.TextSize = 15
+titleLabel.TextSize = 16
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = headerFrame
 
--- Control Buttons (SMALLER)
+-- Control Buttons
 local minimizeBtn = Instance.new("TextButton")
-minimizeBtn.Size = UDim2.new(0, 26, 0, 22)
-minimizeBtn.Position = UDim2.new(1, -60, 0, 9)
+minimizeBtn.Size = UDim2.new(0, 30, 0, 26)
+minimizeBtn.Position = UDim2.new(1, -68, 0, 10)
 minimizeBtn.BackgroundColor3 = colors.secondary
 minimizeBtn.BorderSizePixel = 0
 minimizeBtn.Text = "▢"
 minimizeBtn.TextColor3 = colors.text
-minimizeBtn.TextSize = 12
+minimizeBtn.TextSize = 13
 minimizeBtn.Font = Enum.Font.GothamBold
 minimizeBtn.Parent = headerFrame
 
 local minimizeBtnCorner = Instance.new("UICorner")
-minimizeBtnCorner.CornerRadius = UDim.new(0, 4)
+minimizeBtnCorner.CornerRadius = UDim.new(0, 5)
 minimizeBtnCorner.Parent = minimizeBtn
 
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 26, 0, 22)
-closeBtn.Position = UDim2.new(1, -30, 0, 9)
+closeBtn.Size = UDim2.new(0, 30, 0, 26)
+closeBtn.Position = UDim2.new(1, -33, 0, 10)
 closeBtn.BackgroundColor3 = colors.danger
 closeBtn.BorderSizePixel = 0
 closeBtn.Text = "✕"
 closeBtn.TextColor3 = colors.text
-closeBtn.TextSize = 12
+closeBtn.TextSize = 13
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.Parent = headerFrame
 
 local closeBtnCorner = Instance.new("UICorner")
-closeBtnCorner.CornerRadius = UDim.new(0, 4)
+closeBtnCorner.CornerRadius = UDim.new(0, 5)
 closeBtnCorner.Parent = closeBtn
 
--- Visualizer Section (SMALLER)
+-- Visualizer Section
 local visualizerFrame = Instance.new("Frame")
-visualizerFrame.Size = UDim2.new(1, -16, 0, 50)
-visualizerFrame.Position = UDim2.new(0, 8, 0, 45)
+visualizerFrame.Size = UDim2.new(1, -20, 0, 55)
+visualizerFrame.Position = UDim2.new(0, 10, 0, 50)
 visualizerFrame.BackgroundColor3 = colors.secondary
 visualizerFrame.BorderSizePixel = 0
 visualizerFrame.Parent = mainFrame
 
 local visualizerCorner = Instance.new("UICorner")
-visualizerCorner.CornerRadius = UDim.new(0, 6)
+visualizerCorner.CornerRadius = UDim.new(0, 8)
 visualizerCorner.Parent = visualizerFrame
 
--- Create 15 visualizer bars (reduced from 20)
+-- Create 18 visualizer bars
 local visualizerBars = {}
-for i = 1, 15 do
+for i = 1, 18 do
     local bar = Instance.new("Frame")
-    bar.Size = UDim2.new(0, 12, 0, 5)
-    bar.Position = UDim2.new(0, 8 + (i-1) * 23, 1, -8)
+    bar.Size = UDim2.new(0, 14, 0, 5)
+    bar.Position = UDim2.new(0, 10 + (i-1) * 21, 1, -10)
     bar.AnchorPoint = Vector2.new(0, 1)
     bar.BackgroundColor3 = colors.visualizer
     bar.BorderSizePixel = 0
@@ -228,57 +228,57 @@ for i = 1, 15 do
 end
 
 local visualizerLabel = Instance.new("TextLabel")
-visualizerLabel.Size = UDim2.new(1, 0, 0, 12)
-visualizerLabel.Position = UDim2.new(0, 0, 0, 4)
+visualizerLabel.Size = UDim2.new(1, 0, 0, 15)
+visualizerLabel.Position = UDim2.new(0, 0, 0, 5)
 visualizerLabel.BackgroundTransparency = 1
 visualizerLabel.Text = "🎶 Visualizer"
 visualizerLabel.TextColor3 = colors.textSecondary
-visualizerLabel.TextSize = 9
+visualizerLabel.TextSize = 10
 visualizerLabel.Font = Enum.Font.Gotham
 visualizerLabel.Parent = visualizerFrame
 
--- Now Playing (SMALLER)
+-- Now Playing
 local nowPlayingFrame = Instance.new("Frame")
-nowPlayingFrame.Size = UDim2.new(1, -16, 0, 50)
-nowPlayingFrame.Position = UDim2.new(0, 8, 0, 100)
+nowPlayingFrame.Size = UDim2.new(1, -20, 0, 55)
+nowPlayingFrame.Position = UDim2.new(0, 10, 0, 110)
 nowPlayingFrame.BackgroundColor3 = colors.secondary
 nowPlayingFrame.BorderSizePixel = 0
 nowPlayingFrame.Parent = mainFrame
 
 local nowPlayingCorner = Instance.new("UICorner")
-nowPlayingCorner.CornerRadius = UDim.new(0, 6)
+nowPlayingCorner.CornerRadius = UDim.new(0, 8)
 nowPlayingCorner.Parent = nowPlayingFrame
 
 local musicIcon = Instance.new("TextLabel")
-musicIcon.Size = UDim2.new(0, 35, 0, 35)
-musicIcon.Position = UDim2.new(0, 8, 0, 8)
+musicIcon.Size = UDim2.new(0, 40, 0, 40)
+musicIcon.Position = UDim2.new(0, 8, 0, 7)
 musicIcon.BackgroundColor3 = colors.accent
 musicIcon.BorderSizePixel = 0
 musicIcon.Text = "🎵"
 musicIcon.TextColor3 = colors.text
-musicIcon.TextSize = 18
+musicIcon.TextSize = 20
 musicIcon.Font = Enum.Font.GothamBold
 musicIcon.Parent = nowPlayingFrame
 
 local musicIconCorner = Instance.new("UICorner")
-musicIconCorner.CornerRadius = UDim.new(0, 5)
+musicIconCorner.CornerRadius = UDim.new(0, 6)
 musicIconCorner.Parent = musicIcon
 
 local nowPlayingLabel = Instance.new("TextLabel")
-nowPlayingLabel.Size = UDim2.new(1, -160, 0, 22)
-nowPlayingLabel.Position = UDim2.new(0, 50, 0, 6)
+nowPlayingLabel.Size = UDim2.new(1, -170, 0, 24)
+nowPlayingLabel.Position = UDim2.new(0, 55, 0, 7)
 nowPlayingLabel.BackgroundTransparency = 1
 nowPlayingLabel.Text = "Không có nhạc nào đang phát"
 nowPlayingLabel.TextColor3 = colors.text
-nowPlayingLabel.TextSize = 12
+nowPlayingLabel.TextSize = 13
 nowPlayingLabel.Font = Enum.Font.GothamBold
 nowPlayingLabel.TextXAlignment = Enum.TextXAlignment.Left
 nowPlayingLabel.TextTruncate = Enum.TextTruncate.AtEnd
 nowPlayingLabel.Parent = nowPlayingFrame
 
 local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -160, 0, 13)
-statusLabel.Position = UDim2.new(0, 50, 0, 26)
+statusLabel.Size = UDim2.new(1, -170, 0, 15)
+statusLabel.Position = UDim2.new(0, 55, 0, 29)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = "Volume: 5 | Sẵn sàng phát nhạc"
 statusLabel.TextColor3 = colors.textSecondary
@@ -287,32 +287,32 @@ statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextXAlignment = Enum.TextXAlignment.Left
 statusLabel.Parent = nowPlayingFrame
 
--- Volume Control (SMALLER)
+-- Volume Control
 local volumeFrame = Instance.new("Frame")
-volumeFrame.Size = UDim2.new(0, 100, 0, 35)
-volumeFrame.Position = UDim2.new(1, -108, 0, 8)
+volumeFrame.Size = UDim2.new(0, 110, 0, 40)
+volumeFrame.Position = UDim2.new(1, -118, 0, 8)
 volumeFrame.BackgroundTransparency = 1
 volumeFrame.Parent = nowPlayingFrame
 
 local volumeIcon = Instance.new("TextLabel")
-volumeIcon.Size = UDim2.new(0, 18, 0, 18)
+volumeIcon.Size = UDim2.new(0, 20, 0, 20)
 volumeIcon.Position = UDim2.new(0, 0, 0, 0)
 volumeIcon.BackgroundTransparency = 1
 volumeIcon.Text = "🔊"
 volumeIcon.TextColor3 = colors.text
-volumeIcon.TextSize = 12
+volumeIcon.TextSize = 13
 volumeIcon.Font = Enum.Font.Gotham
 volumeIcon.Parent = volumeFrame
 
 local volumeSlider = Instance.new("TextBox")
-volumeSlider.Size = UDim2.new(0, 38, 0, 18)
-volumeSlider.Position = UDim2.new(0, 22, 0, 0)
+volumeSlider.Size = UDim2.new(0, 42, 0, 20)
+volumeSlider.Position = UDim2.new(0, 24, 0, 0)
 volumeSlider.BackgroundColor3 = colors.primary
 volumeSlider.BorderSizePixel = 1
 volumeSlider.BorderColor3 = colors.accent
 volumeSlider.Text = "5"
 volumeSlider.TextColor3 = colors.text
-volumeSlider.TextSize = 10
+volumeSlider.TextSize = 11
 volumeSlider.Font = Enum.Font.Gotham
 volumeSlider.Parent = volumeFrame
 
@@ -321,23 +321,23 @@ volumeSliderCorner.CornerRadius = UDim.new(0, 4)
 volumeSliderCorner.Parent = volumeSlider
 
 local volumeLabel = Instance.new("TextLabel")
-volumeLabel.Size = UDim2.new(0, 38, 0, 13)
-volumeLabel.Position = UDim2.new(0, 22, 0, 20)
+volumeLabel.Size = UDim2.new(0, 42, 0, 14)
+volumeLabel.Position = UDim2.new(0, 24, 0, 22)
 volumeLabel.BackgroundTransparency = 1
 volumeLabel.Text = "Volume"
 volumeLabel.TextColor3 = colors.textSecondary
-volumeLabel.TextSize = 8
+volumeLabel.TextSize = 9
 volumeLabel.Font = Enum.Font.Gotham
 volumeLabel.Parent = volumeFrame
 
 local repeatBtn = Instance.new("TextButton")
-repeatBtn.Size = UDim2.new(0, 26, 0, 18)
-repeatBtn.Position = UDim2.new(0, 64, 0, 0)
+repeatBtn.Size = UDim2.new(0, 30, 0, 20)
+repeatBtn.Position = UDim2.new(0, 70, 0, 0)
 repeatBtn.BackgroundColor3 = colors.primary
 repeatBtn.BorderSizePixel = 0
 repeatBtn.Text = "🔄"
 repeatBtn.TextColor3 = colors.textSecondary
-repeatBtn.TextSize = 11
+repeatBtn.TextSize = 12
 repeatBtn.Font = Enum.Font.Gotham
 repeatBtn.Parent = volumeFrame
 
@@ -345,41 +345,41 @@ local repeatBtnCorner = Instance.new("UICorner")
 repeatBtnCorner.CornerRadius = UDim.new(0, 4)
 repeatBtnCorner.Parent = repeatBtn
 
--- Progress Bar Section (SMALLER)
+-- Progress Bar Section
 local progressFrame = Instance.new("Frame")
-progressFrame.Size = UDim2.new(1, -16, 0, 42)
-progressFrame.Position = UDim2.new(0, 8, 0, 155)
+progressFrame.Size = UDim2.new(1, -20, 0, 48)
+progressFrame.Position = UDim2.new(0, 10, 0, 170)
 progressFrame.BackgroundColor3 = colors.secondary
 progressFrame.BorderSizePixel = 0
 progressFrame.Parent = mainFrame
 
 local progressCorner = Instance.new("UICorner")
-progressCorner.CornerRadius = UDim.new(0, 6)
+progressCorner.CornerRadius = UDim.new(0, 8)
 progressCorner.Parent = progressFrame
 
 local currentTimeLabel = Instance.new("TextLabel")
-currentTimeLabel.Size = UDim2.new(0, 40, 0, 16)
-currentTimeLabel.Position = UDim2.new(0, 8, 0, 6)
+currentTimeLabel.Size = UDim2.new(0, 45, 0, 18)
+currentTimeLabel.Position = UDim2.new(0, 10, 0, 7)
 currentTimeLabel.BackgroundTransparency = 1
 currentTimeLabel.Text = "0:00"
 currentTimeLabel.TextColor3 = colors.text
-currentTimeLabel.TextSize = 10
+currentTimeLabel.TextSize = 11
 currentTimeLabel.Font = Enum.Font.GothamBold
 currentTimeLabel.Parent = progressFrame
 
 local totalTimeLabel = Instance.new("TextLabel")
-totalTimeLabel.Size = UDim2.new(0, 40, 0, 16)
-totalTimeLabel.Position = UDim2.new(1, -48, 0, 6)
+totalTimeLabel.Size = UDim2.new(0, 45, 0, 18)
+totalTimeLabel.Position = UDim2.new(1, -55, 0, 7)
 totalTimeLabel.BackgroundTransparency = 1
 totalTimeLabel.Text = "0:00"
 totalTimeLabel.TextColor3 = colors.text
-totalTimeLabel.TextSize = 10
+totalTimeLabel.TextSize = 11
 totalTimeLabel.Font = Enum.Font.GothamBold
 totalTimeLabel.Parent = progressFrame
 
 local progressBarBg = Instance.new("Frame")
-progressBarBg.Size = UDim2.new(1, -108, 0, 6)
-progressBarBg.Position = UDim2.new(0, 52, 0, 8)
+progressBarBg.Size = UDim2.new(1, -120, 0, 7)
+progressBarBg.Position = UDim2.new(0, 58, 0, 9)
 progressBarBg.BackgroundColor3 = colors.primary
 progressBarBg.BorderSizePixel = 0
 progressBarBg.Parent = progressFrame
@@ -399,59 +399,59 @@ progressBarFillCorner.CornerRadius = UDim.new(0, 3)
 progressBarFillCorner.Parent = progressBarFill
 
 local shuffleBtn = Instance.new("TextButton")
-shuffleBtn.Size = UDim2.new(0, 50, 0, 20)
-shuffleBtn.Position = UDim2.new(0, 8, 0, 22)
+shuffleBtn.Size = UDim2.new(0, 55, 0, 22)
+shuffleBtn.Position = UDim2.new(0, 10, 0, 24)
 shuffleBtn.BackgroundColor3 = colors.primary
 shuffleBtn.BorderSizePixel = 0
 shuffleBtn.Text = "🔀 OFF"
 shuffleBtn.TextColor3 = colors.textSecondary
-shuffleBtn.TextSize = 9
+shuffleBtn.TextSize = 10
 shuffleBtn.Font = Enum.Font.GothamBold
 shuffleBtn.Parent = progressFrame
 
 local shuffleBtnCorner = Instance.new("UICorner")
-shuffleBtnCorner.CornerRadius = UDim.new(0, 4)
+shuffleBtnCorner.CornerRadius = UDim.new(0, 5)
 shuffleBtnCorner.Parent = shuffleBtn
 
 local prevBtn = Instance.new("TextButton")
-prevBtn.Size = UDim2.new(0, 42, 0, 20)
-prevBtn.Position = UDim2.new(0.5, -50, 0, 22)
+prevBtn.Size = UDim2.new(0, 48, 0, 22)
+prevBtn.Position = UDim2.new(0.5, -55, 0, 24)
 prevBtn.BackgroundColor3 = colors.primary
 prevBtn.BorderSizePixel = 0
 prevBtn.Text = "⏮️ Prev"
 prevBtn.TextColor3 = colors.text
-prevBtn.TextSize = 9
+prevBtn.TextSize = 10
 prevBtn.Font = Enum.Font.GothamBold
 prevBtn.Parent = progressFrame
 
 local prevBtnCorner = Instance.new("UICorner")
-prevBtnCorner.CornerRadius = UDim.new(0, 4)
+prevBtnCorner.CornerRadius = UDim.new(0, 5)
 prevBtnCorner.Parent = prevBtn
 
 local nextBtn = Instance.new("TextButton")
-nextBtn.Size = UDim2.new(0, 42, 0, 20)
-nextBtn.Position = UDim2.new(0.5, 8, 0, 22)
+nextBtn.Size = UDim2.new(0, 48, 0, 22)
+nextBtn.Position = UDim2.new(0.5, 7, 0, 24)
 nextBtn.BackgroundColor3 = colors.primary
 nextBtn.BorderSizePixel = 0
 nextBtn.Text = "Next ⏭️"
 nextBtn.TextColor3 = colors.text
-nextBtn.TextSize = 9
+nextBtn.TextSize = 10
 nextBtn.Font = Enum.Font.GothamBold
 nextBtn.Parent = progressFrame
 
 local nextBtnCorner = Instance.new("UICorner")
-nextBtnCorner.CornerRadius = UDim.new(0, 4)
+nextBtnCorner.CornerRadius = UDim.new(0, 5)
 nextBtnCorner.Parent = nextBtn
 
 -- Tab Navigation
 local tabFrame = Instance.new("Frame")
-tabFrame.Size = UDim2.new(1, -20, 0, 40)
-tabFrame.Position = UDim2.new(0, 10, 0, 255)
+tabFrame.Size = UDim2.new(1, -24, 0, 42)
+tabFrame.Position = UDim2.new(0, 12, 0, 223)
 tabFrame.BackgroundTransparency = 1
 tabFrame.Parent = mainFrame
 
 local tabButtons = {}
-local tabNames = {"🆔 Manual", "📋 Library", "🎲 Random Box", "📜 History"}
+local tabNames = {"🆔 Manual", "📋 Library", "🎲 Random", "📜 History"}
 
 for i, tabName in ipairs(tabNames) do
     local tabBtn = Instance.new("TextButton")
@@ -467,16 +467,16 @@ for i, tabName in ipairs(tabNames) do
     tabBtn.Parent = tabFrame
 
     local tabBtnCorner = Instance.new("UICorner")
-    tabBtnCorner.CornerRadius = UDim.new(0, 6)
+    tabBtnCorner.CornerRadius = UDim.new(0, 7)
     tabBtnCorner.Parent = tabBtn
 
     tabButtons[i] = tabBtn
 end
 
--- Content Area
+-- Content Area (INCREASED HEIGHT)
 local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, -20, 1, -305)
-contentFrame.Position = UDim2.new(0, 10, 0, 300)
+contentFrame.Size = UDim2.new(1, -24, 1, -280)
+contentFrame.Position = UDim2.new(0, 12, 0, 270)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
@@ -488,19 +488,19 @@ manualTab.Visible = true
 manualTab.Parent = contentFrame
 
 local manualLabel = Instance.new("TextLabel")
-manualLabel.Size = UDim2.new(1, 0, 0, 25)
+manualLabel.Size = UDim2.new(1, 0, 0, 28)
 manualLabel.Position = UDim2.new(0, 5, 0, 5)
 manualLabel.BackgroundTransparency = 1
 manualLabel.Text = "🎵 Nhập ID Nhạc Roblox"
 manualLabel.TextColor3 = colors.text
-manualLabel.TextSize = 14
+manualLabel.TextSize = 15
 manualLabel.Font = Enum.Font.GothamBold
 manualLabel.TextXAlignment = Enum.TextXAlignment.Left
 manualLabel.Parent = manualTab
 
 local idInput = Instance.new("TextBox")
-idInput.Size = UDim2.new(1, -10, 0, 40)
-idInput.Position = UDim2.new(0, 5, 0, 35)
+idInput.Size = UDim2.new(1, -10, 0, 45)
+idInput.Position = UDim2.new(0, 5, 0, 38)
 idInput.BackgroundColor3 = colors.secondary
 idInput.BorderSizePixel = 1
 idInput.BorderColor3 = colors.accent
@@ -516,8 +516,8 @@ idInputCorner.CornerRadius = UDim.new(0, 8)
 idInputCorner.Parent = idInput
 
 local manualControlFrame = Instance.new("Frame")
-manualControlFrame.Size = UDim2.new(1, -10, 0, 40)
-manualControlFrame.Position = UDim2.new(0, 5, 0, 85)
+manualControlFrame.Size = UDim2.new(1, -10, 0, 45)
+manualControlFrame.Position = UDim2.new(0, 5, 0, 93)
 manualControlFrame.BackgroundTransparency = 1
 manualControlFrame.Parent = manualTab
 
@@ -528,12 +528,12 @@ playManualBtn.BackgroundColor3 = colors.accent
 playManualBtn.BorderSizePixel = 0
 playManualBtn.Text = "▶️ Play"
 playManualBtn.TextColor3 = colors.text
-playManualBtn.TextSize = 14
+playManualBtn.TextSize = 15
 playManualBtn.Font = Enum.Font.GothamBold
 playManualBtn.Parent = manualControlFrame
 
 local playManualCorner = Instance.new("UICorner")
-playManualCorner.CornerRadius = UDim.new(0, 6)
+playManualCorner.CornerRadius = UDim.new(0, 7)
 playManualCorner.Parent = playManualBtn
 
 local stopBtn = Instance.new("TextButton")
@@ -543,12 +543,12 @@ stopBtn.BackgroundColor3 = colors.danger
 stopBtn.BorderSizePixel = 0
 stopBtn.Text = "⏹️ Stop"
 stopBtn.TextColor3 = colors.text
-stopBtn.TextSize = 14
+stopBtn.TextSize = 15
 stopBtn.Font = Enum.Font.GothamBold
 stopBtn.Parent = manualControlFrame
 
 local stopBtnCorner = Instance.new("UICorner")
-stopBtnCorner.CornerRadius = UDim.new(0, 6)
+stopBtnCorner.CornerRadius = UDim.new(0, 7)
 stopBtnCorner.Parent = stopBtn
 
 -- TAB 2: Library
@@ -559,7 +559,7 @@ libraryTab.Visible = false
 libraryTab.Parent = contentFrame
 
 local searchBox = Instance.new("TextBox")
-searchBox.Size = UDim2.new(1, -10, 0, 35)
+searchBox.Size = UDim2.new(1, -10, 0, 38)
 searchBox.Position = UDim2.new(0, 5, 0, 5)
 searchBox.BackgroundColor3 = colors.secondary
 searchBox.BorderSizePixel = 1
@@ -567,7 +567,7 @@ searchBox.BorderColor3 = colors.accent
 searchBox.PlaceholderText = "🔍 Tìm kiếm bài hát..."
 searchBox.Text = ""
 searchBox.TextColor3 = colors.text
-searchBox.TextSize = 12
+searchBox.TextSize = 13
 searchBox.Font = Enum.Font.Gotham
 searchBox.Parent = libraryTab
 
@@ -576,11 +576,11 @@ searchCorner.CornerRadius = UDim.new(0, 8)
 searchCorner.Parent = searchBox
 
 local libraryScroll = Instance.new("ScrollingFrame")
-libraryScroll.Size = UDim2.new(1, -10, 1, -45)
-libraryScroll.Position = UDim2.new(0, 5, 0, 45)
+libraryScroll.Size = UDim2.new(1, -10, 1, -48)
+libraryScroll.Position = UDim2.new(0, 5, 0, 48)
 libraryScroll.BackgroundColor3 = colors.secondary
 libraryScroll.BorderSizePixel = 0
-libraryScroll.ScrollBarThickness = 6
+libraryScroll.ScrollBarThickness = 7
 libraryScroll.ScrollBarImageColor3 = colors.accent
 libraryScroll.Parent = libraryTab
 
@@ -590,7 +590,7 @@ libraryScrollCorner.Parent = libraryScroll
 
 local libraryLayout = Instance.new("UIListLayout")
 libraryLayout.SortOrder = Enum.SortOrder.LayoutOrder
-libraryLayout.Padding = UDim.new(0, 3)
+libraryLayout.Padding = UDim.new(0, 4)
 libraryLayout.Parent = libraryScroll
 
 -- TAB 3: Random Box
@@ -601,8 +601,8 @@ randomTab.Visible = false
 randomTab.Parent = contentFrame
 
 local randomBoxFrame = Instance.new("Frame")
-randomBoxFrame.Size = UDim2.new(1, -20, 0, 90)
-randomBoxFrame.Position = UDim2.new(0, 10, 0, 10)
+randomBoxFrame.Size = UDim2.new(1, -20, 0, 100)
+randomBoxFrame.Position = UDim2.new(0, 10, 0, 15)
 randomBoxFrame.BackgroundColor3 = colors.secondary
 randomBoxFrame.BorderSizePixel = 2
 randomBoxFrame.BorderColor3 = colors.warning
@@ -613,46 +613,46 @@ randomBoxCorner.CornerRadius = UDim.new(0, 12)
 randomBoxCorner.Parent = randomBoxFrame
 
 local mysteryIcon = Instance.new("TextLabel")
-mysteryIcon.Size = UDim2.new(0, 60, 0, 60)
+mysteryIcon.Size = UDim2.new(0, 70, 0, 70)
 mysteryIcon.Position = UDim2.new(0, 15, 0, 15)
 mysteryIcon.BackgroundTransparency = 1
 mysteryIcon.Text = "🎁"
 mysteryIcon.TextColor3 = colors.warning
-mysteryIcon.TextSize = 40
+mysteryIcon.TextSize = 45
 mysteryIcon.Font = Enum.Font.GothamBold
 mysteryIcon.Parent = randomBoxFrame
 
 local randomTitle = Instance.new("TextLabel")
-randomTitle.Size = UDim2.new(1, -90, 0, 25)
-randomTitle.Position = UDim2.new(0, 85, 0, 15)
+randomTitle.Size = UDim2.new(1, -100, 0, 28)
+randomTitle.Position = UDim2.new(0, 95, 0, 18)
 randomTitle.BackgroundTransparency = 1
 randomTitle.Text = "🎲 MYSTERY MUSIC BOX"
 randomTitle.TextColor3 = colors.text
-randomTitle.TextSize = 14
+randomTitle.TextSize = 15
 randomTitle.Font = Enum.Font.GothamBold
 randomTitle.TextXAlignment = Enum.TextXAlignment.Left
 randomTitle.Parent = randomBoxFrame
 
 local randomDesc = Instance.new("TextLabel")
-randomDesc.Size = UDim2.new(1, -90, 0, 30)
-randomDesc.Position = UDim2.new(0, 85, 0, 40)
+randomDesc.Size = UDim2.new(1, -100, 0, 35)
+randomDesc.Position = UDim2.new(0, 95, 0, 46)
 randomDesc.BackgroundTransparency = 1
 randomDesc.Text = "Mở hộp để nhận bài hát ngẫu nhiên!"
 randomDesc.TextColor3 = colors.textSecondary
-randomDesc.TextSize = 11
+randomDesc.TextSize = 12
 randomDesc.Font = Enum.Font.Gotham
 randomDesc.TextXAlignment = Enum.TextXAlignment.Left
 randomDesc.TextWrapped = true
 randomDesc.Parent = randomBoxFrame
 
 local openBoxBtn = Instance.new("TextButton")
-openBoxBtn.Size = UDim2.new(1, -40, 0, 40)
-openBoxBtn.Position = UDim2.new(0, 20, 0, 110)
+openBoxBtn.Size = UDim2.new(1, -40, 0, 45)
+openBoxBtn.Position = UDim2.new(0, 20, 0, 125)
 openBoxBtn.BackgroundColor3 = colors.warning
 openBoxBtn.BorderSizePixel = 0
 openBoxBtn.Text = "🎁 MỞ HỘP NGẪU NHIÊN 🎁"
 openBoxBtn.TextColor3 = colors.text
-openBoxBtn.TextSize = 14
+openBoxBtn.TextSize = 15
 openBoxBtn.Font = Enum.Font.GothamBold
 openBoxBtn.Parent = randomTab
 
@@ -672,7 +672,7 @@ historyScroll.Size = UDim2.new(1, -10, 1, -10)
 historyScroll.Position = UDim2.new(0, 5, 0, 5)
 historyScroll.BackgroundColor3 = colors.secondary
 historyScroll.BorderSizePixel = 0
-historyScroll.ScrollBarThickness = 6
+historyScroll.ScrollBarThickness = 7
 historyScroll.ScrollBarImageColor3 = colors.accent
 historyScroll.Parent = historyTab
 
@@ -682,13 +682,13 @@ historyScrollCorner.Parent = historyScroll
 
 local historyLayout = Instance.new("UIListLayout")
 historyLayout.SortOrder = Enum.SortOrder.LayoutOrder
-historyLayout.Padding = UDim.new(0, 3)
+historyLayout.Padding = UDim.new(0, 4)
 historyLayout.Parent = historyScroll
 
--- ===== ENHANCED MINIMIZED FRAME =====
+-- ===== MINIMIZED FRAME (OPTIMIZED) =====
 local minimizedFrame = Instance.new("Frame")
-minimizedFrame.Size = UDim2.new(0, 450, 0, 80) -- Increased height
-minimizedFrame.Position = UDim2.new(0.5, -225, 0, 20)
+minimizedFrame.Size = UDim2.new(0, 380, 0, 75)
+minimizedFrame.Position = UDim2.new(0.5, -190, 0, 20)
 minimizedFrame.BackgroundColor3 = colors.primary
 minimizedFrame.BorderSizePixel = 0
 minimizedFrame.Visible = false
@@ -698,14 +698,14 @@ local minimizedCorner = Instance.new("UICorner")
 minimizedCorner.CornerRadius = UDim.new(0, 12)
 minimizedCorner.Parent = minimizedFrame
 
--- Top section (title + close)
+-- Top section
 local miniTopFrame = Instance.new("Frame")
-miniTopFrame.Size = UDim2.new(1, 0, 0, 30)
+miniTopFrame.Size = UDim2.new(1, 0, 0, 28)
 miniTopFrame.BackgroundTransparency = 1
 miniTopFrame.Parent = minimizedFrame
 
 local restoreBtn = Instance.new("TextButton")
-restoreBtn.Size = UDim2.new(1, -40, 1, 0)
+restoreBtn.Size = UDim2.new(1, -35, 1, 0)
 restoreBtn.BackgroundTransparency = 1
 restoreBtn.Text = "🎵 Music Player 3.0"
 restoreBtn.TextColor3 = colors.text
@@ -715,12 +715,12 @@ restoreBtn.TextXAlignment = Enum.TextXAlignment.Left
 restoreBtn.Parent = miniTopFrame
 
 local miniPadding = Instance.new("UIPadding")
-miniPadding.PaddingLeft = UDim.new(0, 15)
+miniPadding.PaddingLeft = UDim.new(0, 12)
 miniPadding.Parent = restoreBtn
 
 local minCloseBtn = Instance.new("TextButton")
-minCloseBtn.Size = UDim2.new(0, 25, 0, 25)
-minCloseBtn.Position = UDim2.new(1, -30, 0, 2)
+minCloseBtn.Size = UDim2.new(0, 24, 0, 24)
+minCloseBtn.Position = UDim2.new(1, -28, 0, 2)
 minCloseBtn.BackgroundColor3 = colors.danger
 minCloseBtn.BorderSizePixel = 0
 minCloseBtn.Text = "✕"
@@ -733,39 +733,39 @@ local minCloseBtnCorner = Instance.new("UICorner")
 minCloseBtnCorner.CornerRadius = UDim.new(0, 6)
 minCloseBtnCorner.Parent = minCloseBtn
 
--- Song info section
+-- Song info
 local miniInfoFrame = Instance.new("Frame")
-miniInfoFrame.Size = UDim2.new(1, -20, 0, 20)
-miniInfoFrame.Position = UDim2.new(0, 10, 0, 32)
+miniInfoFrame.Size = UDim2.new(1, -16, 0, 18)
+miniInfoFrame.Position = UDim2.new(0, 8, 0, 30)
 miniInfoFrame.BackgroundTransparency = 1
 miniInfoFrame.Parent = minimizedFrame
 
 minimizedSongLabel = Instance.new("TextLabel")
-minimizedSongLabel.Size = UDim2.new(1, -80, 1, 0)
+minimizedSongLabel.Size = UDim2.new(1, -75, 1, 0)
 minimizedSongLabel.BackgroundTransparency = 1
 minimizedSongLabel.Text = "Không có nhạc"
 minimizedSongLabel.TextColor3 = colors.textSecondary
-minimizedSongLabel.TextSize = 12
+minimizedSongLabel.TextSize = 11
 minimizedSongLabel.Font = Enum.Font.Gotham
 minimizedSongLabel.TextXAlignment = Enum.TextXAlignment.Left
 minimizedSongLabel.TextTruncate = Enum.TextTruncate.AtEnd
 minimizedSongLabel.Parent = miniInfoFrame
 
 minimizedTimeLabel = Instance.new("TextLabel")
-minimizedTimeLabel.Size = UDim2.new(0, 75, 1, 0)
-minimizedTimeLabel.Position = UDim2.new(1, -75, 0, 0)
+minimizedTimeLabel.Size = UDim2.new(0, 70, 1, 0)
+minimizedTimeLabel.Position = UDim2.new(1, -70, 0, 0)
 minimizedTimeLabel.BackgroundTransparency = 1
 minimizedTimeLabel.Text = "0:00 / 0:00"
 minimizedTimeLabel.TextColor3 = colors.textSecondary
-minimizedTimeLabel.TextSize = 10
+minimizedTimeLabel.TextSize = 9
 minimizedTimeLabel.Font = Enum.Font.Gotham
 minimizedTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
 minimizedTimeLabel.Parent = miniInfoFrame
 
--- Progress bar (minimized)
+-- Progress bar
 local miniProgressBg = Instance.new("Frame")
-miniProgressBg.Size = UDim2.new(1, -20, 0, 4)
-miniProgressBg.Position = UDim2.new(0, 10, 0, 54)
+miniProgressBg.Size = UDim2.new(1, -16, 0, 4)
+miniProgressBg.Position = UDim2.new(0, 8, 0, 50)
 miniProgressBg.BackgroundColor3 = colors.secondary
 miniProgressBg.BorderSizePixel = 0
 miniProgressBg.Parent = minimizedFrame
@@ -784,22 +784,21 @@ local miniProgressFillCorner = Instance.new("UICorner")
 miniProgressFillCorner.CornerRadius = UDim.new(0, 2)
 miniProgressFillCorner.Parent = minimizedProgressBar
 
--- Control buttons section
+-- Control buttons
 local miniControlFrame = Instance.new("Frame")
-miniControlFrame.Size = UDim2.new(0, 140, 0, 30)
-miniControlFrame.Position = UDim2.new(0.5, -70, 1, -35)
+miniControlFrame.Size = UDim2.new(0, 130, 0, 26)
+miniControlFrame.Position = UDim2.new(0.5, -65, 1, -30)
 miniControlFrame.BackgroundTransparency = 1
 miniControlFrame.Parent = minimizedFrame
 
--- Previous button (minimized)
 local miniPrevBtn = Instance.new("TextButton")
-miniPrevBtn.Size = UDim2.new(0, 35, 0, 28)
+miniPrevBtn.Size = UDim2.new(0, 30, 0, 26)
 miniPrevBtn.Position = UDim2.new(0, 0, 0, 0)
 miniPrevBtn.BackgroundColor3 = colors.secondary
 miniPrevBtn.BorderSizePixel = 0
 miniPrevBtn.Text = "⏮️"
 miniPrevBtn.TextColor3 = colors.text
-miniPrevBtn.TextSize = 14
+miniPrevBtn.TextSize = 13
 miniPrevBtn.Font = Enum.Font.GothamBold
 miniPrevBtn.Parent = miniControlFrame
 
@@ -807,15 +806,14 @@ local miniPrevCorner = Instance.new("UICorner")
 miniPrevCorner.CornerRadius = UDim.new(0, 6)
 miniPrevCorner.Parent = miniPrevBtn
 
--- Play/Pause button (minimized)
 minimizedPlayPauseBtn = Instance.new("TextButton")
-minimizedPlayPauseBtn.Size = UDim2.new(0, 40, 0, 28)
-minimizedPlayPauseBtn.Position = UDim2.new(0, 40, 0, 0)
+minimizedPlayPauseBtn.Size = UDim2.new(0, 36, 0, 26)
+minimizedPlayPauseBtn.Position = UDim2.new(0, 35, 0, 0)
 minimizedPlayPauseBtn.BackgroundColor3 = colors.accent
 minimizedPlayPauseBtn.BorderSizePixel = 0
 minimizedPlayPauseBtn.Text = "▶️"
 minimizedPlayPauseBtn.TextColor3 = colors.text
-minimizedPlayPauseBtn.TextSize = 16
+minimizedPlayPauseBtn.TextSize = 15
 minimizedPlayPauseBtn.Font = Enum.Font.GothamBold
 minimizedPlayPauseBtn.Parent = miniControlFrame
 
@@ -823,15 +821,14 @@ local miniPlayCorner = Instance.new("UICorner")
 miniPlayCorner.CornerRadius = UDim.new(0, 6)
 miniPlayCorner.Parent = minimizedPlayPauseBtn
 
--- Next button (minimized)
 local miniNextBtn = Instance.new("TextButton")
-miniNextBtn.Size = UDim2.new(0, 35, 0, 28)
-miniNextBtn.Position = UDim2.new(0, 85, 0, 0)
+miniNextBtn.Size = UDim2.new(0, 30, 0, 26)
+miniNextBtn.Position = UDim2.new(0, 76, 0, 0)
 miniNextBtn.BackgroundColor3 = colors.secondary
 miniNextBtn.BorderSizePixel = 0
 miniNextBtn.Text = "⏭️"
 miniNextBtn.TextColor3 = colors.text
-miniNextBtn.TextSize = 14
+miniNextBtn.TextSize = 13
 miniNextBtn.Font = Enum.Font.GothamBold
 miniNextBtn.Parent = miniControlFrame
 
@@ -839,15 +836,14 @@ local miniNextCorner = Instance.new("UICorner")
 miniNextCorner.CornerRadius = UDim.new(0, 6)
 miniNextCorner.Parent = miniNextBtn
 
--- Stop button (minimized)
 local miniStopBtn = Instance.new("TextButton")
-miniStopBtn.Size = UDim2.new(0, 18, 0, 28)
-miniStopBtn.Position = UDim2.new(0, 125, 0, 0)
+miniStopBtn.Size = UDim2.new(0, 18, 0, 26)
+miniStopBtn.Position = UDim2.new(0, 111, 0, 0)
 miniStopBtn.BackgroundColor3 = colors.danger
 miniStopBtn.BorderSizePixel = 0
 miniStopBtn.Text = "⏹"
 miniStopBtn.TextColor3 = colors.text
-miniStopBtn.TextSize = 12
+miniStopBtn.TextSize = 11
 miniStopBtn.Font = Enum.Font.GothamBold
 miniStopBtn.Parent = miniControlFrame
 
@@ -880,7 +876,7 @@ local function startVisualizer()
                 local randomFactor = math.random(50, 100) / 100
                 local height = 5 + wave * 45 * randomFactor
 
-                bar.Size = UDim2.new(0, 12, 0, height)
+                bar.Size = UDim2.new(0, 14, 0, height)
 
                 local hue = (time * 0.5 + offset * 0.1) % 1
                 bar.BackgroundColor3 = Color3.fromHSV(hue, 0.8, 0.9)
@@ -891,7 +887,7 @@ local function startVisualizer()
                 local wave = math.sin(time * 2 + offset) * 0.3 + 0.5
                 local height = 5 + wave * 10
 
-                bar.Size = UDim2.new(0, 12, 0, height)
+                bar.Size = UDim2.new(0, 14, 0, height)
                 bar.BackgroundColor3 = colors.textSecondary
             end
         end
@@ -905,7 +901,7 @@ local function stopVisualizer()
     end
 
     for _, bar in ipairs(visualizerBars) do
-        bar.Size = UDim2.new(0, 12, 0, 5)
+        bar.Size = UDim2.new(0, 14, 0, 5)
         bar.BackgroundColor3 = colors.visualizer
     end
 end
@@ -941,7 +937,6 @@ local function stopProgressUpdate()
     totalTimeLabel.Text = "0:00"
 end
 
--- NEW: Minimized progress update
 local function startMiniProgressUpdate()
     if miniProgressConnection then
         miniProgressConnection:Disconnect()
@@ -1058,7 +1053,6 @@ local function playPreviousSong()
     end
 end
 
--- NEW: Toggle play/pause
 local function togglePlayPause()
     if currentSound then
         if currentSound.IsPlaying then
@@ -1195,8 +1189,7 @@ function playMusic(musicData)
     nowPlayingLabel.Text = musicData.name
     statusLabel.Text = "Đang phát - Volume: " .. userData.volume
     musicIcon.Text = "🎵"
-    
-    -- Update minimized UI
+
     minimizedSongLabel.Text = musicData.name
     minimizedPlayPauseBtn.Text = "⏸️"
 
@@ -1237,8 +1230,7 @@ local function stopMusic()
     nowPlayingLabel.Text = "Không có nhạc nào đang phát"
     statusLabel.Text = "Volume: " .. userData.volume .. " | Sẵn sàng phát nhạc"
     musicIcon.Text = "⏸️"
-    
-    -- Update minimized UI
+
     minimizedSongLabel.Text = "Không có nhạc"
     minimizedPlayPauseBtn.Text = "▶️"
 
@@ -1339,7 +1331,7 @@ end
 
 local function createMusicItem(musicData, parent)
     local itemFrame = Instance.new("Frame")
-    itemFrame.Size = UDim2.new(1, -12, 0, 50)
+    itemFrame.Size = UDim2.new(1, -12, 0, 46)
     itemFrame.BackgroundColor3 = colors.primary
     itemFrame.BorderSizePixel = 0
     itemFrame.Parent = parent
@@ -1349,8 +1341,8 @@ local function createMusicItem(musicData, parent)
     itemCorner.Parent = itemFrame
 
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, -50, 0, 25)
-    nameLabel.Position = UDim2.new(0, 10, 0, 5)
+    nameLabel.Size = UDim2.new(1, -48, 0, 22)
+    nameLabel.Position = UDim2.new(0, 8, 0, 4)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = musicData.name
     nameLabel.TextColor3 = colors.text
@@ -1361,20 +1353,20 @@ local function createMusicItem(musicData, parent)
     nameLabel.Parent = itemFrame
 
     local idLabel = Instance.new("TextLabel")
-    idLabel.Size = UDim2.new(1, -50, 0, 15)
-    idLabel.Position = UDim2.new(0, 10, 0, 25)
+    idLabel.Size = UDim2.new(1, -48, 0, 14)
+    idLabel.Position = UDim2.new(0, 8, 0, 24)
     idLabel.BackgroundTransparency = 1
     idLabel.Text = "ID: " .. musicData.id
     idLabel.TextColor3 = colors.textSecondary
-    idLabel.TextSize = 10
+    idLabel.TextSize = 9
     idLabel.Font = Enum.Font.Gotham
     idLabel.TextXAlignment = Enum.TextXAlignment.Left
     idLabel.TextTruncate = Enum.TextTruncate.AtEnd
     idLabel.Parent = itemFrame
 
     local playBtn = Instance.new("TextButton")
-    playBtn.Size = UDim2.new(0, 35, 0, 35)
-    playBtn.Position = UDim2.new(1, -40, 0, 7)
+    playBtn.Size = UDim2.new(0, 32, 0, 32)
+    playBtn.Position = UDim2.new(1, -38, 0, 7)
     playBtn.BackgroundColor3 = colors.accent
     playBtn.BorderSizePixel = 0
     playBtn.Text = "▶️"
@@ -1419,7 +1411,7 @@ local function updateLibraryTab()
         createMusicItem(musicData, libraryScroll)
     end
 
-    libraryScroll.CanvasSize = UDim2.new(0, 0, 0, #filteredMusic * 53)
+    libraryScroll.CanvasSize = UDim2.new(0, 0, 0, #filteredMusic * 50)
 end
 
 function updateHistoryTab()
@@ -1440,7 +1432,7 @@ function updateHistoryTab()
         emptyLabel.BackgroundTransparency = 1
         emptyLabel.Text = "📜\n\nChưa có lịch sử phát nhạc\n\nPhát nhạc để xem lịch sử!\nLưu 20 bài gần nhất"
         emptyLabel.TextColor3 = colors.textSecondary
-        emptyLabel.TextSize = 14
+        emptyLabel.TextSize = 13
         emptyLabel.Font = Enum.Font.Gotham
         emptyLabel.Parent = emptyFrame
     else
@@ -1449,7 +1441,7 @@ function updateHistoryTab()
         end
     end
 
-    historyScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(#userData.history * 53, 120))
+    historyScroll.CanvasSize = UDim2.new(0, 0, 0, math.max(#userData.history * 50, 120))
 end
 
 local function filterMusic(searchText)
@@ -1506,7 +1498,7 @@ local function toggleMinimize()
     else
         mainFrame.Visible = true
         minimizedFrame.Visible = false
-        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {Size = UDim2.new(0, 380, 0, 420)})
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4), {Size = UDim2.new(0, 420, 0, 480)})
         tween:Play()
     end
 end
@@ -1606,8 +1598,6 @@ closeBtn.MouseButton1Click:Connect(closePlayer)
 -- Minimized window controls
 restoreBtn.MouseButton1Click:Connect(toggleMinimize)
 minCloseBtn.MouseButton1Click:Connect(closePlayer)
-
--- NEW: Minimized control buttons
 miniPrevBtn.MouseButton1Click:Connect(playPreviousSong)
 miniNextBtn.MouseButton1Click:Connect(playNextSong)
 miniStopBtn.MouseButton1Click:Connect(stopMusic)
@@ -1691,24 +1681,20 @@ spawn(function()
     wait(1)
     showNotification("🎉 Music Player 3.0 đã sẵn sàng!", colors.accent, "🎵")
     wait(2)
-    showNotification("✨ NEW: Enhanced Minimized Mode!", colors.warning, "🆕")
+    showNotification("✨ UI đã được tối ưu hóa!", colors.warning, "🆕")
 end)
 
 -- Console output
-print("🎵 ===== MUSIC PLAYER 3.0 - ENHANCED EDITION ===== 🎵")
+print("🎵 ===== MUSIC PLAYER 3.0 - OPTIMIZED UI ===== 🎵")
 print("✅ LOADED SUCCESSFULLY!")
 print("")
-print("🆕 VERSION 3.0 ENHANCED FEATURES:")
-print("   🎨 VISUALIZER: 20 animated audio bars with rainbow effects")
-print("   🔀 SHUFFLE MODE: Random playback with smart queue")
-print("   ⏱️ PROGRESS BAR: Real-time playback tracking")
-print("   🎮 ENHANCED MINIMIZED MODE:")
-print("      • Previous/Next song buttons")
-print("      • Play/Pause toggle button")
-print("      • Stop button")
-print("      • Live progress bar")
-print("      • Song name display")
-print("      • Time counter (current/total)")
+print("🆕 OPTIMIZED FEATURES:")
+print("   📐 Perfect size: 420x480 (main) | 380x75 (mini)")
+print("   🎨 18 visualizer bars with rainbow effects")
+print("   📜 Scrollable library - hiển thị đủ 80+ bài hát")
+print("   🔀 Shuffle mode with smart queue")
+print("   ⏱️ Real-time progress tracking")
+print("   🎮 Enhanced minimized controls")
 print("")
 print("🎵 80+ SONGS LIBRARY")
 print("🎲 MYSTERY RANDOM BOX")
@@ -1717,10 +1703,4 @@ print("🔊 VOLUME CONTROL (0-10)")
 print("🔄🔂🔁 REPEAT MODES")
 print("🔍 SEARCH FUNCTIONALITY")
 print("")
-print("🎮 MINIMIZED CONTROLS:")
-print("   ⏮️ Previous: Play previous song")
-print("   ▶️/⏸️ Play/Pause: Toggle playback")
-print("   ⏭️ Next: Play next song")
-print("   ⏹️ Stop: Stop music completely")
-print("")
-print("🎉 ENJOY THE ENHANCED MUSIC PLAYER! 🎵")
+print("🎉 ENJOY THE OPTIMIZED MUSIC PLAYER! 🎵")
