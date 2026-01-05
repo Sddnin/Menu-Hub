@@ -857,20 +857,16 @@ local function createLoadingScreen()
         loadingFrame:Destroy()
     end
 
-    -- Loading container (no gray overlay background)
+    -- Loading container (transparent background)
     loadingFrame = Instance.new("Frame")
     loadingFrame.Size = UDim2.new(0, 300, 0, 200)
     loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-    loadingFrame.BackgroundColor3 = colors.primary
+    loadingFrame.BackgroundTransparency = 1
     loadingFrame.BorderSizePixel = 0
     loadingFrame.ZIndex = 1000
     loadingFrame.Parent = screenGui
 
     local loadingContainer = loadingFrame
-
-    local containerCorner = Instance.new("UICorner")
-    containerCorner.CornerRadius = UDim.new(0, 16)
-    containerCorner.Parent = loadingContainer
 
     -- Animated music note icon
     local musicNoteIcon = Instance.new("TextLabel")
