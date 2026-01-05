@@ -66,6 +66,130 @@ islandText.Font = Enum.Font.GothamBold
 islandText.Parent = dynamicIsland
 islandText.ZIndex = 102
 
+-- Quick Actions Panel
+local quickActionsPanel = Instance.new("Frame")
+quickActionsPanel.Name = "QuickActionsPanel"
+quickActionsPanel.Size = UDim2.new(0, 50, 0, 180)
+quickActionsPanel.Position = UDim2.new(0, -60, 0, 0)
+quickActionsPanel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+quickActionsPanel.BorderSizePixel = 0
+quickActionsPanel.Visible = false
+quickActionsPanel.Parent = islandContainer
+quickActionsPanel.ZIndex = 99
+
+local quickPanelCorner = Instance.new("UICorner")
+quickPanelCorner.CornerRadius = UDim.new(0, 15)
+quickPanelCorner.Parent = quickActionsPanel
+
+local quickPanelGradient = Instance.new("UIGradient")
+quickPanelGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(250, 250, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(245, 245, 250))
+}
+quickPanelGradient.Rotation = 90
+quickPanelGradient.Parent = quickActionsPanel
+
+-- Quick Action Button Function
+local function createQuickButton(icon, yPos, tooltip, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 40, 0, 40)
+    btn.Position = UDim2.new(0.5, -20, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(240, 240, 250)
+    btn.Text = icon
+    btn.TextSize = 18
+    btn.Font = Enum.Font.GothamBold
+    btn.AutoButtonColor = false
+    btn.Parent = quickActionsPanel
+    btn.ZIndex = 100
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    btnCorner.Parent = btn
+
+    -- Tooltip
+    local tooltipLabel = Instance.new("TextLabel")
+    tooltipLabel.Size = UDim2.new(0, 80, 0, 25)
+    tooltipLabel.Position = UDim2.new(0, -90, 0.5, -12)
+    tooltipLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    tooltipLabel.Text = tooltip
+    tooltipLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tooltipLabel.TextSize = 10
+    tooltipLabel.Font = Enum.Font.Gotham
+    tooltipLabel.Visible = false
+    tooltipLabel.Parent = btn
+    tooltipLabel.ZIndex = 101
+
+    local tooltipCorner = Instance.new("UICorner")
+    tooltipCorner.CornerRadius = UDim.new(0, 6)
+    tooltipCorner.Parent = tooltipLabel
+
+    btn.MouseEnter:Connect(function()
+        tooltipLabel.Visible = true
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(70, 130, 255),
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        }):Play()
+    end)
+
+    btn.MouseLeave:Connect(function()
+        tooltipLabel.Visible = false
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(240, 240, 250),
+            TextColor3 = Color3.fromRGB(100, 100, 120)
+        }):Play()
+    end)
+
+    btn.MouseButton1Click:Connect(callback)
+
+    return btn
+end
+
+-- Quick Action Buttons
+local quickSpeedBtn = createQuickButton("🏃", 10, "Speed+", function()
+    local currentSpeed = tonumber(speedSlider.Text) or 16
+    local newSpeed = math.min(currentSpeed + 10, 200)
+    humanoid.WalkSpeed = newSpeed
+    speedSlider.Text = tostring(newSpeed)
+    speedLabel.Text = "Speed: " .. newSpeed
+end)
+
+local quickNoclipBtn = createQuickButton("👻", 55, "Noclip", function()
+    toggleNoclip()
+    if noclip then
+        quickNoclipBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    else
+        quickNoclipBtn.BackgroundColor3 = Color3.fromRGB(240, 240, 250)
+    end
+end)
+
+local quickFlyBtn = createQuickButton("🕊️", 100, "Fly", function()
+    loadFlyScript()
+end)
+
+local quickResetBtn = createQuickButton("🔄", 145, "Reset", function()
+    humanoid.WalkSpeed = originalWalkSpeed
+    humanoid.JumpPower = originalJumpPower
+    noclip = false
+    infiniteJump = false
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    speedSlider.Text = "16"
+    jumpSlider.Text = "50"
+    speedLabel.Text = "Speed: 16"
+    jumpLabel.Text = "Jump: 50"
+    resetCamera()
+    
+    quickNoclipBtn.BackgroundColor3 = Color3.fromRGB(240, 240, 250)
+    
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = true
+        end
+    end
+end)
+
 -- Expanded Panel
 local expandedPanel = Instance.new("Frame")
 expandedPanel.Name = "ExpandedPanel"
@@ -339,11 +463,49 @@ listLayout.Padding = UDim.new(0, 3)
 listLayout.Parent = playerList
 
 -- Animation Functions
+local quickActionsVisible = false
+
+local function toggleQuickActions()
+    quickActionsVisible = not quickActionsVisible
+    
+    if quickActionsVisible then
+        quickActionsPanel.Visible = true
+        quickActionsPanel.Position = UDim2.new(0, -60, 0, 0)
+        quickActionsPanel.Size = UDim2.new(0, 0, 0, 180)
+        
+        local tween = TweenService:Create(quickActionsPanel,
+            TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {
+                Size = UDim2.new(0, 50, 0, 180),
+                Position = UDim2.new(0, -60, 0, 0)
+            }
+        )
+        tween:Play()
+    else
+        local tween = TweenService:Create(quickActionsPanel,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {
+                Size = UDim2.new(0, 0, 0, 180),
+                Position = UDim2.new(0, -30, 0, 0)
+            }
+        )
+        tween:Play()
+        tween.Completed:Connect(function()
+            if not quickActionsVisible then
+                quickActionsPanel.Visible = false
+            end
+        end)
+    end
+end
+
 local function expandIsland()
     if isExpanded then return end
     isExpanded = true
     
-    -- Hide island
+    -- Hide quick actions and island
+    if quickActionsVisible then
+        toggleQuickActions()
+    end
     islandContainer.Visible = false
     
     -- Show and expand panel
@@ -960,6 +1122,41 @@ dynamicIsland.MouseButton1Click:Connect(function()
     expandIsland()
 end)
 
+-- Right Click for Quick Actions
+dynamicIsland.MouseButton2Click:Connect(function()
+    toggleQuickActions()
+end)
+
+-- Long press for Quick Actions (mobile friendly)
+local holdTime = 0
+local isHolding = false
+
+dynamicIsland.MouseButton1Down:Connect(function()
+    isHolding = true
+    holdTime = 0
+    
+    spawn(function()
+        while isHolding do
+            wait(0.1)
+            holdTime = holdTime + 0.1
+            
+            if holdTime >= 0.5 and not isExpanded then
+                toggleQuickActions()
+                isHolding = false
+                break
+            end
+        end
+    end)
+end)
+
+dynamicIsland.MouseButton1Up:Connect(function()
+    if holdTime < 0.5 and not quickActionsVisible then
+        -- Normal click - expand
+    end
+    isHolding = false
+    holdTime = 0
+end)
+
 -- Keyboard shortcut
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
@@ -968,6 +1165,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
             collapseIsland()
         else
             expandIsland()
+        end
+    elseif input.KeyCode == Enum.KeyCode.RightControl then
+        -- Ctrl for Quick Actions
+        if not isExpanded then
+            toggleQuickActions()
         end
     end
 end)
@@ -1008,3 +1210,4 @@ end)
 
 print("💖 Mila UI V3.0 - Dynamic Island loaded!")
 print("✨ Click island or press Right Shift to expand")
+print("⚡ Right-click island or hold 0.5s or Right Ctrl for Quick Actions")
