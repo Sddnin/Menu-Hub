@@ -857,21 +857,16 @@ local function createLoadingScreen()
         loadingFrame:Destroy()
     end
 
+    -- Loading container (no gray overlay background)
     loadingFrame = Instance.new("Frame")
-    loadingFrame.Size = UDim2.new(1, 0, 1, 0)
-    loadingFrame.Position = UDim2.new(0, 0, 0, 0)
-    loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    loadingFrame.BackgroundTransparency = 0.3
+    loadingFrame.Size = UDim2.new(0, 300, 0, 200)
+    loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    loadingFrame.BackgroundColor3 = colors.primary
     loadingFrame.BorderSizePixel = 0
     loadingFrame.ZIndex = 1000
     loadingFrame.Parent = screenGui
 
-    local loadingContainer = Instance.new("Frame")
-    loadingContainer.Size = UDim2.new(0, 300, 0, 200)
-    loadingContainer.Position = UDim2.new(0.5, -150, 0.5, -100)
-    loadingContainer.BackgroundColor3 = colors.primary
-    loadingContainer.BorderSizePixel = 0
-    loadingContainer.Parent = loadingFrame
+    local loadingContainer = loadingFrame
 
     local containerCorner = Instance.new("UICorner")
     containerCorner.CornerRadius = UDim.new(0, 16)
