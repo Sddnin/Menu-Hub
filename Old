@@ -346,6 +346,58 @@ local repeatBtnCorner = Instance.new("UICorner")
 repeatBtnCorner.CornerRadius = UDim.new(0, 4)
 repeatBtnCorner.Parent = repeatBtn
 
+-- 🆕 PLAYBACK CONTROLS (Previous/Next)
+local controlFrame = Instance.new("Frame")
+controlFrame.Size = UDim2.new(0, 110, 0, 30)
+controlFrame.Position = UDim2.new(0, 65, 0, 55)
+controlFrame.BackgroundTransparency = 1
+controlFrame.Parent = nowPlayingFrame
+
+local prevBtn = Instance.new("TextButton")
+prevBtn.Size = UDim2.new(0, 35, 0, 30)
+prevBtn.Position = UDim2.new(0, 0, 0, 0)
+prevBtn.BackgroundColor3 = colors.secondary
+prevBtn.BorderSizePixel = 0
+prevBtn.Text = "⏮️"
+prevBtn.TextColor3 = colors.text
+prevBtn.TextSize = 14
+prevBtn.Font = Enum.Font.GothamBold
+prevBtn.Parent = controlFrame
+
+local prevBtnCorner = Instance.new("UICorner")
+prevBtnCorner.CornerRadius = UDim.new(0, 6)
+prevBtnCorner.Parent = prevBtn
+
+local playPauseBtn = Instance.new("TextButton")
+playPauseBtn.Size = UDim2.new(0, 35, 0, 30)
+playPauseBtn.Position = UDim2.new(0, 37.5, 0, 0)
+playPauseBtn.BackgroundColor3 = colors.accent
+playPauseBtn.BorderSizePixel = 0
+playPauseBtn.Text = "▶️"
+playPauseBtn.TextColor3 = colors.text
+playPauseBtn.TextSize = 14
+playPauseBtn.Font = Enum.Font.GothamBold
+playPauseBtn.Parent = controlFrame
+
+local playPauseBtnCorner = Instance.new("UICorner")
+playPauseBtnCorner.CornerRadius = UDim.new(0, 6)
+playPauseBtnCorner.Parent = playPauseBtn
+
+local nextBtn = Instance.new("TextButton")
+nextBtn.Size = UDim2.new(0, 35, 0, 30)
+nextBtn.Position = UDim2.new(0, 75, 0, 0)
+nextBtn.BackgroundColor3 = colors.secondary
+nextBtn.BorderSizePixel = 0
+nextBtn.Text = "⏭️"
+nextBtn.TextColor3 = colors.text
+nextBtn.TextSize = 14
+nextBtn.Font = Enum.Font.GothamBold
+nextBtn.Parent = controlFrame
+
+local nextBtnCorner = Instance.new("UICorner")
+nextBtnCorner.CornerRadius = UDim.new(0, 6)
+nextBtnCorner.Parent = nextBtn
+
 -- 🆕 SHUFFLE BUTTON
 local shuffleBtn = Instance.new("TextButton")
 shuffleBtn.Size = UDim2.new(0, 60, 0, 30)
@@ -683,7 +735,7 @@ minCurrentTime.Parent = minimizedFrame
 
 local minTotalTime = Instance.new("TextLabel")
 minTotalTime.Size = UDim2.new(0, 40, 0, 12)
-minTotalTime.Position = UDim2.new(1, -45, 0, 55)
+minTotalTime.Position = UDim2.new(1, -120, 0, 55)
 minTotalTime.BackgroundTransparency = 1
 minTotalTime.Text = "0:00"
 minTotalTime.TextColor3 = colors.textSecondary
@@ -691,6 +743,58 @@ minTotalTime.TextSize = 9
 minTotalTime.Font = Enum.Font.Gotham
 minTotalTime.TextXAlignment = Enum.TextXAlignment.Right
 minTotalTime.Parent = minimizedFrame
+
+-- Mini playback controls
+local minControlFrame = Instance.new("Frame")
+minControlFrame.Size = UDim2.new(0, 75, 0, 22)
+minControlFrame.Position = UDim2.new(1, -110, 0, 33)
+minControlFrame.BackgroundTransparency = 1
+minControlFrame.Parent = minimizedFrame
+
+local minPrevBtn = Instance.new("TextButton")
+minPrevBtn.Size = UDim2.new(0, 22, 0, 22)
+minPrevBtn.Position = UDim2.new(0, 0, 0, 0)
+minPrevBtn.BackgroundColor3 = colors.secondary
+minPrevBtn.BorderSizePixel = 0
+minPrevBtn.Text = "⏮️"
+minPrevBtn.TextColor3 = colors.text
+minPrevBtn.TextSize = 10
+minPrevBtn.Font = Enum.Font.GothamBold
+minPrevBtn.Parent = minControlFrame
+
+local minPrevBtnCorner = Instance.new("UICorner")
+minPrevBtnCorner.CornerRadius = UDim.new(0, 4)
+minPrevBtnCorner.Parent = minPrevBtn
+
+local minPlayPauseBtn = Instance.new("TextButton")
+minPlayPauseBtn.Size = UDim2.new(0, 22, 0, 22)
+minPlayPauseBtn.Position = UDim2.new(0, 26.5, 0, 0)
+minPlayPauseBtn.BackgroundColor3 = colors.accent
+minPlayPauseBtn.BorderSizePixel = 0
+minPlayPauseBtn.Text = "▶️"
+minPlayPauseBtn.TextColor3 = colors.text
+minPlayPauseBtn.TextSize = 10
+minPlayPauseBtn.Font = Enum.Font.GothamBold
+minPlayPauseBtn.Parent = minControlFrame
+
+local minPlayPauseBtnCorner = Instance.new("UICorner")
+minPlayPauseBtnCorner.CornerRadius = UDim.new(0, 4)
+minPlayPauseBtnCorner.Parent = minPlayPauseBtn
+
+local minNextBtn = Instance.new("TextButton")
+minNextBtn.Size = UDim2.new(0, 22, 0, 22)
+minNextBtn.Position = UDim2.new(0, 53, 0, 0)
+minNextBtn.BackgroundColor3 = colors.secondary
+minNextBtn.BorderSizePixel = 0
+minNextBtn.Text = "⏭️"
+minNextBtn.TextColor3 = colors.text
+minNextBtn.TextSize = 10
+minNextBtn.Font = Enum.Font.GothamBold
+minNextBtn.Parent = minControlFrame
+
+local minNextBtnCorner = Instance.new("UICorner")
+minNextBtnCorner.CornerRadius = UDim.new(0, 4)
+minNextBtnCorner.Parent = minNextBtn
 
 local minCloseBtn = Instance.new("TextButton")
 minCloseBtn.Size = UDim2.new(0, 30, 0, 30)
@@ -871,6 +975,68 @@ local function getNextSong()
     end
 end
 
+local function getPreviousSong()
+    if userData.shuffleMode then
+        -- In shuffle mode, get random song
+        return musicLibrary[math.random(1, #musicLibrary)]
+    else
+        local currentIndex = 1
+        for i, item in ipairs(filteredMusic) do
+            if currentPlaying and item.id == currentPlaying.id then
+                currentIndex = i
+                break
+            end
+        end
+        
+        local prevIndex = currentIndex - 1
+        if prevIndex < 1 then
+            prevIndex = #filteredMusic
+        end
+        
+        return filteredMusic[prevIndex]
+    end
+end
+
+local function playNextSong()
+    local nextSong = getNextSong()
+    if nextSong then
+        playMusic(nextSong)
+    else
+        showNotification("Không có bài tiếp theo!", colors.warning, "⚠️")
+    end
+end
+
+local function playPreviousSong()
+    local prevSong = getPreviousSong()
+    if prevSong then
+        playMusic(prevSong)
+    else
+        showNotification("Không có bài trước đó!", colors.warning, "⚠️")
+    end
+end
+
+local function togglePlayPause()
+    if currentSound then
+        if currentSound.IsPlaying then
+            currentSound:Pause()
+            playPauseBtn.Text = "▶️"
+            minPlayPauseBtn.Text = "▶️"
+            musicIcon.Text = "⏸️"
+            stopProgressUpdate()
+            showNotification("⏸️ Tạm dừng", colors.warning, "⏸️")
+        else
+            currentSound:Resume()
+            playPauseBtn.Text = "⏸️"
+            minPlayPauseBtn.Text = "⏸️"
+            musicIcon.Text = "🎵"
+            startProgressUpdate()
+            showNotification("▶️ Tiếp tục phát", colors.accent, "▶️")
+        end
+    else
+        showNotification("Chưa có nhạc nào đang phát!", colors.danger, "⚠️")
+    end
+end
+
 local function playMusic(musicData)
     currentSound = createSound(musicData.id)
     
@@ -893,6 +1059,8 @@ local function playMusic(musicData)
     minSongLabel.Text = musicData.name
     statusLabel.Text = "Đang phát - Volume: " .. userData.volume
     musicIcon.Text = "🎵"
+    playPauseBtn.Text = "⏸️"
+    minPlayPauseBtn.Text = "⏸️"
     
     startProgressUpdate()
     addToHistory(musicData)
@@ -933,6 +1101,8 @@ local function stopMusic()
     minSongLabel.Text = "Không có nhạc"
     statusLabel.Text = "Volume: " .. userData.volume .. " | Sẵn sàng phát nhạc"
     musicIcon.Text = "⏸️"
+    playPauseBtn.Text = "▶️"
+    minPlayPauseBtn.Text = "▶️"
     
     showNotification("Đã dừng phát nhạc", colors.danger, "⏹️")
 end
@@ -1293,6 +1463,12 @@ end)
 
 repeatBtn.MouseButton1Click:Connect(cycleRepeatMode)
 shuffleBtn.MouseButton1Click:Connect(toggleShuffle)
+prevBtn.MouseButton1Click:Connect(playPreviousSong)
+nextBtn.MouseButton1Click:Connect(playNextSong)
+playPauseBtn.MouseButton1Click:Connect(togglePlayPause)
+minPrevBtn.MouseButton1Click:Connect(playPreviousSong)
+minNextBtn.MouseButton1Click:Connect(playNextSong)
+minPlayPauseBtn.MouseButton1Click:Connect(togglePlayPause)
 minimizeBtn.MouseButton1Click:Connect(toggleMinimize)
 restoreBtn.MouseButton1Click:Connect(toggleMinimize)
 closeBtn.MouseButton1Click:Connect(closePlayer)
@@ -1321,6 +1497,12 @@ addHoverEffect(stopBtn)
 addHoverEffect(openBoxBtn)
 addHoverEffect(repeatBtn)
 addHoverEffect(shuffleBtn)
+addHoverEffect(prevBtn)
+addHoverEffect(nextBtn)
+addHoverEffect(playPauseBtn)
+addHoverEffect(minPrevBtn)
+addHoverEffect(minNextBtn)
+addHoverEffect(minPlayPauseBtn)
 addHoverEffect(minimizeBtn)
 addHoverEffect(closeBtn)
 addHoverEffect(minCloseBtn)
@@ -1365,25 +1547,31 @@ makeDraggable(minimizedFrame)
 -- Welcome
 spawn(function()
     wait(1)
-    showNotification("🎉 Music Player v3.0 đã sẵn sàng!\n🔀 Shuffle & ⏱️ Progress Bar!", colors.accent, "🎵")
+    showNotification("🎉 Music Player v3.0 đã sẵn sàng!\n🔀 Shuffle & ⏱️ Progress & ⏯️ Controls!", colors.accent, "🎵")
 end)
 
 print("🎵 MUSIC PLAYER V3.0 LOADED! 🎵")
 print("✅ NEW FEATURES:")
 print("   🔀 SHUFFLE MODE: Random continuous playback!")
 print("   ⏱️ PROGRESS BAR: Real-time song progress!")
-print("   📱 MINIMIZED VIEW: Shows song name + progress!")
+print("   ⏮️⏯️⏭️ PLAYBACK CONTROLS: Prev/Pause/Next!")
+print("   📱 MINI PLAYER: Shows name + progress + controls!")
 print("   🎵 80+ Songs in library")
 print("")
 print("🆕 V3.0 FEATURES:")
 print("   🔀 Shuffle: Click button to toggle random play")
 print("   ⏱️ Progress: See current time / total time")
-print("   📱 Mini player: Shows name + time when minimized")
+print("   ⏮️ Previous: Go to previous song")
+print("   ⏯️ Play/Pause: Pause and resume music")
+print("   ⏭️ Next: Skip to next song")
+print("   📱 Mini player: Full controls when minimized!")
 print("   🔄 Works with repeat modes!")
 print("")
-print("🎮 HOW TO USE SHUFFLE:")
-print("   1. Click 🔀 button (turns purple when ON)")
-print("   2. Songs will play randomly after current song")
-print("   3. Works with Random Box too!")
+print("🎮 HOW TO USE:")
+print("   ⏮️ Click to play previous song")
+print("   ⏯️ Click to pause/resume current song")
+print("   ⏭️ Click to play next song")
+print("   🔀 Shuffle works with prev/next!")
+print("   📱 All controls available in mini mode!")
 print("")
 print("🎵 Enjoy your music with v3.0! 🎵")
