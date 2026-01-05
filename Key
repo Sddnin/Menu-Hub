@@ -1,5 +1,5 @@
 -- Mila UI V2.0 - Stable Version
--- Tạo bởi: Assistant
+-- Tạo bởi: Mila
 -- Tính năng: Speed, Jump, Fly, Noclip, Teleport, Infinite Jump, Anti-AFK
 
 local Players = game:GetService("Players")
