@@ -153,7 +153,7 @@ local musicLibrary = {
     {name = "Mưa Đỏ", id = "102055738614721"},
     {name = "BAD HAPPENING FUNK", id = "70661591361974"},
     {name = "Cry for me", id = "127509228934839"},
-    {name = "Còn gì đẹp hơn", id = "136098580227293"},
+    {name = "Còn gì đẹp hơn", id = "119556157387718"},
 }
 
 -- 💾 User Data
