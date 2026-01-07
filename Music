@@ -128,6 +128,32 @@ local musicLibrary = {
     {name = "Beach Cushions", id = "9047105893"},
     {name = "Home Town Easy", id = "9047106105"},
     {name = "Santo Ervilio", id = "9039769202"},
+    {name = "Not Cute Anymore", id = "127469192882657"},
+    {name = "Unslept Miraidempa", id = "108483365019009"},
+    {name = "Your Pain", id = "7024132063"},
+    {name = "Celestial 천상", id = "1841740985"},
+    {name = "You Say", id = "5410083447"},
+    {name = "Expedition", id = "7023887630"},
+    {name = "Balance", id = "7024183256"},
+    {name = "Surfer 서퍼", id = "5409360995"},
+    {name = "Ethereal 이테리얼", id = "1837449610"},
+    {name = "<<< RUINS >>> << 유적 >>", id = "1836291936"},
+    {name = "Twilight 황혼", id = "7028518546"},
+    {name = "Twilight: Iridescent Memory", id = "9041766601"},
+    {name = "SHARD SURFER 샤드 서퍼", id = "1839841807"},
+    {name = "BRX PHONK", id = "17422074849"},
+    {name = "Phonk't Out", id = "14145625743"},
+    {name = "Black Seed", id = "14145622615"},
+    {name = "Gambare Gambare Senpai", id = "7431081635"},
+    {name = "Zero Two - Here Darling Say Ahh", id = "4606614518"},
+    {name = "Besto Friendo", id = "8232643121"},
+    {name = "Initial D - Deja Vu", id = "16831106636"},
+    {name = "TheFatRat", id = "105059799927487"},
+    {name = "Chạy về bên anh", id = "127667093795280"},
+    {name = "Mưa Đỏ", id = "102055738614721"},
+    {name = "BAD HAPPENING FUNK", id = "70661591361974"},
+    {name = "Cry for me", id = "127509228934839"},
+    {name = "Còn gì đẹp hơn", id = "136098580227293"},
 }
 
 -- 💾 User Data
@@ -214,7 +240,7 @@ minimizeBtn.Size = UDim2.new(0, 30, 0, 26)
 minimizeBtn.Position = UDim2.new(1, -68, 0, 10)
 minimizeBtn.BackgroundColor3 = colors.secondary
 minimizeBtn.BorderSizePixel = 0
-minimizeBtn.Text = "▢"
+minimizeBtn.Text = "➕"
 minimizeBtn.TextColor3 = colors.text
 minimizeBtn.TextSize = 13
 minimizeBtn.Font = Enum.Font.GothamBold
@@ -229,7 +255,7 @@ closeBtn.Size = UDim2.new(0, 30, 0, 26)
 closeBtn.Position = UDim2.new(1, -33, 0, 10)
 closeBtn.BackgroundColor3 = colors.danger
 closeBtn.BorderSizePixel = 0
-closeBtn.Text = "✕"
+closeBtn.Text = "❌"
 closeBtn.TextColor3 = colors.text
 closeBtn.TextSize = 13
 closeBtn.Font = Enum.Font.GothamBold
@@ -764,7 +790,7 @@ minCloseBtn.Size = UDim2.new(0, 24, 0, 24)
 minCloseBtn.Position = UDim2.new(1, -28, 0, 2)
 minCloseBtn.BackgroundColor3 = colors.danger
 minCloseBtn.BorderSizePixel = 0
-minCloseBtn.Text = "✕"
+minCloseBtn.Text = "❌"
 minCloseBtn.TextColor3 = colors.text
 minCloseBtn.TextSize = 12
 minCloseBtn.Font = Enum.Font.GothamBold
