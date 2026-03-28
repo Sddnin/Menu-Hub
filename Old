@@ -171,17 +171,17 @@ tabFrame.ZIndex = 51
 Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 12)
 
 local tabButtons = {}
-local tabDefs = {{"Home", "🏠 Home"}, {"Other", "🔧 Other"}}
+local tabDefs = {{"Home", "🏠 Home"}, {"WP", "📍 WP"}, {"Other", "🔧 Other"}}
 
 for i, def in ipairs(tabDefs) do
     local tabName, tabLabel = def[1], def[2]
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.5, -6, 1, -8)
-    btn.Position = UDim2.new((i-1)*0.5, i==1 and 4 or 2, 0, 4)
+    btn.Size = UDim2.new(0.333, -5, 1, -8)
+    btn.Position = UDim2.new((i-1)*0.333, i==1 and 4 or (i==2 and 2 or 1), 0, 4)
     btn.BackgroundColor3 = i==1 and Color3.fromRGB(80,60,200) or Color3.fromRGB(30,30,42)
     btn.Text = tabLabel
     btn.TextColor3 = i==1 and Color3.fromRGB(255,255,255) or Color3.fromRGB(140,140,160)
-    btn.TextSize = 12
+    btn.TextSize = 11
     btn.Font = Enum.Font.GothamSemibold
     btn.AutoButtonColor = false
     btn.Parent = tabFrame
@@ -495,7 +495,7 @@ jumpApply.MouseButton1Click:Connect(function()
     end
 end)
 
--- Players + Fly + Screenshot side by side
+-- Players + Waypoint + Fly side by side
 local playersBtn = Instance.new("TextButton")
 playersBtn.Size = UDim2.new(0.148, 0, 0, 32)
 playersBtn.Position = UDim2.new(0.54, 0, 0, 130)
@@ -512,9 +512,25 @@ Instance.new("UICorner", playersBtn).CornerRadius = UDim.new(0,10)
 playersBtn.MouseEnter:Connect(function() TweenService:Create(playersBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
 playersBtn.MouseLeave:Connect(function() TweenService:Create(playersBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
 
+local wpBtn = Instance.new("TextButton")
+wpBtn.Size = UDim2.new(0.148, 0, 0, 32)
+wpBtn.Position = UDim2.new(0.696, 0, 0, 130)
+wpBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
+wpBtn.Text = "📍"
+wpBtn.TextColor3 = Color3.fromRGB(170,170,220)
+wpBtn.TextSize = 16
+wpBtn.Font = Enum.Font.GothamSemibold
+wpBtn.AutoButtonColor = false
+wpBtn.BorderSizePixel = 0
+wpBtn.Parent = homeContent
+wpBtn.ZIndex = 52
+Instance.new("UICorner", wpBtn).CornerRadius = UDim.new(0,10)
+wpBtn.MouseEnter:Connect(function() TweenService:Create(wpBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
+wpBtn.MouseLeave:Connect(function() TweenService:Create(wpBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
+
 local flyBtn = Instance.new("TextButton")
 flyBtn.Size = UDim2.new(0.148, 0, 0, 32)
-flyBtn.Position = UDim2.new(0.696, 0, 0, 130)
+flyBtn.Position = UDim2.new(0.852, 0, 0, 130)
 flyBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
 flyBtn.Text = "🕊️"
 flyBtn.TextColor3 = Color3.fromRGB(170,170,220)
@@ -528,22 +544,6 @@ Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,10)
 flyBtn.MouseEnter:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
 flyBtn.MouseLeave:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
 
-local ssBtn = Instance.new("TextButton")
-ssBtn.Size = UDim2.new(0.148, 0, 0, 32)
-ssBtn.Position = UDim2.new(0.852, 0, 0, 130)
-ssBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-ssBtn.Text = "📸"
-ssBtn.TextColor3 = Color3.fromRGB(170,170,220)
-ssBtn.TextSize = 16
-ssBtn.Font = Enum.Font.GothamSemibold
-ssBtn.AutoButtonColor = false
-ssBtn.BorderSizePixel = 0
-ssBtn.Parent = homeContent
-ssBtn.ZIndex = 52
-Instance.new("UICorner", ssBtn).CornerRadius = UDim.new(0,10)
-ssBtn.MouseEnter:Connect(function() TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
-ssBtn.MouseLeave:Connect(function() TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
-
 local flyLoaded = false
 flyBtn.MouseButton1Click:Connect(function()
     if not flyLoaded then
@@ -554,29 +554,6 @@ flyBtn.MouseButton1Click:Connect(function()
         end)
         flyBtn.Text = "✅"
     end
-end)
-
-ssBtn.MouseButton1Click:Connect(function()
-    -- Hide UI, screenshot, show UI
-    screenGui.Enabled = false
-    wait(0.1)
-    local ss = game:GetService("MarketplaceService")
-    pcall(function()
-        writefile("xnos_screenshot.png", game:GetService("HttpService"):JSONEncode({}))
-    end)
-    -- Use screenshotting via viewport
-    pcall(function()
-        local img = game:GetService("RunService"):IsStudio() and "studio" or ""
-        setclipboard("Screenshot taken!")
-    end)
-    wait(0.1)
-    screenGui.Enabled = true
-    -- Flash feedback
-    ssBtn.Text = "✓"
-    TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(40,160,80)}):Play()
-    wait(1.5)
-    ssBtn.Text = "📸"
-    TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play()
 end)
 
 -- ==================== RESET / THEME BUTTON ====================
@@ -599,8 +576,8 @@ resetBtn.MouseLeave:Connect(function() TweenService:Create(resetBtn,TweenInfo.ne
 -- ==================== POPUP (Reset + Theme) ====================
 local popup = Instance.new("Frame")
 popup.Name = "Popup"
-popup.Size = UDim2.new(0, 310, 0, 290)
-popup.Position = UDim2.new(0.5,-155,0.5,-145)
+popup.Size = UDim2.new(0, 310, 0, 330)
+popup.Position = UDim2.new(0.5,-155,0.5,-165)
 popup.BackgroundColor3 = Color3.fromRGB(20,20,30)
 popup.BorderSizePixel = 0
 popup.Visible = false
@@ -648,10 +625,94 @@ local resetAllBtn = makePopupBtn("🔄 Reset All", 162, 36, 138, Color3.fromRGB(
 local darkBtn  = makePopupBtn("🌙 Dark",  10, 84, 138, Color3.fromRGB(28,28,45))
 local lightBtn = makePopupBtn("☀️ Light", 162, 84, 138, Color3.fromRGB(225,222,245), Color3.fromRGB(50,40,100))
 
+-- Row 3: Auto Reconnect toggle row
+local autoReconnect = false
+local autoReconnectRow = Instance.new("Frame")
+autoReconnectRow.Size = UDim2.new(1,-20,0,38)
+autoReconnectRow.Position = UDim2.new(0,10,0,132)
+autoReconnectRow.BackgroundColor3 = Color3.fromRGB(24,24,36)
+autoReconnectRow.BorderSizePixel = 0
+autoReconnectRow.Parent = popup
+autoReconnectRow.ZIndex = 82
+Instance.new("UICorner",autoReconnectRow).CornerRadius = UDim.new(0,10)
+
+local arIcon = Instance.new("TextLabel")
+arIcon.Size = UDim2.new(0,28,1,0)
+arIcon.Position = UDim2.new(0,6,0,0)
+arIcon.BackgroundTransparency = 1
+arIcon.Text = "🔁"
+arIcon.TextSize = 15
+arIcon.Font = Enum.Font.Gotham
+arIcon.Parent = autoReconnectRow
+arIcon.ZIndex = 83
+
+local arLabel = Instance.new("TextLabel")
+arLabel.Size = UDim2.new(1,-85,1,0)
+arLabel.Position = UDim2.new(0,36,0,0)
+arLabel.BackgroundTransparency = 1
+arLabel.Text = "Auto Reconnect"
+arLabel.TextColor3 = Color3.fromRGB(170,170,210)
+arLabel.TextSize = 10
+arLabel.Font = Enum.Font.GothamSemibold
+arLabel.TextXAlignment = Enum.TextXAlignment.Left
+arLabel.Parent = autoReconnectRow
+arLabel.ZIndex = 83
+
+-- Toggle switch for auto reconnect
+local arTrack = Instance.new("Frame")
+arTrack.Name = "ARTrack"
+arTrack.Size = UDim2.new(0,38,0,22)
+arTrack.Position = UDim2.new(1,-44,0.5,-11)
+arTrack.BackgroundColor3 = Color3.fromRGB(55,55,75)
+arTrack.BorderSizePixel = 0
+arTrack.Parent = autoReconnectRow
+arTrack.ZIndex = 83
+Instance.new("UICorner",arTrack).CornerRadius = UDim.new(1,0)
+
+local arThumb = Instance.new("Frame")
+arThumb.Size = UDim2.new(0,16,0,16)
+arThumb.Position = UDim2.new(0,3,0.5,-8)
+arThumb.BackgroundColor3 = Color3.fromRGB(255,255,255)
+arThumb.BorderSizePixel = 0
+arThumb.Parent = arTrack
+arThumb.ZIndex = 84
+Instance.new("UICorner",arThumb).CornerRadius = UDim.new(1,0)
+
+local arClickBtn = Instance.new("TextButton")
+arClickBtn.Size = UDim2.new(1,0,1,0)
+arClickBtn.BackgroundTransparency = 1
+arClickBtn.Text = ""
+arClickBtn.AutoButtonColor = false
+arClickBtn.Parent = autoReconnectRow
+arClickBtn.ZIndex = 85
+
+local arConnection
+arClickBtn.MouseButton1Click:Connect(function()
+    autoReconnect = not autoReconnect
+    if autoReconnect then
+        TweenService:Create(arTrack,TweenInfo.new(0.22),{BackgroundColor3=Color3.fromRGB(80,60,200)}):Play()
+        TweenService:Create(arThumb,TweenInfo.new(0.22),{Position=UDim2.new(0,19,0.5,-8)}):Play()
+        TweenService:Create(autoReconnectRow,TweenInfo.new(0.18),{BackgroundColor3=Color3.fromRGB(28,22,55)}):Play()
+        -- Start watching for disconnects
+        arConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if not game:IsLoaded() then
+                pcall(function()
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+                end)
+            end
+        end)
+    else
+        TweenService:Create(arTrack,TweenInfo.new(0.22),{BackgroundColor3=Color3.fromRGB(55,55,75)}):Play()
+        TweenService:Create(arThumb,TweenInfo.new(0.22),{Position=UDim2.new(0,3,0.5,-8)}):Play()
+        TweenService:Create(autoReconnectRow,TweenInfo.new(0.18),{BackgroundColor3=Color3.fromRGB(24,24,36)}):Play()
+        if arConnection then arConnection:Disconnect(); arConnection = nil end
+    end
+end)
+
 -- TP History section
 local tpHistLabel = Instance.new("TextLabel")
 tpHistLabel.Size = UDim2.new(1,-20,0,18)
-tpHistLabel.Position = UDim2.new(0,10,0,132)
+tpHistLabel.Position = UDim2.new(0,10,0,178)
 tpHistLabel.BackgroundTransparency = 1
 tpHistLabel.Text = "📍 TP History"
 tpHistLabel.TextColor3 = Color3.fromRGB(160,160,220)
@@ -662,8 +723,8 @@ tpHistLabel.Parent = popup
 tpHistLabel.ZIndex = 82
 
 local tpHistFrame = Instance.new("Frame")
-tpHistFrame.Size = UDim2.new(1,-20,0,118)
-tpHistFrame.Position = UDim2.new(0,10,0,152)
+tpHistFrame.Size = UDim2.new(1,-20,0,110)
+tpHistFrame.Position = UDim2.new(0,10,0,198)
 tpHistFrame.BackgroundColor3 = Color3.fromRGB(14,14,22)
 tpHistFrame.BorderSizePixel = 0
 tpHistFrame.Parent = popup
@@ -755,7 +816,7 @@ local function showPopup()
     popup.Position = UDim2.new(0.5,0,0.5,0)
     popup.Visible = true
     TweenService:Create(popup, TweenInfo.new(0.28,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-        Size=UDim2.new(0,310,0,290), Position=UDim2.new(0.5,-155,0.5,-145)
+        Size=UDim2.new(0,310,0,330), Position=UDim2.new(0.5,-155,0.5,-165)
     }):Play()
 end
 
@@ -765,8 +826,8 @@ local function hidePopup()
     }):Play()
     wait(0.2)
     popup.Visible = false
-    popup.Size = UDim2.new(0,310,0,290)
-    popup.Position = UDim2.new(0.5,-155,0.5,-145)
+    popup.Size = UDim2.new(0,310,0,330)
+    popup.Position = UDim2.new(0.5,-155,0.5,-165)
 end
 
 resetBtn.MouseButton1Click:Connect(showPopup)
@@ -823,13 +884,29 @@ local function applyTheme()
 
     -- Set buttons (speedApply, jumpApply stay accent blue — fine)
 
-    -- Players + Fly + Screenshot buttons
+    -- Players + Waypoint + Fly buttons
     playersBtn.BackgroundColor3 = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
     playersBtn.TextColor3       = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
+    wpBtn.BackgroundColor3      = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    wpBtn.TextColor3            = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
     flyBtn.BackgroundColor3     = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
     flyBtn.TextColor3           = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
-    ssBtn.BackgroundColor3      = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
-    ssBtn.TextColor3            = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
+
+    -- Waypoint panel
+    waypointFrame.BackgroundColor3 = dark and Color3.fromRGB(18,18,26) or Color3.fromRGB(235,235,250)
+    wpStroke.Color                 = dark and Color3.fromRGB(55,50,100) or Color3.fromRGB(180,175,220)
+    wpTitle.TextColor3             = dark and Color3.fromRGB(180,180,240) or Color3.fromRGB(60,50,120)
+    wpNameBox.BackgroundColor3     = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(220,220,240)
+    wpNameBox.TextColor3           = dark and Color3.fromRGB(180,180,220) or Color3.fromRGB(60,55,120)
+    wpList.BackgroundColor3        = dark and Color3.fromRGB(22,22,32) or Color3.fromRGB(225,225,242)
+
+    -- Auto reconnect row
+    autoReconnectRow.BackgroundColor3 = dark and
+        (autoReconnect and Color3.fromRGB(28,22,55) or Color3.fromRGB(24,24,36)) or
+        (autoReconnect and Color3.fromRGB(218,212,248) or Color3.fromRGB(232,232,248))
+    arLabel.TextColor3 = dark and Color3.fromRGB(170,170,210) or Color3.fromRGB(70,60,130)
+    arTrack.BackgroundColor3 = autoReconnect and Color3.fromRGB(80,60,200) or
+        (dark and Color3.fromRGB(55,55,75) or Color3.fromRGB(185,185,210))
 
     -- Reset button
     resetBtn.BackgroundColor3 = dark and Color3.fromRGB(32,24,58) or Color3.fromRGB(218,210,248)
@@ -1060,10 +1137,200 @@ end
 
 playersBtn.MouseButton1Click:Connect(function()
     playerFrame.Visible = not playerFrame.Visible
-    if playerFrame.Visible then updatePlayerList("") end
+    if playerFrame.Visible then
+        waypointFrame.Visible = false
+        updatePlayerList("")
+    end
 end)
 playerSearchBox.Changed:Connect(function(p)
     if p=="Text" then updatePlayerList(playerSearchBox.Text) end
+end)
+
+wpBtn.MouseButton1Click:Connect(function()
+    waypointFrame.Visible = not waypointFrame.Visible
+    if waypointFrame.Visible then
+        playerFrame.Visible = false
+        refreshWaypointUI()
+    end
+end)
+
+-- ==================== WAYPOINT PANEL ====================
+local waypoints = {}  -- {name, cframe}
+local MAX_WAYPOINTS = 8
+
+local waypointFrame = Instance.new("Frame")
+waypointFrame.Size = UDim2.new(0,190,0,280)
+waypointFrame.Position = UDim2.new(1,10,0,0)
+waypointFrame.BackgroundColor3 = Color3.fromRGB(18,18,26)
+waypointFrame.BorderSizePixel = 0
+waypointFrame.Visible = false
+waypointFrame.Parent = expandedPanel
+waypointFrame.ZIndex = 60
+Instance.new("UICorner",waypointFrame).CornerRadius = UDim.new(0,14)
+
+local wpStroke = Instance.new("UIStroke")
+wpStroke.Color = Color3.fromRGB(55,50,100)
+wpStroke.Thickness = 1
+wpStroke.Parent = waypointFrame
+
+local wpTitle = Instance.new("TextLabel")
+wpTitle.Size = UDim2.new(1,0,0,30)
+wpTitle.BackgroundTransparency = 1
+wpTitle.Text = "📍 Waypoints"
+wpTitle.TextColor3 = Color3.fromRGB(180,180,240)
+wpTitle.TextSize = 13
+wpTitle.Font = Enum.Font.GothamBold
+wpTitle.Parent = waypointFrame
+wpTitle.ZIndex = 61
+
+-- Name input + Save button
+local wpNameBox = Instance.new("TextBox")
+wpNameBox.Size = UDim2.new(1,-70,0,26)
+wpNameBox.Position = UDim2.new(0,8,0,34)
+wpNameBox.BackgroundColor3 = Color3.fromRGB(28,28,42)
+wpNameBox.PlaceholderText = "Name..."
+wpNameBox.Text = ""
+wpNameBox.TextColor3 = Color3.fromRGB(180,180,220)
+wpNameBox.TextSize = 11
+wpNameBox.Font = Enum.Font.Gotham
+wpNameBox.BorderSizePixel = 0
+wpNameBox.Parent = waypointFrame
+wpNameBox.ZIndex = 62
+Instance.new("UICorner",wpNameBox).CornerRadius = UDim.new(0,7)
+
+local wpSaveBtn = Instance.new("TextButton")
+wpSaveBtn.Size = UDim2.new(0,54,0,26)
+wpSaveBtn.Position = UDim2.new(1,-62,0,34)
+wpSaveBtn.BackgroundColor3 = Color3.fromRGB(60,80,200)
+wpSaveBtn.Text = "+ Save"
+wpSaveBtn.TextColor3 = Color3.fromRGB(255,255,255)
+wpSaveBtn.TextSize = 10
+wpSaveBtn.Font = Enum.Font.GothamBold
+wpSaveBtn.AutoButtonColor = false
+wpSaveBtn.BorderSizePixel = 0
+wpSaveBtn.Parent = waypointFrame
+wpSaveBtn.ZIndex = 62
+Instance.new("UICorner",wpSaveBtn).CornerRadius = UDim.new(0,7)
+
+-- Waypoint list
+local wpList = Instance.new("ScrollingFrame")
+wpList.Size = UDim2.new(1,-16,1,-72)
+wpList.Position = UDim2.new(0,8,0,66)
+wpList.BackgroundColor3 = Color3.fromRGB(22,22,32)
+wpList.ScrollBarThickness = 3
+wpList.ScrollBarImageColor3 = Color3.fromRGB(80,60,180)
+wpList.BorderSizePixel = 0
+wpList.Parent = waypointFrame
+wpList.ZIndex = 61
+Instance.new("UICorner",wpList).CornerRadius = UDim.new(0,8)
+
+local wpLayout = Instance.new("UIListLayout")
+wpLayout.Padding = UDim.new(0,3)
+wpLayout.Parent = wpList
+
+local function refreshWaypointUI()
+    for _, c in pairs(wpList:GetChildren()) do
+        if c:IsA("Frame") then c:Destroy() end
+    end
+    if #waypoints == 0 then
+        local empty = Instance.new("TextLabel")
+        empty.Size = UDim2.new(1,0,0,26)
+        empty.BackgroundTransparency = 1
+        empty.Text = "No waypoints saved"
+        empty.TextColor3 = Color3.fromRGB(80,80,110)
+        empty.TextSize = 9
+        empty.Font = Enum.Font.Gotham
+        empty.Parent = wpList
+        empty.ZIndex = 62
+        wpList.CanvasSize = UDim2.new(0,0,0,26)
+        return
+    end
+    for i, wp in ipairs(waypoints) do
+        local row = Instance.new("Frame")
+        row.Size = UDim2.new(1,0,0,32)
+        row.BackgroundColor3 = Color3.fromRGB(28,28,42)
+        row.BorderSizePixel = 0
+        row.Parent = wpList
+        row.ZIndex = 62
+        Instance.new("UICorner",row).CornerRadius = UDim.new(0,7)
+
+        local nameLbl = Instance.new("TextLabel")
+        nameLbl.Size = UDim2.new(1,-96,1,0)
+        nameLbl.Position = UDim2.new(0,6,0,0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = "📍 "..wp.name
+        nameLbl.TextColor3 = Color3.fromRGB(180,180,230)
+        nameLbl.TextSize = 10
+        nameLbl.Font = Enum.Font.GothamSemibold
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+        nameLbl.TextTruncate = Enum.TextTruncate.AtEnd
+        nameLbl.Parent = row
+        nameLbl.ZIndex = 63
+
+        -- TP button
+        local tpWpBtn = Instance.new("TextButton")
+        tpWpBtn.Size = UDim2.new(0,38,0,22)
+        tpWpBtn.Position = UDim2.new(1,-88,0.5,-11)
+        tpWpBtn.BackgroundColor3 = Color3.fromRGB(50,80,190)
+        tpWpBtn.Text = "↩ Go"
+        tpWpBtn.TextSize = 9
+        tpWpBtn.Font = Enum.Font.GothamBold
+        tpWpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+        tpWpBtn.AutoButtonColor = false
+        tpWpBtn.BorderSizePixel = 0
+        tpWpBtn.Parent = row
+        tpWpBtn.ZIndex = 63
+        Instance.new("UICorner",tpWpBtn).CornerRadius = UDim.new(0,5)
+
+        -- Delete button
+        local delWpBtn = Instance.new("TextButton")
+        delWpBtn.Size = UDim2.new(0,38,0,22)
+        delWpBtn.Position = UDim2.new(1,-46,0.5,-11)
+        delWpBtn.BackgroundColor3 = Color3.fromRGB(160,40,60)
+        delWpBtn.Text = "🗑"
+        delWpBtn.TextSize = 11
+        delWpBtn.Font = Enum.Font.Gotham
+        delWpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+        delWpBtn.AutoButtonColor = false
+        delWpBtn.BorderSizePixel = 0
+        delWpBtn.Parent = row
+        delWpBtn.ZIndex = 63
+        Instance.new("UICorner",delWpBtn).CornerRadius = UDim.new(0,5)
+
+        local cf = wp.cframe
+        tpWpBtn.MouseButton1Click:Connect(function()
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                character.HumanoidRootPart.CFrame = cf
+            end
+        end)
+
+        local idx = i
+        delWpBtn.MouseButton1Click:Connect(function()
+            table.remove(waypoints, idx)
+            refreshWaypointUI()
+        end)
+    end
+    wpList.CanvasSize = UDim2.new(0,0,0,#waypoints*35)
+end
+
+wpSaveBtn.MouseButton1Click:Connect(function()
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    if #waypoints >= MAX_WAYPOINTS then
+        wpSaveBtn.Text = "Full!"
+        wait(1); wpSaveBtn.Text = "+ Save"
+        return
+    end
+    local name = wpNameBox.Text ~= "" and wpNameBox.Text or ("WP "..#waypoints+1)
+    local cf = character.HumanoidRootPart.CFrame
+    table.insert(waypoints, {name=name, cframe=cf})
+    wpNameBox.Text = ""
+    refreshWaypointUI()
+    -- Flash feedback
+    wpSaveBtn.Text = "✓"
+    TweenService:Create(wpSaveBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(40,160,80)}):Play()
+    wait(1)
+    wpSaveBtn.Text = "+ Save"
+    TweenService:Create(wpSaveBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(60,80,200)}):Play()
 end)
 
 -- ==================== OTHER CONTENT ====================
@@ -1204,6 +1471,7 @@ local function collapseIsland()
     if not isExpanded then return end
     isExpanded = false
     playerFrame.Visible = false
+    waypointFrame.Visible = false
     popup.Visible = false
     local islandPos = islandContainer.Position
     local t = TweenService:Create(expandedPanel, TweenInfo.new(0.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),
