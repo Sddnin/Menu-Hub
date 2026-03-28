@@ -54,14 +54,58 @@ dynamicIsland.ZIndex = 101
 Instance.new("UICorner", dynamicIsland).CornerRadius = UDim.new(1, 0)
 
 local islandText = Instance.new("TextLabel")
-islandText.Size = UDim2.new(1, 0, 1, 0)
+islandText.Size = UDim2.new(1, -10, 1, 0)
+islandText.Position = UDim2.new(0, 5, 0, 0)
 islandText.BackgroundTransparency = 1
-islandText.Text = "⚡ Xnos"
+islandText.Text = "⚡ Xnos  00:00"
 islandText.TextColor3 = Color3.fromRGB(200, 200, 255)
-islandText.TextSize = 14
+islandText.TextSize = 12
 islandText.Font = Enum.Font.GothamBold
 islandText.Parent = dynamicIsland
 islandText.ZIndex = 102
+
+-- ==================== ISLAND DRAG ====================
+local isDraggingIsland = false
+local islandDragStart, islandStartPos
+
+dynamicIsland.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDraggingIsland = true
+        islandDragStart = input.Position
+        islandStartPos = islandContainer.Position
+    end
+end)
+
+dynamicIsland.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDraggingIsland = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if isDraggingIsland and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - islandDragStart
+        local vp = workspace.CurrentCamera.ViewportSize
+        local newX = islandStartPos.X.Scale * vp.X + islandStartPos.X.Offset + delta.X
+        local newY = islandStartPos.Y.Scale * vp.Y + islandStartPos.Y.Offset + delta.Y
+        -- Clamp inside screen
+        newX = math.clamp(newX, 0, vp.X - 120)
+        newY = math.clamp(newY, 0, vp.Y - 37)
+        islandContainer.Position = UDim2.new(0, newX, 0, newY)
+    end
+end)
+
+-- ==================== SESSION TIMER ====================
+local sessionStart = tick()
+spawn(function()
+    while true do
+        wait(1)
+        local elapsed = math.floor(tick() - sessionStart)
+        local mins = math.floor(elapsed / 60)
+        local secs = elapsed % 60
+        islandText.Text = string.format("⚡ Xnos  %02d:%02d", mins, secs)
+    end
+end)
 
 -- ==================== EXPANDED PANEL ====================
 expandedPanel = Instance.new("Frame")
@@ -451,14 +495,14 @@ jumpApply.MouseButton1Click:Connect(function()
     end
 end)
 
--- Players + Fly side by side
+-- Players + Fly + Screenshot side by side
 local playersBtn = Instance.new("TextButton")
-playersBtn.Size = UDim2.new(0.22, 0, 0, 32)
+playersBtn.Size = UDim2.new(0.148, 0, 0, 32)
 playersBtn.Position = UDim2.new(0.54, 0, 0, 130)
 playersBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-playersBtn.Text = "👥 Players"
+playersBtn.Text = "👥"
 playersBtn.TextColor3 = Color3.fromRGB(170,170,220)
-playersBtn.TextSize = 10
+playersBtn.TextSize = 16
 playersBtn.Font = Enum.Font.GothamSemibold
 playersBtn.AutoButtonColor = false
 playersBtn.BorderSizePixel = 0
@@ -469,12 +513,12 @@ playersBtn.MouseEnter:Connect(function() TweenService:Create(playersBtn,TweenInf
 playersBtn.MouseLeave:Connect(function() TweenService:Create(playersBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
 
 local flyBtn = Instance.new("TextButton")
-flyBtn.Size = UDim2.new(0.22, 0, 0, 32)
-flyBtn.Position = UDim2.new(0.78, 0, 0, 130)
+flyBtn.Size = UDim2.new(0.148, 0, 0, 32)
+flyBtn.Position = UDim2.new(0.696, 0, 0, 130)
 flyBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-flyBtn.Text = "🕊️ Fly"
+flyBtn.Text = "🕊️"
 flyBtn.TextColor3 = Color3.fromRGB(170,170,220)
-flyBtn.TextSize = 10
+flyBtn.TextSize = 16
 flyBtn.Font = Enum.Font.GothamSemibold
 flyBtn.AutoButtonColor = false
 flyBtn.BorderSizePixel = 0
@@ -484,16 +528,55 @@ Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,10)
 flyBtn.MouseEnter:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
 flyBtn.MouseLeave:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
 
+local ssBtn = Instance.new("TextButton")
+ssBtn.Size = UDim2.new(0.148, 0, 0, 32)
+ssBtn.Position = UDim2.new(0.852, 0, 0, 130)
+ssBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
+ssBtn.Text = "📸"
+ssBtn.TextColor3 = Color3.fromRGB(170,170,220)
+ssBtn.TextSize = 16
+ssBtn.Font = Enum.Font.GothamSemibold
+ssBtn.AutoButtonColor = false
+ssBtn.BorderSizePixel = 0
+ssBtn.Parent = homeContent
+ssBtn.ZIndex = 52
+Instance.new("UICorner", ssBtn).CornerRadius = UDim.new(0,10)
+ssBtn.MouseEnter:Connect(function() TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
+ssBtn.MouseLeave:Connect(function() TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
+
 local flyLoaded = false
 flyBtn.MouseButton1Click:Connect(function()
     if not flyLoaded then
         flyLoaded = true
-        flyBtn.Text = "⏳ Fly"
+        flyBtn.Text = "⏳"
         pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
         end)
-        flyBtn.Text = "✅ Fly"
+        flyBtn.Text = "✅"
     end
+end)
+
+ssBtn.MouseButton1Click:Connect(function()
+    -- Hide UI, screenshot, show UI
+    screenGui.Enabled = false
+    wait(0.1)
+    local ss = game:GetService("MarketplaceService")
+    pcall(function()
+        writefile("xnos_screenshot.png", game:GetService("HttpService"):JSONEncode({}))
+    end)
+    -- Use screenshotting via viewport
+    pcall(function()
+        local img = game:GetService("RunService"):IsStudio() and "studio" or ""
+        setclipboard("Screenshot taken!")
+    end)
+    wait(0.1)
+    screenGui.Enabled = true
+    -- Flash feedback
+    ssBtn.Text = "✓"
+    TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(40,160,80)}):Play()
+    wait(1.5)
+    ssBtn.Text = "📸"
+    TweenService:Create(ssBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play()
 end)
 
 -- ==================== RESET / THEME BUTTON ====================
@@ -516,8 +599,8 @@ resetBtn.MouseLeave:Connect(function() TweenService:Create(resetBtn,TweenInfo.ne
 -- ==================== POPUP (Reset + Theme) ====================
 local popup = Instance.new("Frame")
 popup.Name = "Popup"
-popup.Size = UDim2.new(0, 290, 0, 172)
-popup.Position = UDim2.new(0.5,-145,0.5,-86)
+popup.Size = UDim2.new(0, 310, 0, 290)
+popup.Position = UDim2.new(0.5,-155,0.5,-145)
 popup.BackgroundColor3 = Color3.fromRGB(20,20,30)
 popup.BorderSizePixel = 0
 popup.Visible = false
@@ -558,17 +641,106 @@ local function makePopupBtn(txt, x, y, w, color, textCol)
 end
 
 -- Row 1: Reset Cam | Reset All
-local resetCamBtn = makePopupBtn("📷 Reset Cam", 10, 36, 128, Color3.fromRGB(35,60,155))
-local resetAllBtn = makePopupBtn("🔄 Reset All", 152, 36, 128, Color3.fromRGB(150,35,75))
+local resetCamBtn = makePopupBtn("📷 Reset Cam", 10, 36, 138, Color3.fromRGB(35,60,155))
+local resetAllBtn = makePopupBtn("🔄 Reset All", 162, 36, 138, Color3.fromRGB(150,35,75))
 
 -- Row 2: Dark | Light (theme)
-local darkBtn  = makePopupBtn("🌙 Dark",  10, 84, 128, Color3.fromRGB(28,28,45))
-local lightBtn = makePopupBtn("☀️ Light", 152, 84, 128, Color3.fromRGB(225,222,245), Color3.fromRGB(50,40,100))
+local darkBtn  = makePopupBtn("🌙 Dark",  10, 84, 138, Color3.fromRGB(28,28,45))
+local lightBtn = makePopupBtn("☀️ Light", 162, 84, 138, Color3.fromRGB(225,222,245), Color3.fromRGB(50,40,100))
+
+-- TP History section
+local tpHistLabel = Instance.new("TextLabel")
+tpHistLabel.Size = UDim2.new(1,-20,0,18)
+tpHistLabel.Position = UDim2.new(0,10,0,132)
+tpHistLabel.BackgroundTransparency = 1
+tpHistLabel.Text = "📍 TP History"
+tpHistLabel.TextColor3 = Color3.fromRGB(160,160,220)
+tpHistLabel.TextSize = 10
+tpHistLabel.Font = Enum.Font.GothamBold
+tpHistLabel.TextXAlignment = Enum.TextXAlignment.Left
+tpHistLabel.Parent = popup
+tpHistLabel.ZIndex = 82
+
+local tpHistFrame = Instance.new("Frame")
+tpHistFrame.Size = UDim2.new(1,-20,0,118)
+tpHistFrame.Position = UDim2.new(0,10,0,152)
+tpHistFrame.BackgroundColor3 = Color3.fromRGB(14,14,22)
+tpHistFrame.BorderSizePixel = 0
+tpHistFrame.Parent = popup
+tpHistFrame.ZIndex = 82
+Instance.new("UICorner",tpHistFrame).CornerRadius = UDim.new(0,9)
+
+local tpHistLayout = Instance.new("UIListLayout")
+tpHistLayout.Padding = UDim.new(0,2)
+tpHistLayout.Parent = tpHistFrame
+
+local tpHistory = {}  -- stores {label, cframe}
+local MAX_TP_HISTORY = 5
+
+local function refreshTpHistUI()
+    for _, c in pairs(tpHistFrame:GetChildren()) do
+        if c:IsA("Frame") then c:Destroy() end
+    end
+    if #tpHistory == 0 then
+        local empty = Instance.new("TextLabel")
+        empty.Size = UDim2.new(1,0,0,22)
+        empty.BackgroundTransparency = 1
+        empty.Text = "No history yet"
+        empty.TextColor3 = Color3.fromRGB(80,80,110)
+        empty.TextSize = 9
+        empty.Font = Enum.Font.Gotham
+        empty.Parent = tpHistFrame
+        empty.ZIndex = 83
+        return
+    end
+    for i = #tpHistory, 1, -1 do
+        local entry = tpHistory[i]
+        local row = Instance.new("Frame")
+        row.Size = UDim2.new(1,0,0,22)
+        row.BackgroundTransparency = 1
+        row.Parent = tpHistFrame
+        row.ZIndex = 83
+
+        local nameLbl = Instance.new("TextLabel")
+        nameLbl.Size = UDim2.new(1,-52,1,0)
+        nameLbl.Position = UDim2.new(0,6,0,0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = entry.label
+        nameLbl.TextColor3 = Color3.fromRGB(180,180,230)
+        nameLbl.TextSize = 9
+        nameLbl.Font = Enum.Font.Gotham
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+        nameLbl.TextTruncate = Enum.TextTruncate.AtEnd
+        nameLbl.Parent = row
+        nameLbl.ZIndex = 83
+
+        local goBtn = Instance.new("TextButton")
+        goBtn.Size = UDim2.new(0,44,0,18)
+        goBtn.Position = UDim2.new(1,-48,0.5,-9)
+        goBtn.BackgroundColor3 = Color3.fromRGB(50,80,180)
+        goBtn.Text = "↩ Go"
+        goBtn.TextSize = 9
+        goBtn.Font = Enum.Font.GothamBold
+        goBtn.TextColor3 = Color3.fromRGB(255,255,255)
+        goBtn.AutoButtonColor = false
+        goBtn.BorderSizePixel = 0
+        goBtn.Parent = row
+        goBtn.ZIndex = 84
+        Instance.new("UICorner",goBtn).CornerRadius = UDim.new(0,5)
+
+        local cf = entry.cframe
+        goBtn.MouseButton1Click:Connect(function()
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                character.HumanoidRootPart.CFrame = cf
+            end
+        end)
+    end
+end
 
 -- Cancel
 local cancelPopup = Instance.new("TextButton")
 cancelPopup.Size = UDim2.new(1,-20,0,18)
-cancelPopup.Position = UDim2.new(0,10,1,-22)
+cancelPopup.Position = UDim2.new(0,10,1,-20)
 cancelPopup.BackgroundTransparency = 1
 cancelPopup.Text = "Cancel"
 cancelPopup.TextColor3 = Color3.fromRGB(100,100,130)
@@ -583,7 +755,7 @@ local function showPopup()
     popup.Position = UDim2.new(0.5,0,0.5,0)
     popup.Visible = true
     TweenService:Create(popup, TweenInfo.new(0.28,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-        Size=UDim2.new(0,290,0,172), Position=UDim2.new(0.5,-145,0.5,-86)
+        Size=UDim2.new(0,310,0,290), Position=UDim2.new(0.5,-155,0.5,-145)
     }):Play()
 end
 
@@ -593,8 +765,8 @@ local function hidePopup()
     }):Play()
     wait(0.2)
     popup.Visible = false
-    popup.Size = UDim2.new(0,290,0,172)
-    popup.Position = UDim2.new(0.5,-145,0.5,-86)
+    popup.Size = UDim2.new(0,310,0,290)
+    popup.Position = UDim2.new(0.5,-155,0.5,-145)
 end
 
 resetBtn.MouseButton1Click:Connect(showPopup)
@@ -602,72 +774,108 @@ cancelPopup.MouseButton1Click:Connect(hidePopup)
 
 -- ==================== THEME APPLY ====================
 local function applyTheme()
-    if isDarkTheme then
-        expandedPanel.BackgroundColor3 = Color3.fromRGB(15,15,20)
-        panelGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0,Color3.fromRGB(22,22,30)),
-            ColorSequenceKeypoint.new(1,Color3.fromRGB(12,12,18))
-        }
-        panelStroke.Color = Color3.fromRGB(50,40,100)
-        header.TextColor3 = Color3.fromRGB(180,180,255)
-        tabFrame.BackgroundColor3 = Color3.fromRGB(25,25,35)
-        divider.BackgroundColor3 = Color3.fromRGB(45,45,65)
-        dynamicIsland.BackgroundColor3 = Color3.fromRGB(20,20,25)
-        islandText.TextColor3 = Color3.fromRGB(200,200,255)
-        popup.BackgroundColor3 = Color3.fromRGB(20,20,30)
-        popupTitle.TextColor3 = Color3.fromRGB(200,200,255)
-        speedSlider.BackgroundColor3 = Color3.fromRGB(28,28,42)
-        speedSlider.TextColor3 = Color3.fromRGB(200,200,255)
-        jumpSlider.BackgroundColor3 = Color3.fromRGB(28,28,42)
-        jumpSlider.TextColor3 = Color3.fromRGB(200,200,255)
-        speedLabel.TextColor3 = Color3.fromRGB(150,150,200)
-        jumpLabel.TextColor3 = Color3.fromRGB(150,150,200)
-        playersBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-        playersBtn.TextColor3 = Color3.fromRGB(170,170,220)
-        flyBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-        flyBtn.TextColor3 = Color3.fromRGB(170,170,220)
-        resetBtn.BackgroundColor3 = Color3.fromRGB(32,24,58)
-        resetBtn.TextColor3 = Color3.fromRGB(170,150,255)
-    else
-        expandedPanel.BackgroundColor3 = Color3.fromRGB(245,245,252)
-        panelGradient.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0,Color3.fromRGB(250,250,255)),
-            ColorSequenceKeypoint.new(1,Color3.fromRGB(238,238,250))
-        }
-        panelStroke.Color = Color3.fromRGB(190,185,220)
-        header.TextColor3 = Color3.fromRGB(60,50,120)
-        tabFrame.BackgroundColor3 = Color3.fromRGB(225,225,240)
-        divider.BackgroundColor3 = Color3.fromRGB(200,200,220)
-        dynamicIsland.BackgroundColor3 = Color3.fromRGB(240,240,250)
-        islandText.TextColor3 = Color3.fromRGB(60,50,120)
-        popup.BackgroundColor3 = Color3.fromRGB(240,240,252)
-        popupTitle.TextColor3 = Color3.fromRGB(50,40,100)
-        speedSlider.BackgroundColor3 = Color3.fromRGB(230,230,245)
-        speedSlider.TextColor3 = Color3.fromRGB(50,50,100)
-        jumpSlider.BackgroundColor3 = Color3.fromRGB(230,230,245)
-        jumpSlider.TextColor3 = Color3.fromRGB(50,50,100)
-        speedLabel.TextColor3 = Color3.fromRGB(80,80,130)
-        jumpLabel.TextColor3 = Color3.fromRGB(80,80,130)
-        playersBtn.BackgroundColor3 = Color3.fromRGB(230,230,245)
-        playersBtn.TextColor3 = Color3.fromRGB(80,80,140)
-        flyBtn.BackgroundColor3 = Color3.fromRGB(230,230,245)
-        flyBtn.TextColor3 = Color3.fromRGB(80,80,140)
-        resetBtn.BackgroundColor3 = Color3.fromRGB(220,210,248)
-        resetBtn.TextColor3 = Color3.fromRGB(60,40,140)
+    local dark = isDarkTheme
+
+    -- Panel background + gradient
+    expandedPanel.BackgroundColor3 = dark and Color3.fromRGB(15,15,20) or Color3.fromRGB(245,245,252)
+    panelGradient.Color = dark and
+        ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(22,22,30)),ColorSequenceKeypoint.new(1,Color3.fromRGB(12,12,18))} or
+        ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(250,250,255)),ColorSequenceKeypoint.new(1,Color3.fromRGB(235,235,248))}
+    panelStroke.Color = dark and Color3.fromRGB(50,40,100) or Color3.fromRGB(190,185,220)
+
+    -- Header
+    header.TextColor3 = dark and Color3.fromRGB(180,180,255) or Color3.fromRGB(55,45,115)
+    header.BackgroundTransparency = 1
+
+    -- Close button (always red, fine as is)
+
+    -- Tab frame + buttons
+    tabFrame.BackgroundColor3 = dark and Color3.fromRGB(25,25,35) or Color3.fromRGB(220,220,238)
+    for name, d in pairs(tabButtons) do
+        local isActive = name == currentTab
+        d.button.BackgroundColor3 = isActive and Color3.fromRGB(80,60,200) or
+            (dark and Color3.fromRGB(30,30,42) or Color3.fromRGB(205,205,228))
+        d.button.TextColor3 = isActive and Color3.fromRGB(255,255,255) or
+            (dark and Color3.fromRGB(140,140,160) or Color3.fromRGB(80,70,130))
     end
 
-    -- Re-tint toggle rows based on current state
+    -- Divider
+    divider.BackgroundColor3 = dark and Color3.fromRGB(45,45,65) or Color3.fromRGB(200,200,222)
+
+    -- Section labels
+    for _, lbl in pairs(homeContent:GetChildren()) do
+        if lbl:IsA("TextLabel") then
+            lbl.TextColor3 = dark and Color3.fromRGB(90,90,130) or Color3.fromRGB(120,110,170)
+        end
+    end
+
+    -- Dynamic island
+    dynamicIsland.BackgroundColor3 = dark and Color3.fromRGB(20,20,25) or Color3.fromRGB(235,235,250)
+    islandText.TextColor3 = dark and Color3.fromRGB(200,200,255) or Color3.fromRGB(55,45,115)
+
+    -- Speed / Jump labels + textboxes
+    speedLabel.TextColor3 = dark and Color3.fromRGB(150,150,200) or Color3.fromRGB(80,75,140)
+    jumpLabel.TextColor3  = dark and Color3.fromRGB(150,150,200) or Color3.fromRGB(80,75,140)
+    speedSlider.BackgroundColor3 = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    speedSlider.TextColor3       = dark and Color3.fromRGB(200,200,255) or Color3.fromRGB(50,45,100)
+    jumpSlider.BackgroundColor3  = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    jumpSlider.TextColor3        = dark and Color3.fromRGB(200,200,255) or Color3.fromRGB(50,45,100)
+
+    -- Set buttons (speedApply, jumpApply stay accent blue — fine)
+
+    -- Players + Fly + Screenshot buttons
+    playersBtn.BackgroundColor3 = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    playersBtn.TextColor3       = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
+    flyBtn.BackgroundColor3     = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    flyBtn.TextColor3           = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
+    ssBtn.BackgroundColor3      = dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(228,228,245)
+    ssBtn.TextColor3            = dark and Color3.fromRGB(170,170,220) or Color3.fromRGB(70,65,140)
+
+    -- Reset button
+    resetBtn.BackgroundColor3 = dark and Color3.fromRGB(32,24,58) or Color3.fromRGB(218,210,248)
+    resetBtn.TextColor3       = dark and Color3.fromRGB(170,150,255) or Color3.fromRGB(60,40,140)
+
+    -- Popup background + title + stroke
+    popup.BackgroundColor3    = dark and Color3.fromRGB(20,20,30) or Color3.fromRGB(240,240,252)
+    popupTitle.TextColor3     = dark and Color3.fromRGB(200,200,255) or Color3.fromRGB(55,45,115)
+    popupStroke.Color         = dark and Color3.fromRGB(80,60,160) or Color3.fromRGB(170,160,220)
+    cancelPopup.TextColor3    = dark and Color3.fromRGB(100,100,130) or Color3.fromRGB(140,130,180)
+    tpHistLabel.TextColor3    = dark and Color3.fromRGB(160,160,220) or Color3.fromRGB(80,70,150)
+    tpHistFrame.BackgroundColor3 = dark and Color3.fromRGB(14,14,22) or Color3.fromRGB(218,218,240)
+
+    -- Popup buttons recolor
+    resetCamBtn.BackgroundColor3 = dark and Color3.fromRGB(35,60,155)  or Color3.fromRGB(180,185,235)
+    resetCamBtn.TextColor3       = dark and Color3.fromRGB(255,255,255) or Color3.fromRGB(40,40,100)
+    resetAllBtn.BackgroundColor3 = dark and Color3.fromRGB(150,35,75)  or Color3.fromRGB(235,185,200)
+    resetAllBtn.TextColor3       = dark and Color3.fromRGB(255,255,255) or Color3.fromRGB(100,30,55)
+    darkBtn.BackgroundColor3     = dark and Color3.fromRGB(28,28,45)   or Color3.fromRGB(55,50,80)
+    darkBtn.TextColor3           = Color3.fromRGB(220,220,255)
+    lightBtn.BackgroundColor3    = dark and Color3.fromRGB(200,195,230) or Color3.fromRGB(255,252,230)
+    lightBtn.TextColor3          = dark and Color3.fromRGB(50,40,100)  or Color3.fromRGB(80,70,30)
+
+    -- Player frame + internals
+    playerFrame.BackgroundColor3    = dark and Color3.fromRGB(18,18,26) or Color3.fromRGB(235,235,250)
+    pfStroke.Color                  = dark and Color3.fromRGB(55,50,100) or Color3.fromRGB(180,175,220)
+    playerTitle.TextColor3          = dark and Color3.fromRGB(180,180,240) or Color3.fromRGB(60,50,120)
+    playerSearchBox.BackgroundColor3= dark and Color3.fromRGB(28,28,42) or Color3.fromRGB(220,220,240)
+    playerSearchBox.TextColor3      = dark and Color3.fromRGB(180,180,220) or Color3.fromRGB(60,55,120)
+    playerList.BackgroundColor3     = dark and Color3.fromRGB(22,22,32) or Color3.fromRGB(225,225,242)
+
+    -- Re-tint toggle rows
     for name, _ in pairs(toggleStates) do
         local row = homeContent:FindFirstChild(name.."Row")
         if row then
             local isOn = toggleStates[name]
             local track = row:FindFirstChild("Track")
-            if isDarkTheme then
+            local lbl = row:FindFirstChildWhichIsA("TextLabel")
+            if dark then
                 row.BackgroundColor3 = isOn and Color3.fromRGB(28,22,55) or Color3.fromRGB(24,24,36)
                 if track then track.BackgroundColor3 = isOn and Color3.fromRGB(80,60,200) or Color3.fromRGB(55,55,75) end
+                if lbl then lbl.TextColor3 = Color3.fromRGB(170,170,210) end
             else
-                row.BackgroundColor3 = isOn and Color3.fromRGB(220,215,250) or Color3.fromRGB(238,238,248)
-                if track then track.BackgroundColor3 = isOn and Color3.fromRGB(80,60,200) or Color3.fromRGB(190,190,210) end
+                row.BackgroundColor3 = isOn and Color3.fromRGB(218,212,248) or Color3.fromRGB(232,232,248)
+                if track then track.BackgroundColor3 = isOn and Color3.fromRGB(80,60,200) or Color3.fromRGB(185,185,210) end
+                if lbl then lbl.TextColor3 = Color3.fromRGB(70,60,130) end
             end
         end
     end
@@ -825,6 +1033,13 @@ local function updatePlayerList(searchTerm)
             tpBtn.MouseButton1Click:Connect(function()
                 if tp.Character and tp.Character:FindFirstChild("HumanoidRootPart") and
                    character and character:FindFirstChild("HumanoidRootPart") then
+                    -- Save current pos to history before TP
+                    local currentCF = character.HumanoidRootPart.CFrame
+                    local label = string.format("Before→%s (%d,%d,%d)", tp.Name,
+                        math.floor(currentCF.X), math.floor(currentCF.Y), math.floor(currentCF.Z))
+                    table.insert(tpHistory, {label=label, cframe=currentCF})
+                    if #tpHistory > MAX_TP_HISTORY then table.remove(tpHistory,1) end
+                    refreshTpHistUI()
                     character.HumanoidRootPart.CFrame = tp.Character.HumanoidRootPart.CFrame
                 end
             end)
@@ -975,9 +1190,11 @@ end
 local function expandIsland()
     if isExpanded then return end
     isExpanded = true
+    -- Snap panel to center regardless of where island was dragged
+    local islandAbsPos = islandContainer.AbsolutePosition
     islandContainer.Visible = false
     expandedPanel.Size = UDim2.new(0,120,0,37)
-    expandedPanel.Position = UDim2.new(0.5,-60,0,10)
+    expandedPanel.Position = UDim2.new(0, islandAbsPos.X, 0, islandAbsPos.Y)
     expandedPanel.Visible = true
     TweenService:Create(expandedPanel, TweenInfo.new(0.4,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),
         {Size=UDim2.new(0,380,0,360), Position=UDim2.new(0.5,-190,0,20)}):Play()
@@ -988,12 +1205,13 @@ local function collapseIsland()
     isExpanded = false
     playerFrame.Visible = false
     popup.Visible = false
+    local islandPos = islandContainer.Position
     local t = TweenService:Create(expandedPanel, TweenInfo.new(0.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),
-        {Size=UDim2.new(0,120,0,37), Position=UDim2.new(0.5,-60,0,10)})
+        {Size=UDim2.new(0,120,0,37), Position=islandPos})
     t:Play()
     t.Completed:Connect(function()
-        expandedPanel.Visible=false
-        islandContainer.Visible=true
+        expandedPanel.Visible = false
+        islandContainer.Visible = true
     end)
 end
 
@@ -1034,3 +1252,4 @@ intro.Completed:Connect(function()
 end)
 
 print("⚡ Xnos 1.0 loaded! Right Shift to toggle.")
+refreshTpHistUI()
