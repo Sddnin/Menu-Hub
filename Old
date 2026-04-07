@@ -110,7 +110,7 @@ end)
 -- ==================== EXPANDED PANEL ====================
 expandedPanel = Instance.new("Frame")
 expandedPanel.Name = "ExpandedPanel"
-expandedPanel.Size = UDim2.new(0, 380, 0, 360)
+expandedPanel.Size = UDim2.new(0, 380, 0, 400)
 expandedPanel.Position = UDim2.new(0.5, -190, 0, 20)
 expandedPanel.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 expandedPanel.BorderSizePixel = 0
@@ -392,6 +392,117 @@ createToggleSwitch("AntiAFK", "⚡", "Anti-AFK", 114, function(state)
     end
 end)
 
+-- ==================== ESP ====================
+local espEnabled = false
+local espObjects = {}  -- [player] = { highlight, billboard }
+local espConnection
+
+local function removeESP(p)
+    if espObjects[p] then
+        pcall(function()
+            if espObjects[p].highlight then espObjects[p].highlight:Destroy() end
+            if espObjects[p].billboard then espObjects[p].billboard:Destroy() end
+        end)
+        espObjects[p] = nil
+    end
+end
+
+local function addESP(p)
+    if p == player then return end
+    removeESP(p)
+
+    local function setup(char)
+        if not char then return end
+        local hrp = char:WaitForChild("HumanoidRootPart", 3)
+        if not hrp then return end
+
+        -- White highlight box (SelectionBox style via Highlight)
+        local hl = Instance.new("Highlight")
+        hl.Name = "XnosESP"
+        hl.Adornee = char
+        hl.FillColor = Color3.fromRGB(255, 255, 255)
+        hl.FillTransparency = 0.75
+        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+        hl.OutlineTransparency = 0
+        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        hl.Parent = char
+
+        -- BillboardGui: tên + khoảng cách
+        local bb = Instance.new("BillboardGui")
+        bb.Name = "XnosESPBB"
+        bb.Adornee = hrp
+        bb.Size = UDim2.new(0, 120, 0, 36)
+        bb.StudsOffset = Vector3.new(0, 3.2, 0)
+        bb.AlwaysOnTop = true
+        bb.ResetOnSpawn = false
+        bb.Parent = char
+
+        local nameLbl = Instance.new("TextLabel")
+        nameLbl.Size = UDim2.new(1, 0, 0.55, 0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = p.Name
+        nameLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        nameLbl.TextStrokeTransparency = 0.3
+        nameLbl.TextSize = 13
+        nameLbl.Font = Enum.Font.GothamBold
+        nameLbl.Parent = bb
+
+        local distLbl = Instance.new("TextLabel")
+        distLbl.Size = UDim2.new(1, 0, 0.45, 0)
+        distLbl.Position = UDim2.new(0, 0, 0.55, 0)
+        distLbl.BackgroundTransparency = 1
+        distLbl.Text = "0 studs"
+        distLbl.TextColor3 = Color3.fromRGB(200, 255, 200)
+        distLbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        distLbl.TextStrokeTransparency = 0.3
+        distLbl.TextSize = 11
+        distLbl.Font = Enum.Font.Gotham
+        distLbl.Parent = bb
+
+        espObjects[p] = { highlight = hl, billboard = bb, distLbl = distLbl }
+    end
+
+    if p.Character then setup(p.Character) end
+    p.CharacterAdded:Connect(function(c)
+        if espEnabled then setup(c) end
+    end)
+end
+
+local function enableESP()
+    for _, p in pairs(Players:GetPlayers()) do
+        addESP(p)
+    end
+    -- Update distances every frame
+    espConnection = RunService.RenderStepped:Connect(function()
+        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+        local myPos = character.HumanoidRootPart.Position
+        for p, obj in pairs(espObjects) do
+            if obj.distLbl and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local dist = math.floor((p.Character.HumanoidRootPart.Position - myPos).Magnitude)
+                obj.distLbl.Text = dist .. " studs"
+            end
+        end
+    end)
+    -- Track players joining
+    Players.PlayerAdded:Connect(function(p)
+        if espEnabled then addESP(p) end
+    end)
+end
+
+local function disableESP()
+    if espConnection then espConnection:Disconnect(); espConnection = nil end
+    for p, _ in pairs(espObjects) do
+        removeESP(p)
+    end
+    espObjects = {}
+end
+
+createToggleSwitch("ESP", "👁", "ESP", 160, function(state)
+    espEnabled = state
+    if espEnabled then enableESP() else disableESP() end
+end)
+
 -- ===== RIGHT SIDE: Speed, Jump, Fly, Players =====
 speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(0.46, 0, 0, 16)
@@ -495,14 +606,14 @@ jumpApply.MouseButton1Click:Connect(function()
     end
 end)
 
--- Players + Waypoint + Fly side by side
+-- Players + Fly side by side
 local playersBtn = Instance.new("TextButton")
-playersBtn.Size = UDim2.new(0.148, 0, 0, 32)
-playersBtn.Position = UDim2.new(0.54, 0, 0, 130)
+playersBtn.Size = UDim2.new(0.22, 0, 0, 32)
+playersBtn.Position = UDim2.new(0.54, 0, 0, 170)
 playersBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-playersBtn.Text = "👥"
+playersBtn.Text = "👥 Players"
 playersBtn.TextColor3 = Color3.fromRGB(170,170,220)
-playersBtn.TextSize = 16
+playersBtn.TextSize = 10
 playersBtn.Font = Enum.Font.GothamSemibold
 playersBtn.AutoButtonColor = false
 playersBtn.BorderSizePixel = 0
@@ -512,29 +623,13 @@ Instance.new("UICorner", playersBtn).CornerRadius = UDim.new(0,10)
 playersBtn.MouseEnter:Connect(function() TweenService:Create(playersBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
 playersBtn.MouseLeave:Connect(function() TweenService:Create(playersBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
 
-local wpBtn = Instance.new("TextButton")
-wpBtn.Size = UDim2.new(0.148, 0, 0, 32)
-wpBtn.Position = UDim2.new(0.696, 0, 0, 130)
-wpBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-wpBtn.Text = "📍"
-wpBtn.TextColor3 = Color3.fromRGB(170,170,220)
-wpBtn.TextSize = 16
-wpBtn.Font = Enum.Font.GothamSemibold
-wpBtn.AutoButtonColor = false
-wpBtn.BorderSizePixel = 0
-wpBtn.Parent = homeContent
-wpBtn.ZIndex = 52
-Instance.new("UICorner", wpBtn).CornerRadius = UDim.new(0,10)
-wpBtn.MouseEnter:Connect(function() TweenService:Create(wpBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
-wpBtn.MouseLeave:Connect(function() TweenService:Create(wpBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
-
 local flyBtn = Instance.new("TextButton")
-flyBtn.Size = UDim2.new(0.148, 0, 0, 32)
-flyBtn.Position = UDim2.new(0.852, 0, 0, 130)
+flyBtn.Size = UDim2.new(0.22, 0, 0, 32)
+flyBtn.Position = UDim2.new(0.78, 0, 0, 170)
 flyBtn.BackgroundColor3 = Color3.fromRGB(28,28,42)
-flyBtn.Text = "🕊️"
+flyBtn.Text = "🕊️ Fly"
 flyBtn.TextColor3 = Color3.fromRGB(170,170,220)
-flyBtn.TextSize = 16
+flyBtn.TextSize = 10
 flyBtn.Font = Enum.Font.GothamSemibold
 flyBtn.AutoButtonColor = false
 flyBtn.BorderSizePixel = 0
@@ -543,16 +638,15 @@ flyBtn.ZIndex = 52
 Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0,10)
 flyBtn.MouseEnter:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,58)}):Play() end)
 flyBtn.MouseLeave:Connect(function() TweenService:Create(flyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(28,28,42)}):Play() end)
-
 local flyLoaded = false
 flyBtn.MouseButton1Click:Connect(function()
     if not flyLoaded then
         flyLoaded = true
-        flyBtn.Text = "⏳"
+        flyBtn.Text = "⏳ Fly"
         pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
         end)
-        flyBtn.Text = "✅"
+        flyBtn.Text = "✅ Fly"
     end
 end)
 
@@ -988,8 +1082,9 @@ resetAllBtn.MouseButton1Click:Connect(function()
         if humanoid.UseJumpPower then humanoid.JumpPower = originalJumpPower
         else humanoid.JumpHeight = originalJumpPower/10 end
     end
-    noclip = false; infiniteJump = false; antiAFK = false
+    noclip = false; infiniteJump = false; antiAFK = false; espEnabled = false
     flyLoaded = false; flyBtn.Text = "🕊️ Fly"
+    disableESP()
     if noclipConnection then noclipConnection:Disconnect(); noclipConnection = nil end
     if jumpConnection then jumpConnection:Disconnect(); jumpConnection = nil end
     if afkConnection then afkConnection:Disconnect(); afkConnection = nil end
@@ -1464,7 +1559,7 @@ local function expandIsland()
     expandedPanel.Position = UDim2.new(0, islandAbsPos.X, 0, islandAbsPos.Y)
     expandedPanel.Visible = true
     TweenService:Create(expandedPanel, TweenInfo.new(0.4,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),
-        {Size=UDim2.new(0,380,0,360), Position=UDim2.new(0.5,-190,0,20)}):Play()
+        {Size=UDim2.new(0,380,0,400), Position=UDim2.new(0.5,-190,0,20)}):Play()
 end
 
 local function collapseIsland()
@@ -1504,6 +1599,11 @@ player.CharacterAdded:Connect(function(newChar)
     humanoid.WalkSpeed = originalWalkSpeed
     if humanoid.UseJumpPower then humanoid.JumpPower=originalJumpPower
     else humanoid.JumpHeight=originalJumpPower/10 end
+    -- Re-apply ESP if still enabled
+    if espEnabled then
+        disableESP()
+        enableESP()
+    end
 end)
 
 -- ==================== INTRO ANIMATION ====================
