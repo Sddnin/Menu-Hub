@@ -66,11 +66,13 @@ islandText.ZIndex = 102
 
 -- ==================== ISLAND DRAG ====================
 local isDraggingIsland = false
+local didDrag = false
 local islandDragStart, islandStartPos
 
 dynamicIsland.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         isDraggingIsland = true
+        didDrag = false
         islandDragStart = input.Position
         islandStartPos = islandContainer.Position
     end
@@ -85,13 +87,16 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if isDraggingIsland and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - islandDragStart
-        local vp = workspace.CurrentCamera.ViewportSize
-        local newX = islandStartPos.X.Scale * vp.X + islandStartPos.X.Offset + delta.X
-        local newY = islandStartPos.Y.Scale * vp.Y + islandStartPos.Y.Offset + delta.Y
-        -- Clamp inside screen
-        newX = math.clamp(newX, 0, vp.X - 120)
-        newY = math.clamp(newY, 0, vp.Y - 37)
-        islandContainer.Position = UDim2.new(0, newX, 0, newY)
+        -- Only count as drag if moved more than 5px
+        if delta.Magnitude > 5 then
+            didDrag = true
+            local vp = workspace.CurrentCamera.ViewportSize
+            local newX = islandStartPos.X.Scale * vp.X + islandStartPos.X.Offset + delta.X
+            local newY = islandStartPos.Y.Scale * vp.Y + islandStartPos.Y.Offset + delta.Y
+            newX = math.clamp(newX, 0, vp.X - 120)
+            newY = math.clamp(newY, 0, vp.Y - 37)
+            islandContainer.Position = UDim2.new(0, newX, 0, newY)
+        end
     end
 end)
 
@@ -1233,7 +1238,7 @@ end
 playersBtn.MouseButton1Click:Connect(function()
     playerFrame.Visible = not playerFrame.Visible
     if playerFrame.Visible then
-        waypointFrame.Visible = false
+        if waypointFrame then waypointFrame.Visible = false end
         updatePlayerList("")
     end
 end)
@@ -1241,16 +1246,8 @@ playerSearchBox.Changed:Connect(function(p)
     if p=="Text" then updatePlayerList(playerSearchBox.Text) end
 end)
 
-wpBtn.MouseButton1Click:Connect(function()
-    waypointFrame.Visible = not waypointFrame.Visible
-    if waypointFrame.Visible then
-        playerFrame.Visible = false
-        refreshWaypointUI()
-    end
-end)
-
 -- ==================== WAYPOINT PANEL ====================
-local waypoints = {}  -- {name, cframe}
+local waypoints = {}
 local MAX_WAYPOINTS = 8
 
 local waypointFrame = Instance.new("Frame")
@@ -1262,6 +1259,9 @@ waypointFrame.Visible = false
 waypointFrame.Parent = expandedPanel
 waypointFrame.ZIndex = 60
 Instance.new("UICorner",waypointFrame).CornerRadius = UDim.new(0,14)
+
+-- Also assign to wpContent forward ref for switchTab
+wpContent = waypointFrame
 
 local wpStroke = Instance.new("UIStroke")
 wpStroke.Color = Color3.fromRGB(55,50,100)
@@ -1428,6 +1428,17 @@ wpSaveBtn.MouseButton1Click:Connect(function()
     TweenService:Create(wpSaveBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(60,80,200)}):Play()
 end)
 
+-- Wire wpBtn now that waypointFrame exists
+if wpBtn then
+    wpBtn.MouseButton1Click:Connect(function()
+        waypointFrame.Visible = not waypointFrame.Visible
+        if waypointFrame.Visible then
+            playerFrame.Visible = false
+            refreshWaypointUI()
+        end
+    end)
+end
+
 -- ==================== OTHER CONTENT ====================
 otherContent = Instance.new("ScrollingFrame")
 otherContent.Name = "OtherContent"
@@ -1531,6 +1542,8 @@ createFeatureCard("⚙️","Client Settings","Advanced config",340,Color3.fromRG
 end)
 
 -- ==================== TAB SWITCHING ====================
+local wpContent  -- forward ref, defined below in WP section
+
 local function switchTab(name)
     currentTab = name
     for n,d in pairs(tabButtons) do
@@ -1540,8 +1553,9 @@ local function switchTab(name)
             TweenService:Create(d.button,TweenInfo.new(0.2),{BackgroundColor3=Color3.fromRGB(30,30,42),TextColor3=Color3.fromRGB(140,140,160)}):Play()
         end
     end
-    homeContent.Visible = name=="Home"
-    otherContent.Visible = name=="Other"
+    homeContent.Visible  = name == "Home"
+    if wpContent then wpContent.Visible = name == "WP" end
+    otherContent.Visible = name == "Other"
 end
 
 for name,d in pairs(tabButtons) do
@@ -1551,8 +1565,8 @@ end
 -- ==================== EXPAND / COLLAPSE ====================
 local function expandIsland()
     if isExpanded then return end
+    if didDrag then didDrag = false; return end  -- ignore click after drag
     isExpanded = true
-    -- Snap panel to center regardless of where island was dragged
     local islandAbsPos = islandContainer.AbsolutePosition
     islandContainer.Visible = false
     expandedPanel.Size = UDim2.new(0,120,0,37)
@@ -1566,8 +1580,8 @@ local function collapseIsland()
     if not isExpanded then return end
     isExpanded = false
     playerFrame.Visible = false
-    waypointFrame.Visible = false
     popup.Visible = false
+    if wpContent then wpContent.Visible = false end
     local islandPos = islandContainer.Position
     local t = TweenService:Create(expandedPanel, TweenInfo.new(0.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),
         {Size=UDim2.new(0,120,0,37), Position=islandPos})
