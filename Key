@@ -1,4 +1,4 @@
--- ⚡ Xnos 1.0 — Clean Rewrite
+-- ⚡ Xnos 1.0
 
 local Players    = game:GetService("Players")
 local UIS        = game:GetService("UserInputService")
@@ -371,7 +371,35 @@ jpSet.MouseButton1Click:Connect(function()
     end
 end)
 
--- Players + Fly buttons
+-- FOV
+local fovLbl = Instance.new("TextLabel")
+fovLbl.Size=UDim2.new(0.46,0,0,13); fovLbl.Position=UDim2.new(0.54,0,0,104)
+fovLbl.BackgroundTransparency=1; fovLbl.Text="FOV: 70"; fovLbl.TextColor3=tx2()
+fovLbl.TextSize=9; fovLbl.Font=Enum.Font.GothamSemibold
+fovLbl.TextXAlignment=Enum.TextXAlignment.Left; fovLbl.Parent=home; fovLbl.ZIndex=52
+
+local fovRow = Instance.new("Frame"); fovRow.Size=UDim2.new(0.46,0,0,24)
+fovRow.Position=UDim2.new(0.54,0,0,118); fovRow.BackgroundTransparency=1
+fovRow.Parent=home; fovRow.ZIndex=52
+
+local fovBox = Instance.new("TextBox"); fovBox.Size=UDim2.new(0.6,0,1,0)
+fovBox.BackgroundColor3=bg3(); fovBox.Text="70"; fovBox.TextColor3=tx()
+fovBox.TextSize=11; fovBox.Font=Enum.Font.Gotham; fovBox.BorderSizePixel=0
+fovBox.Parent=fovRow; fovBox.ZIndex=53; corner(6,fovBox)
+
+local fovSet = Instance.new("TextButton"); fovSet.Size=UDim2.new(0.38,-2,1,0)
+fovSet.Position=UDim2.new(0.62,2,0,0); fovSet.BackgroundColor3=acc(); fovSet.Text="Set"
+fovSet.TextColor3=Color3.fromRGB(255,255,255); fovSet.TextSize=9
+fovSet.Font=Enum.Font.GothamBold; fovSet.AutoButtonColor=false; fovSet.BorderSizePixel=0
+fovSet.Parent=fovRow; fovSet.ZIndex=53; corner(6,fovSet)
+fovSet.MouseButton1Click:Connect(function()
+    local v = math.clamp(tonumber(fovBox.Text) or 70, 1, 120)
+    fovBox.Text = tostring(v)
+    workspace.CurrentCamera.FieldOfView = v
+    fovLbl.Text = "FOV: "..v
+end)
+
+-- Players + Fly buttons (shifted down)
 local function mkRightBtn(txt, xScale, y, w)
     local b = Instance.new("TextButton")
     b.Size=UDim2.new(0,w,0,26); b.Position=UDim2.new(xScale,0,0,y)
@@ -384,8 +412,8 @@ local function mkRightBtn(txt, xScale, y, w)
     return b
 end
 
-local playersBtn = mkRightBtn("👥 Players", 0.54, 106, 66)
-local flyBtn     = mkRightBtn("🕊️ Fly",     0.78, 106, 62)
+local playersBtn = mkRightBtn("👥 Players", 0.54, 150, 66)
+local flyBtn     = mkRightBtn("🕊️ Fly",     0.78, 150, 62)
 
 flyBtn.MouseButton1Click:Connect(function()
     if flyLoaded then return end; flyLoaded=true
@@ -600,8 +628,9 @@ resetAllBtn.MouseButton1Click:Connect(function()
     if char then for _,p in pairs(char:GetChildren()) do
         if p:IsA("BasePart") and p.Name~="HumanoidRootPart" then p.CanCollide=true end
     end end
-    speedSlider.Text="16"; jumpSlider.Text="50"
-    spLbl.Text="Speed: 16"; jpLbl.Text="Jump: 50"
+    speedSlider.Text="16"; jumpSlider.Text="50"; fovBox.Text="70"
+    spLbl.Text="Speed: 16"; jpLbl.Text="Jump: 50"; fovLbl.Text="FOV: 70"
+    workspace.CurrentCamera.FieldOfView = 70
     flyLoaded=false; flyBtn.Text="🕊️ Fly"
     for _,s in pairs(toggleSetters) do s(false) end
     resetCamera(); hidePopup()
@@ -623,9 +652,10 @@ local function applyTheme()
     div.BackgroundColor3 = isDark and Color3.fromRGB(45,45,65) or Color3.fromRGB(195,195,218)
     island.BackgroundColor3 = isDark and Color3.fromRGB(18,18,22) or Color3.fromRGB(232,232,248)
     islandTxt.TextColor3 = tx()
-    spLbl.TextColor3=tx2(); jpLbl.TextColor3=tx2()
+    spLbl.TextColor3=tx2(); jpLbl.TextColor3=tx2(); fovLbl.TextColor3=tx2()
     speedSlider.BackgroundColor3=bg3(); speedSlider.TextColor3=tx()
     jumpSlider.BackgroundColor3=bg3(); jumpSlider.TextColor3=tx()
+    fovBox.BackgroundColor3=bg3(); fovBox.TextColor3=tx()
     playersBtn.BackgroundColor3=bg3(); playersBtn.TextColor3=tx2()
     flyBtn.BackgroundColor3=bg3(); flyBtn.TextColor3=tx2()
     resetBtn.BackgroundColor3 = isDark and Color3.fromRGB(30,22,55) or Color3.fromRGB(215,208,245)
