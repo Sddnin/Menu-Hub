@@ -1,4 +1,4 @@
--- Xnos 1.0
+-- ⚡ Xnos 1.0 — Clean Rewrite
 
 local Players    = game:GetService("Players")
 local UIS        = game:GetService("UserInputService")
@@ -72,7 +72,7 @@ corner(20, island)
 
 local islandTxt = Instance.new("TextLabel")
 islandTxt.Size = UDim2.new(1,-8,1,0); islandTxt.Position = UDim2.new(0,4,0,0)
-islandTxt.BackgroundTransparency = 1; islandTxt.Text = "Xnos  00:00"
+islandTxt.BackgroundTransparency = 1; islandTxt.Text = "⚡ Xnos  00:00"
 islandTxt.TextColor3 = Color3.fromRGB(200,200,255); islandTxt.TextSize = 11
 islandTxt.Font = Enum.Font.GothamBold; islandTxt.Parent = island; islandTxt.ZIndex = 102
 
@@ -81,7 +81,7 @@ local t0 = tick()
 spawn(function()
     while true do wait(1)
         local e = math.floor(tick()-t0)
-        islandTxt.Text = string.format("Xnos  %02d:%02d", math.floor(e/60), e%60)
+        islandTxt.Text = string.format("⚡ Xnos  %02d:%02d", math.floor(e/60), e%60)
     end
 end)
 
@@ -136,7 +136,7 @@ closeBtn.Parent = panel; closeBtn.ZIndex = 51; corner(12, closeBtn)
 -- Header
 local header = Instance.new("TextLabel")
 header.Size = UDim2.new(1,-34,0,28); header.Position = UDim2.new(0,0,0,2)
-header.BackgroundTransparency = 1; header.Text = "Xnos 1.0"
+header.BackgroundTransparency = 1; header.Text = "⚡ Xnos 1.0"
 header.TextColor3 = tx(); header.TextSize = 13; header.Font = Enum.Font.GothamBold
 header.Parent = panel; header.ZIndex = 51
 
@@ -146,14 +146,14 @@ tabBar.Size = UDim2.new(1,-16,0,28); tabBar.Position = UDim2.new(0,8,0,32)
 tabBar.BackgroundColor3 = bg2(); tabBar.BorderSizePixel = 0
 tabBar.Parent = panel; tabBar.ZIndex = 51; corner(10, tabBar)
 
-local tabDefs = {{"Home"},{"WP"},{"Other"}}
+local tabDefs = {{"Home","🏠"},{"WP","📍"},{"Other","🔧"}}
 local tabBtns = {}
 
 for i,d in ipairs(tabDefs) do
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(0.333,-4,1,-6); b.Position = UDim2.new((i-1)*0.333,i==1 and 3 or 2,0,3)
     b.BackgroundColor3 = i==1 and acc() or bg3()
-    b.Text = d[1]; b.TextSize = 10; b.Font = Enum.Font.GothamSemibold
+    b.Text = d[2].." "..d[1]; b.TextSize = 10; b.Font = Enum.Font.GothamSemibold
     b.TextColor3 = i==1 and Color3.fromRGB(255,255,255) or tx2()
     b.AutoButtonColor = false; b.BorderSizePixel = 0
     b.Parent = tabBar; b.ZIndex = 52; corner(8,b)
@@ -236,7 +236,7 @@ local function makeToggle(id, icon, label, y, cb)
 end
 
 -- Left toggles
-makeToggle("Noclip","Noclip",16,function(s)
+makeToggle("Noclip","👻","Noclip",16,function(s)
     noclip=s
     if noclipConn then noclipConn:Disconnect(); noclipConn=nil end
     if s then
@@ -252,7 +252,7 @@ makeToggle("Noclip","Noclip",16,function(s)
     end
 end)
 
-makeToggle("InfJump","Inf Jump",56,function(s)
+makeToggle("InfJump","♾️","Inf Jump",56,function(s)
     infJump=s
     if jumpConn then jumpConn:Disconnect(); jumpConn=nil end
     if s then jumpConn=UIS.JumpRequest:Connect(function()
@@ -262,7 +262,7 @@ makeToggle("InfJump","Inf Jump",56,function(s)
     end) end
 end)
 
-makeToggle("AntiAFK","Anti-AFK",96,function(s)
+makeToggle("AntiAFK","⚡","Anti-AFK",96,function(s)
     antiAFK=s
     if afkConn then afkConn:Disconnect(); afkConn=nil end
     if s then afkConn=lp.Idled:Connect(function()
@@ -271,7 +271,7 @@ makeToggle("AntiAFK","Anti-AFK",96,function(s)
     end) end
 end)
 
-makeToggle("ESP","ESP",136,function(s)
+makeToggle("ESP","👁","ESP",136,function(s)
     if espConn then espConn:Disconnect(); espConn=nil end
     if not s then
         for _,o in pairs(espObjs) do
@@ -371,7 +371,6 @@ jpSet.MouseButton1Click:Connect(function()
     end
 end)
 
--- FOV
 local fovLbl = Instance.new("TextLabel")
 fovLbl.Size=UDim2.new(0.46,0,0,13); fovLbl.Position=UDim2.new(0.54,0,0,104)
 fovLbl.BackgroundTransparency=1; fovLbl.Text="FOV: 70"; fovLbl.TextColor3=tx2()
@@ -394,12 +393,11 @@ fovSet.Font=Enum.Font.GothamBold; fovSet.AutoButtonColor=false; fovSet.BorderSiz
 fovSet.Parent=fovRow; fovSet.ZIndex=53; corner(6,fovSet)
 fovSet.MouseButton1Click:Connect(function()
     local v = math.clamp(tonumber(fovBox.Text) or 70, 1, 120)
-    fovBox.Text = tostring(v)
     workspace.CurrentCamera.FieldOfView = v
     fovLbl.Text = "FOV: "..v
 end)
 
--- Players + Fly buttons (shifted down)
+-- Players + Fly buttons
 local function mkRightBtn(txt, xScale, y, w)
     local b = Instance.new("TextButton")
     b.Size=UDim2.new(0,w,0,26); b.Position=UDim2.new(xScale,0,0,y)
@@ -412,8 +410,8 @@ local function mkRightBtn(txt, xScale, y, w)
     return b
 end
 
-local playersBtn = mkRightBtn("Players", 0.54, 150, 66)
-local flyBtn     = mkRightBtn("Fly",     0.78, 150, 62)
+local playersBtn = mkRightBtn("👥 Players", 0.54, 148, 66)
+local flyBtn     = mkRightBtn("🕊️ Fly",     0.78, 148, 62)
 
 flyBtn.MouseButton1Click:Connect(function()
     if flyLoaded then return end; flyLoaded=true
@@ -425,7 +423,7 @@ end)
 -- Reset / Theme button
 local resetBtn = Instance.new("TextButton")
 resetBtn.Size=UDim2.new(1,0,0,26); resetBtn.Position=UDim2.new(0,0,1,-28)
-resetBtn.BackgroundColor3=Color3.fromRGB(30,22,55); resetBtn.Text="Reset / Theme"
+resetBtn.BackgroundColor3=Color3.fromRGB(30,22,55); resetBtn.Text="🔄 Reset / 🎨 Theme"
 resetBtn.TextColor3=Color3.fromRGB(160,140,255); resetBtn.TextSize=10
 resetBtn.Font=Enum.Font.GothamBold; resetBtn.AutoButtonColor=false; resetBtn.BorderSizePixel=0
 resetBtn.Parent=home; resetBtn.ZIndex=52; corner(9,resetBtn)
@@ -454,22 +452,22 @@ local function popBtn(txt,x,y,w,h,col,tc)
 end
 
 -- Row 1: Reset Cam | Reset All
-local resetCamBtn = popBtn("Reset Cam", 9,30,122,30,Color3.fromRGB(35,58,150))
-local resetAllBtn = popBtn("Reset All",141,30,122,30,Color3.fromRGB(140,32,70))
+local resetCamBtn = popBtn("📷 Reset Cam", 9,30,122,30,Color3.fromRGB(35,58,150))
+local resetAllBtn = popBtn("🔄 Reset All",141,30,122,30,Color3.fromRGB(140,32,70))
 
 -- Row 2: Dark | Light
-local darkBtn  = popBtn("Dark",   9,68,122,30,Color3.fromRGB(26,26,42))
-local lightBtn = popBtn("Light", 141,68,122,30,Color3.fromRGB(220,215,240),Color3.fromRGB(50,40,100))
+local darkBtn  = popBtn("🌙 Dark",   9,68,122,30,Color3.fromRGB(26,26,42))
+local lightBtn = popBtn("☀️ Light", 141,68,122,30,Color3.fromRGB(220,215,240),Color3.fromRGB(50,40,100))
 
 -- Row 3: Reconnect | Rejoin | Server Hop
-local reconnBtn  = popBtn("Reconnect", 9,   106, 82, 30, Color3.fromRGB(38,80,160))
-local rejoinBtn  = popBtn("Rejoin",    96,  106, 72, 30, Color3.fromRGB(38,110,80))
-local shopBtn    = popBtn("Hop",       173, 106, 56, 30, Color3.fromRGB(100,50,150))
+local reconnBtn  = popBtn("🔌 Reconnect", 9,   106, 82, 30, Color3.fromRGB(38,80,160))
+local rejoinBtn  = popBtn("🔁 Rejoin",    96,  106, 72, 30, Color3.fromRGB(38,110,80))
+local shopBtn    = popBtn("🌐 Hop",       173, 106, 56, 30, Color3.fromRGB(100,50,150))
 
 -- TP History (shifted down)
 local histLbl = Instance.new("TextLabel"); histLbl.Size=UDim2.new(1,-18,0,14)
 histLbl.Position=UDim2.new(0,9,0,144); histLbl.BackgroundTransparency=1
-histLbl.Text="TP History"; histLbl.TextColor3=Color3.fromRGB(140,140,200)
+histLbl.Text="📍 TP History"; histLbl.TextColor3=Color3.fromRGB(140,140,200)
 histLbl.TextSize=9; histLbl.Font=Enum.Font.GothamBold; histLbl.TextXAlignment=Enum.TextXAlignment.Left
 histLbl.Parent=popup; histLbl.ZIndex=81
 
@@ -539,7 +537,7 @@ local reconnConn = nil
 local function setAutoReconnect(state)
     autoReconnect = state
     if state then
-        reconnBtn.Text = "Auto ON"
+        reconnBtn.Text = "🔌 Auto ON"
         tw(reconnBtn, 0.15, {BackgroundColor3 = Color3.fromRGB(40,160,80)})
         -- Watch for disconnect
         reconnConn = game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(tpState)
@@ -559,7 +557,7 @@ local function setAutoReconnect(state)
             end
         end)
     else
-        reconnBtn.Text = "Reconnect"
+        reconnBtn.Text = "🔌 Reconnect"
         tw(reconnBtn, 0.15, {BackgroundColor3 = isDark and Color3.fromRGB(38,80,160) or Color3.fromRGB(175,190,235)})
         if reconnConn then reconnConn:Disconnect(); reconnConn = nil end
     end
@@ -628,10 +626,9 @@ resetAllBtn.MouseButton1Click:Connect(function()
     if char then for _,p in pairs(char:GetChildren()) do
         if p:IsA("BasePart") and p.Name~="HumanoidRootPart" then p.CanCollide=true end
     end end
-    speedSlider.Text="16"; jumpSlider.Text="50"; fovBox.Text="70"
-    spLbl.Text="Speed: 16"; jpLbl.Text="Jump: 50"; fovLbl.Text="FOV: 70"
-    workspace.CurrentCamera.FieldOfView = 70
-    flyLoaded=false; flyBtn.Text="Fly"
+    speedSlider.Text="16"; jumpSlider.Text="50"
+    spLbl.Text="Speed: 16"; jpLbl.Text="Jump: 50"
+    flyLoaded=false; flyBtn.Text="🕊️ Fly"
     for _,s in pairs(toggleSetters) do s(false) end
     resetCamera(); hidePopup()
 end)
@@ -652,10 +649,9 @@ local function applyTheme()
     div.BackgroundColor3 = isDark and Color3.fromRGB(45,45,65) or Color3.fromRGB(195,195,218)
     island.BackgroundColor3 = isDark and Color3.fromRGB(18,18,22) or Color3.fromRGB(232,232,248)
     islandTxt.TextColor3 = tx()
-    spLbl.TextColor3=tx2(); jpLbl.TextColor3=tx2(); fovLbl.TextColor3=tx2()
+    spLbl.TextColor3=tx2(); jpLbl.TextColor3=tx2()
     speedSlider.BackgroundColor3=bg3(); speedSlider.TextColor3=tx()
     jumpSlider.BackgroundColor3=bg3(); jumpSlider.TextColor3=tx()
-    fovBox.BackgroundColor3=bg3(); fovBox.TextColor3=tx()
     playersBtn.BackgroundColor3=bg3(); playersBtn.TextColor3=tx2()
     flyBtn.BackgroundColor3=bg3(); flyBtn.TextColor3=tx2()
     resetBtn.BackgroundColor3 = isDark and Color3.fromRGB(30,22,55) or Color3.fromRGB(215,208,245)
@@ -694,13 +690,13 @@ pfFrame.Visible=false; pfFrame.Parent=panel; pfFrame.ZIndex=60; corner(13,pfFram
 stroke(Color3.fromRGB(50,46,95),1,pfFrame)
 
 local pfTitle=Instance.new("TextLabel"); pfTitle.Size=UDim2.new(1,0,0,26)
-pfTitle.BackgroundTransparency=1; pfTitle.Text="Players"
+pfTitle.BackgroundTransparency=1; pfTitle.Text="👥 Players"
 pfTitle.TextColor3=Color3.fromRGB(170,170,235); pfTitle.TextSize=12; pfTitle.Font=Enum.Font.GothamBold
 pfTitle.Parent=pfFrame; pfTitle.ZIndex=61
 
 local pfSearch=Instance.new("TextBox"); pfSearch.Size=UDim2.new(1,-16,0,24)
 pfSearch.Position=UDim2.new(0,8,0,28); pfSearch.BackgroundColor3=Color3.fromRGB(26,26,38)
-pfSearch.PlaceholderText="Search..."; pfSearch.Text=""
+pfSearch.PlaceholderText="🔍 Search..."; pfSearch.Text=""
 pfSearch.TextColor3=Color3.fromRGB(170,170,215); pfSearch.TextSize=10; pfSearch.Font=Enum.Font.Gotham
 pfSearch.BorderSizePixel=0; pfSearch.Parent=pfFrame; pfSearch.ZIndex=62; corner(6,pfSearch)
 
@@ -733,7 +729,7 @@ local function updatePF(q)
             end
             local tpB=sb("TP",4,Color3.fromRGB(45,92,185))
             local vwB=sb("View",52,Color3.fromRGB(185,105,35))
-            local idB=sb(" ID",100,Color3.fromRGB(50,145,100))
+            local idB=sb("📋 ID",100,Color3.fromRGB(50,145,100))
             tpB.MouseButton1Click:Connect(function()
                 if tp.Character and tp.Character:FindFirstChild("HumanoidRootPart") and
                    char and char:FindFirstChild("HumanoidRootPart") then
@@ -751,7 +747,7 @@ local function updatePF(q)
             end)
             idB.MouseButton1Click:Connect(function()
                 pcall(function() setclipboard(tostring(tp.UserId)) end)
-                idB.Text="✓"; task.delay(1.5,function() idB.Text=" ID" end)
+                idB.Text="✓"; task.delay(1.5,function() idB.Text="📋 ID" end)
             end)
             n=n+1
         end
@@ -814,7 +810,7 @@ cardA.Size=UDim2.new(0.48,0,1,0); cardA.Position=UDim2.new(0,0,0,0)
 cardA.BackgroundColor3=bg3(); cardA.BorderSizePixel=0; cardA.Parent=rowAB; cardA.ZIndex=52; corner(10,cardA)
 
 local lblA = Instance.new("TextLabel"); lblA.Size=UDim2.new(1,0,0,16); lblA.Position=UDim2.new(0,0,0,4)
-lblA.BackgroundTransparency=1; lblA.Text=" Point A"; lblA.TextColor3=Color3.fromRGB(140,140,200)
+lblA.BackgroundTransparency=1; lblA.Text="📍 Point A"; lblA.TextColor3=Color3.fromRGB(140,140,200)
 lblA.TextSize=9; lblA.Font=Enum.Font.GothamBold; lblA.Parent=cardA; lblA.ZIndex=53
 
 local posA = Instance.new("TextLabel"); posA.Size=UDim2.new(1,-8,0,14); posA.Position=UDim2.new(0,4,0,20)
@@ -823,7 +819,7 @@ posA.TextSize=8; posA.Font=Enum.Font.Gotham; posA.TextXAlignment=Enum.TextXAlign
 posA.TextTruncate=Enum.TextTruncate.AtEnd; posA.Parent=cardA; posA.ZIndex=53
 
 local setA = Instance.new("TextButton"); setA.Size=UDim2.new(1,-8,0,22); setA.Position=UDim2.new(0,4,0,36)
-setA.BackgroundColor3=Color3.fromRGB(38,65,168); setA.Text=" Set A"; setA.TextColor3=Color3.fromRGB(220,220,255)
+setA.BackgroundColor3=Color3.fromRGB(38,65,168); setA.Text="📌 Set A"; setA.TextColor3=Color3.fromRGB(220,220,255)
 setA.TextSize=9; setA.Font=Enum.Font.GothamSemibold; setA.AutoButtonColor=false; setA.BorderSizePixel=0
 setA.Parent=cardA; setA.ZIndex=53; corner(7,setA)
 
@@ -838,7 +834,7 @@ cardB.Size=UDim2.new(0.48,0,1,0); cardB.Position=UDim2.new(0.52,0,0,0)
 cardB.BackgroundColor3=bg3(); cardB.BorderSizePixel=0; cardB.Parent=rowAB; cardB.ZIndex=52; corner(10,cardB)
 
 local lblB = Instance.new("TextLabel"); lblB.Size=UDim2.new(1,0,0,16); lblB.Position=UDim2.new(0,0,0,4)
-lblB.BackgroundTransparency=1; lblB.Text=" Point B"; lblB.TextColor3=Color3.fromRGB(140,140,200)
+lblB.BackgroundTransparency=1; lblB.Text="📍 Point B"; lblB.TextColor3=Color3.fromRGB(140,140,200)
 lblB.TextSize=9; lblB.Font=Enum.Font.GothamBold; lblB.Parent=cardB; lblB.ZIndex=53
 
 local posB = Instance.new("TextLabel"); posB.Size=UDim2.new(1,-8,0,14); posB.Position=UDim2.new(0,4,0,20)
@@ -847,7 +843,7 @@ posB.TextSize=8; posB.Font=Enum.Font.Gotham; posB.TextXAlignment=Enum.TextXAlign
 posB.TextTruncate=Enum.TextTruncate.AtEnd; posB.Parent=cardB; posB.ZIndex=53
 
 local setB = Instance.new("TextButton"); setB.Size=UDim2.new(1,-8,0,22); setB.Position=UDim2.new(0,4,0,36)
-setB.BackgroundColor3=Color3.fromRGB(38,65,168); setB.Text=" Set B"; setB.TextColor3=Color3.fromRGB(220,220,255)
+setB.BackgroundColor3=Color3.fromRGB(38,65,168); setB.Text="📌 Set B"; setB.TextColor3=Color3.fromRGB(220,220,255)
 setB.TextSize=9; setB.Font=Enum.Font.GothamSemibold; setB.AutoButtonColor=false; setB.BorderSizePixel=0
 setB.Parent=cardB; setB.ZIndex=53; corner(7,setB)
 
@@ -881,7 +877,7 @@ setA.MouseButton1Click:Connect(function()
     ptA=char.HumanoidRootPart.CFrame
     posA.Text=fmtPos(ptA); posA.TextColor3=Color3.fromRGB(90,210,110)
     setA.Text="✓ Set"; tw(setA,0.12,{BackgroundColor3=Color3.fromRGB(35,120,55)})
-    task.delay(1.2,function() setA.Text=" Set A"; tw(setA,0.12,{BackgroundColor3=Color3.fromRGB(38,65,168)}) end)
+    task.delay(1.2,function() setA.Text="📌 Set A"; tw(setA,0.12,{BackgroundColor3=Color3.fromRGB(38,65,168)}) end)
 end)
 
 setB.MouseButton1Click:Connect(function()
@@ -889,7 +885,7 @@ setB.MouseButton1Click:Connect(function()
     ptB=char.HumanoidRootPart.CFrame
     posB.Text=fmtPos(ptB); posB.TextColor3=Color3.fromRGB(90,210,110)
     setB.Text="✓ Set"; tw(setB,0.12,{BackgroundColor3=Color3.fromRGB(35,120,55)})
-    task.delay(1.2,function() setB.Text=" Set B"; tw(setB,0.12,{BackgroundColor3=Color3.fromRGB(38,65,168)}) end)
+    task.delay(1.2,function() setB.Text="📌 Set B"; tw(setB,0.12,{BackgroundColor3=Color3.fromRGB(38,65,168)}) end)
 end)
 
 tpA.MouseButton1Click:Connect(function()
@@ -972,11 +968,11 @@ local function card(icon,title,desc,y,col,cb)
     ab.Parent=c; ab.ZIndex=53; corner(6,ab); ab.MouseButton1Click:Connect(cb)
 end
 
-card("Arceus X","Script executor hub","Load scripts",4,   Color3.fromRGB(118,45,185),function() showLoad("Arceus X");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))() end) end)
-card("Music Player","Play music with ID","Play any music",78,  Color3.fromRGB(90,45,165),function() showLoad("Music");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))() end) end)
-card("Graphics","Enhance visuals","Boost graphics",152,        Color3.fromRGB(38,85,185),function() showLoad("Graphics");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))() end) end)
-card("Paint-Alpha","Draw and create","Drawing tool",226,     Color3.fromRGB(180,45,110),function() showLoad("Paint");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))() end) end)
-card("Client Settings","Advanced config","Client tweaks",300, Color3.fromRGB(38,148,65),function() showLoad("Client");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))() end) end)
+card("⚔️","Arceus X","Script executor hub",4,   Color3.fromRGB(118,45,185),function() showLoad("Arceus X");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))() end) end)
+card("🎵","Music Player","Play music with ID",78,  Color3.fromRGB(90,45,165),function() showLoad("Music");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))() end) end)
+card("🎮","Graphics","Enhance visuals",152,        Color3.fromRGB(38,85,185),function() showLoad("Graphics");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))() end) end)
+card("🎨","Paint-Alpha","Draw and create",226,     Color3.fromRGB(180,45,110),function() showLoad("Paint");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))() end) end)
+card("⚙️","Client Settings","Advanced config",300, Color3.fromRGB(38,148,65),function() showLoad("Client");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))() end) end)
 
 -- ══════════════════════════════════════════════════════
 -- TAB SWITCHING
@@ -1052,4 +1048,4 @@ intro.Completed:Connect(function()
     Tween:Create(islandTxt,TweenInfo.new(0.25),{TextTransparency=0}):Play()
 end)
 
-print("Xnos 1.0 loaded!")
+print("⚡ Xnos 1.0 loaded!")
