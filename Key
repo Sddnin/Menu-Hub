@@ -153,7 +153,7 @@ for i,d in ipairs(tabDefs) do
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(0.333,-4,1,-6); b.Position = UDim2.new((i-1)*0.333,i==1 and 3 or 2,0,3)
     b.BackgroundColor3 = i==1 and acc() or bg3()
-    b.Text = d[2].." "..d[1]; b.TextSize = 10; b.Font = Enum.Font.GothamSemibold
+    b.Text = d[1]; b.TextSize = 10; b.Font = Enum.Font.GothamSemibold
     b.TextColor3 = i==1 and Color3.fromRGB(255,255,255) or tx2()
     b.AutoButtonColor = false; b.BorderSizePixel = 0
     b.Parent = tabBar; b.ZIndex = 52; corner(8,b)
@@ -972,11 +972,11 @@ local function card(icon,title,desc,y,col,cb)
     ab.Parent=c; ab.ZIndex=53; corner(6,ab); ab.MouseButton1Click:Connect(cb)
 end
 
-card("Arceus X","Script executor hub",4,   Color3.fromRGB(118,45,185),function() showLoad("Arceus X");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))() end) end)
-card("Music Player","Play music with ID",78,  Color3.fromRGB(90,45,165),function() showLoad("Music");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))() end) end)
-card("Graphics","Enhance visuals",152,        Color3.fromRGB(38,85,185),function() showLoad("Graphics");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))() end) end)
-card("Paint-Alpha","Draw and create",226,     Color3.fromRGB(180,45,110),function() showLoad("Paint");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))() end) end)
-card("Client Settings","Advanced config",300, Color3.fromRGB(38,148,65),function() showLoad("Client");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))() end) end)
+card("Arceus X","Script executor hub","Load scripts",4,   Color3.fromRGB(118,45,185),function() showLoad("Arceus X");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))() end) end)
+card("Music Player","Play music with ID","Play any music",78,  Color3.fromRGB(90,45,165),function() showLoad("Music");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Music"))() end) end)
+card("Graphics","Enhance visuals","Boost graphics",152,        Color3.fromRGB(38,85,185),function() showLoad("Graphics");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Graphics"))() end) end)
+card("Paint-Alpha","Draw and create","Drawing tool",226,     Color3.fromRGB(180,45,110),function() showLoad("Paint");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Paint"))() end) end)
+card("Client Settings","Advanced config","Client tweaks",300, Color3.fromRGB(38,148,65),function() showLoad("Client");pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sddnin/Menu-Hub/refs/heads/main/Command"))() end) end)
 
 -- ══════════════════════════════════════════════════════
 -- TAB SWITCHING
