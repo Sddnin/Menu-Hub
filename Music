@@ -1943,5 +1943,5 @@ spawn(function()
     showNotification("✨ Play a song to get started!", colors.warning, "🆕")
 end)
 
-print("🎵 ===== MUSIC PLAYER 3.2 ===== 🎵")
+print("🎵 ===== MUSIC PLAYER 3.7 ===== 🎵")
 print("✅ LOADED SUCCESSFULLY!")
