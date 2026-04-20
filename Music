@@ -1,5 +1,5 @@
--- 🎵 Roblox Music Player 3.7 - With Loading Screen
--- Tạo bởi Mila | Version 3.7 - Added Loading Animation
+-- 🎵 Roblox Music Player 3.1 - With Loading Screen
+-- Tạo bởi Mila | Version 3.1 - Added Loading Animation
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -237,7 +237,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -50, 1, 0)
 titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Xnos Music"
+titleLabel.Text = "HỆ THỐNG ÂM NHẠC ROBLOX"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
 titleLabel.Font = Enum.Font.GothamBold
@@ -344,7 +344,7 @@ local nowPlayingLabel = Instance.new("TextLabel")
 nowPlayingLabel.Size = UDim2.new(1, -90, 0, 30)
 nowPlayingLabel.Position = UDim2.new(0, 88, 0, 12)
 nowPlayingLabel.BackgroundTransparency = 1
-nowPlayingLabel.Text = "No song playing"
+nowPlayingLabel.Text = "Không có nhạc nào đang phát"
 nowPlayingLabel.TextColor3 = colors.accent
 nowPlayingLabel.TextSize = 15
 nowPlayingLabel.Font = Enum.Font.GothamBold
@@ -396,7 +396,7 @@ local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, -90, 0, 14)
 statusLabel.Position = UDim2.new(0, 88, 0, 32)
 statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Ready to play"
+statusLabel.Text = "Sẵn sàng phát nhạc"
 statusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
 statusLabel.TextSize = 10
 statusLabel.Font = Enum.Font.Gotham
@@ -436,7 +436,7 @@ local volTextLabel = Instance.new("TextLabel")
 volTextLabel.Size = UDim2.new(0, 55, 1, 0)
 volTextLabel.Position = UDim2.new(0, 34, 0, 0)
 volTextLabel.BackgroundTransparency = 1
-volTextLabel.Text = "Volume"
+volTextLabel.Text = "Âm lượng"
 volTextLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 volTextLabel.TextSize = 11
 volTextLabel.Font = Enum.Font.GothamBold
@@ -515,7 +515,7 @@ tabFrame.Parent = mainFrame
 local tabFrameC = Instance.new("UICorner"); tabFrameC.CornerRadius = UDim.new(0,8); tabFrameC.Parent = tabFrame
 
 local tabButtons = {}
-local tabNames = {"[MANUAL ID]", "[LIBRARY]"}
+local tabNames = {"[NHẬP ID THỦ CÔNG]", "[THƯ VIỆN]"}
 
 for i, tabName in ipairs(tabNames) do
     local tabBtn = Instance.new("TextButton")
@@ -566,7 +566,7 @@ local idInput = Instance.new("TextBox")
 idInput.Size = UDim2.new(1, -80, 1, 0)
 idInput.Position = UDim2.new(0, 36, 0, 0)
 idInput.BackgroundTransparency = 1
-idInput.PlaceholderText = "Enter Roblox music ID here..."
+idInput.PlaceholderText = "Nhập ID nhạc Roblox vào đây..."
 idInput.PlaceholderColor3 = Color3.fromRGB(160, 160, 160)
 idInput.Text = ""
 idInput.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -596,7 +596,7 @@ manualLabel.TextSize = 1
 manualLabel.Font = Enum.Font.Gotham
 manualLabel.Parent = manualTab
 
--- Controls row: |◀ PREVIOUS | ⏸ PLAY/PAUSE | NEXT ▶ | 🔀 SHUFFLE |
+-- Controls row: |◀ BÀI TRƯỚC | ⏸ PHÁT/TẠM DỪNG | BÀI KẾ TIẾP ▶ | 🔀 TRỘN BÀI |
 local controlsRow = Instance.new("Frame")
 controlsRow.Size = UDim2.new(1, 0, 0, 46)
 controlsRow.Position = UDim2.new(0, 0, 0, 56)
@@ -616,7 +616,7 @@ prevBtn.Size = UDim2.new(0.25, -3, 1, -8)
 prevBtn.Position = UDim2.new(0, 4, 0, 4)
 prevBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 prevBtn.BorderSizePixel = 0
-prevBtn.Text = "⏮\nPREVIOUS"
+prevBtn.Text = "⏮\nBÀI TRƯỚC"
 prevBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
 prevBtn.TextSize = 9
 prevBtn.Font = Enum.Font.GothamBold
@@ -629,7 +629,7 @@ playPauseMainBtn.Size = UDim2.new(0.25, -2, 1, -8)
 playPauseMainBtn.Position = UDim2.new(0.25, 1, 0, 4)
 playPauseMainBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 playPauseMainBtn.BorderSizePixel = 0
-playPauseMainBtn.Text = "⏸\nPLAY/PAUSE"
+playPauseMainBtn.Text = "⏸\nPHÁT/TẠM DỪNG"
 playPauseMainBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
 playPauseMainBtn.TextSize = 9
 playPauseMainBtn.Font = Enum.Font.GothamBold
@@ -642,7 +642,7 @@ nextBtn.Size = UDim2.new(0.25, -2, 1, -8)
 nextBtn.Position = UDim2.new(0.5, 1, 0, 4)
 nextBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 nextBtn.BorderSizePixel = 0
-nextBtn.Text = "⏭\nNEXT"
+nextBtn.Text = "⏭\nBÀI KẾ TIẾP"
 nextBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
 nextBtn.TextSize = 9
 nextBtn.Font = Enum.Font.GothamBold
@@ -655,7 +655,7 @@ shuffleBtn.Size = UDim2.new(0.25, -5, 1, -8)
 shuffleBtn.Position = UDim2.new(0.75, 1, 0, 4)
 shuffleBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 shuffleBtn.BorderSizePixel = 0
-shuffleBtn.Text = "🔀\nSHUFFLE"
+shuffleBtn.Text = "🔀\nTRỘN BÀI"
 shuffleBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
 shuffleBtn.TextSize = 9
 shuffleBtn.Font = Enum.Font.GothamBold
@@ -714,7 +714,7 @@ local searchBox = Instance.new("TextBox")
 searchBox.Size = UDim2.new(1, 0, 0, 38)
 searchBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 searchBox.BorderSizePixel = 0
-searchBox.PlaceholderText = "🔍 Search songs..."
+searchBox.PlaceholderText = "🔍 Tìm kiếm bài hát..."
 searchBox.PlaceholderColor3 = Color3.fromRGB(160,160,160)
 searchBox.Text = ""
 searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -878,7 +878,7 @@ minimizedSongLabel = Instance.new("TextLabel")
 minimizedSongLabel.Size = UDim2.new(1, -24, 1, 0)
 minimizedSongLabel.Position = UDim2.new(0, 22, 0, 0)
 minimizedSongLabel.BackgroundTransparency = 1
-minimizedSongLabel.Text = "No song"
+minimizedSongLabel.Text = "Không có nhạc"
 minimizedSongLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizedSongLabel.TextSize = 15
 minimizedSongLabel.Font = Enum.Font.GothamBold
@@ -1143,7 +1143,7 @@ local function createLoadingScreen()
     loadingText.Size = UDim2.new(1, -40, 0, 30)
     loadingText.Position = UDim2.new(0, 20, 0, 110)
     loadingText.BackgroundTransparency = 1
-    loadingText.Text = "Loading music..."
+    loadingText.Text = "Đang tải nhạc..."
     loadingText.TextColor3 = colors.text
     loadingText.TextSize = 16
     loadingText.Font = Enum.Font.GothamBold
@@ -1198,7 +1198,7 @@ local function createLoadingScreen()
         local dots = 0
         while loadingFrame and loadingFrame.Parent do
             dots = (dots % 3) + 1
-            loadingText.Text = "Loading music" .. string.rep(".", dots)
+            loadingText.Text = "Đang tải nhạc" .. string.rep(".", dots)
             wait(0.4)
         end
     end)
@@ -1364,12 +1364,12 @@ local function togglePlayPause()
             currentSound:Pause()
             musicIcon.Text = "⏸️"
             minimizedPlayPauseBtn.Text = "▶️"
-            showNotification("Paused", colors.warning, "⏸️")
+            showNotification("Đã tạm dừng", colors.warning, "⏸️")
         else
             currentSound:Resume()
             musicIcon.Text = "🎵"
             minimizedPlayPauseBtn.Text = "⏸️"
-            showNotification("Resumed", colors.accent, "▶️")
+            showNotification("Tiếp tục phát", colors.accent, "▶️")
         end
     end
 end
@@ -1463,7 +1463,7 @@ function playMusic(musicData)
 
         if not currentSound then
             hideLoadingScreen()
-            showNotification("Sound error! Invalid ID.", colors.danger, "⚠️")
+            showNotification("Lỗi tạo âm thanh! ID không hợp lệ.", colors.danger, "⚠️")
             return
         end
 
@@ -1480,20 +1480,20 @@ function playMusic(musicData)
         hideLoadingScreen()
 
         if not success then
-            showNotification("Playback error! Try again.", colors.danger, "⚠️")
+            showNotification("Lỗi phát nhạc! Thử lại sau.", colors.danger, "⚠️")
             return
         end
 
         currentPlaying = musicData
         nowPlayingLabel.Text = musicData.name
-        statusLabel.Text = "Playing - Vol: " .. userData.volume
+        statusLabel.Text = "Đang phát - Volume: " .. userData.volume
         musicIcon.Text = "🎵"
 
         minimizedSongLabel.Text = musicData.name
         miniIdBtn.Text = "ID: " .. musicData.id .. "  📋"
         minimizedPlayPauseBtn.Text = "⏸️"
 
-        showNotification("🎵 Now playing: " .. musicData.name, colors.accent, "🎵")
+        showNotification("🎵 Đang phát: " .. musicData.name, colors.accent, "🎵")
 
         startProgressUpdate()
         startMiniProgressUpdate()
@@ -1528,15 +1528,15 @@ local function stopMusic()
     hideLoadingScreen()
 
     currentPlaying = nil
-    nowPlayingLabel.Text = "No song playing"
-    statusLabel.Text = "Volume: " .. userData.volume .. " | Ready to play"
+    nowPlayingLabel.Text = "Không có nhạc nào đang phát"
+    statusLabel.Text = "Volume: " .. userData.volume .. " | Sẵn sàng phát nhạc"
     musicIcon.Text = "⏸️"
 
-    minimizedSongLabel.Text = "No song"
+    minimizedSongLabel.Text = "Không có nhạc"
     miniIdBtn.Text = "ID: --"
     minimizedPlayPauseBtn.Text = "▶️"
 
-    showNotification("Music stopped", colors.danger, "⏹️")
+    showNotification("Đã dừng phát nhạc", colors.danger, "⏹️")
 end
 
 local function updateVolume(newVolume)
@@ -1559,9 +1559,9 @@ local function updateVolume(newVolume)
     end
 
     if currentPlaying then
-        statusLabel.Text = "Playing - Vol: " .. newVolume .. "/10"
+        statusLabel.Text = "Đang phát - Volume: " .. newVolume .. "/10"
     else
-        statusLabel.Text = "Ready to play"
+        statusLabel.Text = "Sẵn sàng phát nhạc"
     end
 end
 
@@ -1570,17 +1570,17 @@ local function cycleRepeatMode()
         userData.repeatMode = "one"
         repeatBtn.Text = "🔂"
         repeatBtn.TextColor3 = colors.accent
-        showNotification("Repeat: One", colors.accent, "🔂")
+        showNotification("Lặp lại: Một bài", colors.accent, "🔂")
     elseif userData.repeatMode == "one" then
         userData.repeatMode = "all"
         repeatBtn.Text = "🔁"
         repeatBtn.TextColor3 = colors.accent
-        showNotification("Repeat: All", colors.accent, "🔁")
+        showNotification("Lặp lại: Tất cả", colors.accent, "🔁")
     else
         userData.repeatMode = "off"
         repeatBtn.Text = "🔄"
         repeatBtn.TextColor3 = colors.textSecondary
-        showNotification("Repeat: Off", colors.textSecondary, "🔄")
+        showNotification("Tắt lặp lại", colors.textSecondary, "🔄")
     end
 
     if currentSound then
@@ -1710,13 +1710,13 @@ local function toggleShuffle()
         shuffleBtn.TextColor3 = colors.accent
         shuffleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         generateShuffleQueue()
-        showNotification("Shuffle: ON", colors.accent, "🔀")
+        showNotification("Shuffle: BẬT", colors.accent, "🔀")
     else
         shuffleBtn.Text = "🔀 OFF"
         shuffleBtn.TextColor3 = colors.textSecondary
         shuffleBtn.BackgroundColor3 = colors.primary
         shuffleQueue = {}
-        showNotification("Shuffle: OFF", colors.textSecondary, "🔀")
+        showNotification("Shuffle: TẮT", colors.textSecondary, "🔀")
     end
 end
 
@@ -1785,20 +1785,20 @@ end
 playManualBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
-        playMusic({name = "ID: " .. id, id = id})
+        playMusic({name = "Custom ID: " .. id, id = id})
     else
-        showNotification("Please enter a music ID!", colors.danger, "⚠️")
+        showNotification("Vui lòng nhập ID nhạc!", colors.danger, "⚠️")
     end
 end)
 
 bigPlayBtn.MouseButton1Click:Connect(function()
     local id = idInput.Text:gsub("%s+", "")
     if id ~= "" then
-        playMusic({name = "ID: " .. id, id = id})
+        playMusic({name = "Custom ID: " .. id, id = id})
     elseif currentPlaying then
         togglePlayPause()
     else
-        showNotification("Please enter a music ID!", colors.danger, "⚠️")
+        showNotification("Vui lòng nhập ID nhạc!", colors.danger, "⚠️")
     end
 end)
 
@@ -1818,7 +1818,7 @@ idInput.FocusLost:Connect(function(enterPressed)
     if enterPressed then
         local id = idInput.Text:gsub("%s+", "")
         if id ~= "" then
-            playMusic({name = "ID: " .. id, id = id})
+            playMusic({name = "Custom ID: " .. id, id = id})
         end
     end
 end)
@@ -1833,7 +1833,7 @@ volumeSlider.FocusLost:Connect(function()
         updateVolume(volume)
     else
         volumeSlider.Text = tostring(userData.volume)
-        showNotification("Volume must be a number 0-10!", colors.danger, "⚠️")
+        showNotification("Volume phải là số từ 0-10!", colors.danger, "⚠️")
     end
 end)
 
@@ -1938,10 +1938,10 @@ makeDraggable(minimizedFrame)
 
 spawn(function()
     wait(1)
-    showNotification("🎉 Xnos Music - Ready!", colors.accent, "🎵")
+    showNotification("🎉 Music Player 3.1 - Với Loading Screen!", colors.accent, "🎵")
     wait(2)
-    showNotification("✨ Play a song to get started!", colors.warning, "🆕")
+    showNotification("✨ Thử phát nhạc để xem hiệu ứng loading!", colors.warning, "🆕")
 end)
 
-print("🎵 ===== MUSIC PLAYER 3.7 ===== 🎵")
+print("🎵 ===== MUSIC PLAYER 3.2 ===== 🎵")
 print("✅ LOADED SUCCESSFULLY!")
