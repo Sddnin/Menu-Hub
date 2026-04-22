@@ -1,814 +1,1110 @@
--- 🎨 Drawing Studio v3.0 - Ultimate Edition
--- Fully optimized, bug-free, professional
--- Place in StarterPlayerScripts (LocalScript)
+-- ╔══════════════════════════════════════════════════════════════╗
+-- ║         🎨 DRAWING STUDIO v4.0 — PROFESSIONAL EDITION        ║
+-- ║    Rewritten from scratch — Touch + Mouse — Optimized        ║
+-- ║    Place in StarterPlayerScripts (LocalScript)               ║
+-- ╚══════════════════════════════════════════════════════════════╝
 
-local Players = game:GetService("Players")
+local Players         = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
+local TweenService    = game:GetService("TweenService")
+local RunService      = game:GetService("RunService")
 
-local player = Players.LocalPlayer
+local player  = Players.LocalPlayer
+local mouse   = player:GetMouse()
 
--- ============================================
--- CORE STATE MANAGEMENT
--- ============================================
-local App = {
-    version = "3.0",
-    state = {
-        isDrawing = false,
-        currentTool = "brush",
-        currentColor = Color3.new(0.4, 0.6, 1),
-        brushSize = 15,
-        opacity = 1,
-        canvasScale = 1,
-        strokeCount = 0,
-        history = {},
-        historyIndex = 0,
-        maxHistory = 100,
-        activeTab = "tools"
-    }
+-- ============================================================
+-- CONSTANTS
+-- ============================================================
+local CANVAS_W, CANVAS_H = 800, 560
+local MAX_HISTORY        = 50   -- lower = less RAM pressure
+local SPRAY_PARTICLES    = 8
+
+-- ============================================================
+-- THEME
+-- ============================================================
+local T = {
+    bg0  = Color3.fromRGB( 10,  11,  15),
+    bg1  = Color3.fromRGB( 18,  20,  26),
+    bg2  = Color3.fromRGB( 26,  29,  38),
+    bg3  = Color3.fromRGB( 36,  40,  52),
+    line = Color3.fromRGB( 55,  62,  80),
+    acc  = Color3.fromRGB( 94, 158, 255),
+    acc2 = Color3.fromRGB(255, 100, 170),
+    ok   = Color3.fromRGB( 72, 210, 130),
+    warn = Color3.fromRGB(255, 200,  80),
+    err  = Color3.fromRGB(255,  90,  90),
+    txt  = Color3.fromRGB(230, 234, 242),
+    txt2 = Color3.fromRGB(160, 168, 185),
+    txt3 = Color3.fromRGB(100, 110, 130),
+    white = Color3.new(1,1,1),
 }
 
--- ============================================
--- THEME SYSTEM
--- ============================================
-local Theme = {
-    -- Dark theme colors
-    bg = {
-        primary = Color3.fromRGB(13, 14, 18),
-        secondary = Color3.fromRGB(20, 22, 28),
-        tertiary = Color3.fromRGB(28, 31, 38)
-    },
-    accent = {
-        primary = Color3.fromRGB(99, 152, 255),
-        secondary = Color3.fromRGB(255, 105, 180),
-        success = Color3.fromRGB(76, 209, 127),
-        warning = Color3.fromRGB(255, 199, 77),
-        danger = Color3.fromRGB(255, 102, 102)
-    },
-    text = {
-        primary = Color3.fromRGB(242, 244, 247),
-        secondary = Color3.fromRGB(178, 186, 199),
-        muted = Color3.fromRGB(115, 125, 140)
-    },
-    border = Color3.fromRGB(51, 56, 68)
+-- ============================================================
+-- UTILITIES
+-- ============================================================
+local function corner(parent, r)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, r or 10)
+    c.Parent = parent
+    return c
+end
+
+local function stroke(parent, color, thick, trans)
+    local s = Instance.new("UIStroke")
+    s.Color = color or T.line
+    s.Thickness = thick or 1
+    s.Transparency = trans or 0.5
+    s.Parent = parent
+    return s
+end
+
+local function label(parent, text, size, font, color, align)
+    local l = Instance.new("TextLabel")
+    l.BackgroundTransparency = 1
+    l.Text = text or ""
+    l.TextSize = size or 14
+    l.Font = font or Enum.Font.Gotham
+    l.TextColor3 = color or T.txt
+    l.TextXAlignment = align or Enum.TextXAlignment.Left
+    l.Parent = parent
+    return l
+end
+
+local function tween(obj, props, t_, style, dir)
+    TweenService:Create(obj,
+        TweenInfo.new(t_ or 0.25, style or Enum.EasingStyle.Quad, dir or Enum.EasingDirection.Out),
+        props):Play()
+end
+
+-- ============================================================
+-- STATE
+-- ============================================================
+local S = {
+    drawing      = false,
+    tool         = "brush",
+    color        = Color3.fromHSV(0.6, 0.7, 1),
+    size         = 14,
+    opacity      = 1,
+    history      = {},   -- each entry = array of FrameData
+    histIdx      = 0,
+    strokeCount  = 0,
+    lastPos      = nil,
+    layerVisible = {true, true, true},
+    activeLayer  = 1,
+    showUI       = true,
 }
 
--- ============================================
--- UI COMPONENTS FACTORY
--- ============================================
-local UI = {}
+-- ============================================================
+-- ROOT GUI
+-- ============================================================
+local sg = Instance.new("ScreenGui")
+sg.Name          = "DrawingStudio4"
+sg.ResetOnSpawn  = false
+sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+sg.Parent        = player.PlayerGui
 
-function UI.createRoundedFrame(props)
-    local frame = Instance.new("Frame")
-    frame.Size = props.size or UDim2.new(1, 0, 1, 0)
-    frame.Position = props.position or UDim2.new(0, 0, 0, 0)
-    frame.BackgroundColor3 = props.color or Theme.bg.secondary
-    frame.BackgroundTransparency = props.transparency or 0
-    frame.BorderSizePixel = 0
-    frame.Parent = props.parent
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, props.cornerRadius or 12)
-    corner.Parent = frame
-    
-    if props.stroke then
-        local stroke = Instance.new("UIStroke")
-        stroke.Color = props.strokeColor or Theme.border
-        stroke.Thickness = props.strokeThickness or 1
-        stroke.Transparency = props.strokeTransparency or 0.5
-        stroke.Parent = frame
-    end
-    
-    return frame
+-- Background
+local root = Instance.new("Frame")
+root.Size               = UDim2.new(1,0,1,0)
+root.BackgroundColor3   = T.bg0
+root.BorderSizePixel    = 0
+root.Parent             = sg
+corner(root, 0)
+
+-- Subtle grid texture overlay
+local gridOverlay = Instance.new("Frame")
+gridOverlay.Size             = UDim2.new(1,0,1,0)
+gridOverlay.BackgroundColor3 = Color3.new(1,1,1)
+gridOverlay.BackgroundTransparency = 0.97
+gridOverlay.BorderSizePixel  = 0
+gridOverlay.ZIndex           = 1
+gridOverlay.Parent           = root
+
+-- ============================================================
+-- OPEN ANIMATION
+-- ============================================================
+root.Size     = UDim2.new(0,0,0,0)
+root.Position = UDim2.new(0.5,0,0.5,0)
+tween(root, {Size = UDim2.new(1,0,1,0), Position = UDim2.new(0,0,0,0)}, 0.7, Enum.EasingStyle.Back)
+
+-- ============================================================
+-- TOP BAR
+-- ============================================================
+local topBar = Instance.new("Frame")
+topBar.Size             = UDim2.new(1,-20,0,60)
+topBar.Position         = UDim2.new(0,10,0,8)
+topBar.BackgroundColor3 = T.bg1
+topBar.BorderSizePixel  = 0
+topBar.ZIndex           = 10
+topBar.Parent           = root
+corner(topBar, 14)
+stroke(topBar, T.line, 1, 0.4)
+
+-- Logo pill
+local logoPill = Instance.new("Frame")
+logoPill.Size           = UDim2.new(0,240,0,44)
+logoPill.Position       = UDim2.new(0,8,0.5,-22)
+logoPill.BackgroundColor3 = T.acc
+logoPill.BorderSizePixel  = 0
+logoPill.ZIndex           = 11
+logoPill.Parent           = topBar
+corner(logoPill, 22)
+
+local grad = Instance.new("UIGradient")
+grad.Color    = ColorSequence.new(T.acc, T.acc2)
+grad.Rotation = 60
+grad.Parent   = logoPill
+
+local logoLbl = label(logoPill, "🎨  STUDIO  v4.0", 17, Enum.Font.GothamBold, T.white, Enum.TextXAlignment.Center)
+logoLbl.Size     = UDim2.new(1,0,1,0)
+logoLbl.ZIndex   = 12
+
+-- Tool-hint label (center)
+local toolHint = label(topBar, "Brush  •  14px  •  100%", 13, Enum.Font.GothamMedium, T.txt3, Enum.TextXAlignment.Center)
+toolHint.Size     = UDim2.new(0,300,1,0)
+toolHint.Position = UDim2.new(0.5,-150,0,0)
+toolHint.ZIndex   = 11
+
+local function refreshHint()
+    toolHint.Text = S.tool:sub(1,1):upper()..S.tool:sub(2)
+        .. "  •  " .. S.size .. "px"
+        .. "  •  " .. math.floor(S.opacity*100) .. "%"
 end
+refreshHint()
 
-function UI.createButton(props)
-    local button = Instance.new("TextButton")
-    button.Size = props.size or UDim2.new(0, 60, 0, 40)
-    button.Position = props.position or UDim2.new(0, 0, 0, 0)
-    button.Text = props.text or ""
-    button.TextColor3 = props.textColor or Theme.text.primary
-    button.TextScaled = props.textScaled ~= false
-    button.Font = props.font or Enum.Font.GothamBold
-    button.BackgroundColor3 = props.backgroundColor or Theme.accent.primary
-    button.BorderSizePixel = 0
-    button.Parent = props.parent
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, props.cornerRadius or 12)
-    corner.Parent = button
-    
-    if props.onClick then
-        button.MouseButton1Click:Connect(props.onClick)
-    end
-    
-    -- Hover animation
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {
-            Size = UDim2.new(button.Size.X.Scale, button.Size.X.Offset * 1.05, 
-                           button.Size.Y.Scale, button.Size.Y.Offset * 1.05)
-        }):Play()
-    end)
-    
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {
-            Size = props.size or UDim2.new(0, 60, 0, 40)
-        }):Play()
-    end)
-    
-    return button
-end
-
-function UI.createScrollFrame(props)
-    local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = props.size or UDim2.new(1, 0, 1, 0)
-    scroll.Position = props.position or UDim2.new(0, 0, 0, 0)
-    scroll.BackgroundTransparency = 1
-    scroll.BorderSizePixel = 0
-    scroll.ScrollBarThickness = props.scrollThickness or 4
-    scroll.ScrollBarImageColor3 = Theme.accent.primary
-    scroll.CanvasSize = props.canvasSize or UDim2.new(0, 0, 0, 500)
-    scroll.Parent = props.parent
-    
-    return scroll
-end
-
--- ============================================
--- MAIN GUI STRUCTURE
--- ============================================
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "DrawingStudioV3"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player.PlayerGui
-
-local mainFrame = UI.createRoundedFrame({
-    size = UDim2.new(1, 0, 1, 0),
-    color = Theme.bg.primary,
-    cornerRadius = 0,
-    parent = screenGui
-})
-
--- ============================================
--- TOP NAVIGATION BAR
--- ============================================
-local topNav = UI.createRoundedFrame({
-    size = UDim2.new(1, -20, 0, 65),
-    position = UDim2.new(0, 10, 0, 10),
-    color = Theme.bg.secondary,
-    stroke = true,
-    parent = mainFrame
-})
-
--- Logo section
-local logo = UI.createRoundedFrame({
-    size = UDim2.new(0, 280, 1, -10),
-    position = UDim2.new(0, 5, 0, 5),
-    color = Theme.accent.primary,
-    cornerRadius = 20,
-    parent = topNav
-})
-
-local logoGradient = Instance.new("UIGradient")
-logoGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Theme.accent.primary),
-    ColorSequenceKeypoint.new(1, Theme.accent.secondary)
-})
-logoGradient.Rotation = 45
-logoGradient.Parent = logo
-
-local logoIcon = Instance.new("TextLabel")
-logoIcon.Size = UDim2.new(0, 50, 1, 0)
-logoIcon.Position = UDim2.new(0, 15, 0, 0)
-logoIcon.BackgroundTransparency = 1
-logoIcon.Text = "🎨"
-logoIcon.TextScaled = true
-logoIcon.Parent = logo
-
-local logoText = Instance.new("TextLabel")
-logoText.Size = UDim2.new(1, -80, 1, 0)
-logoText.Position = UDim2.new(0, 70, 0, 0)
-logoText.BackgroundTransparency = 1
-logoText.Text = "STUDIO v3.0"
-logoText.TextColor3 = Color3.new(1, 1, 1)
-logoText.TextScaled = true
-logoText.Font = Enum.Font.GothamBold
-logoText.TextXAlignment = Enum.TextXAlignment.Left
-logoText.Parent = logo
-
--- Action buttons container
-local actionsContainer = Instance.new("Frame")
-actionsContainer.Size = UDim2.new(0, 350, 1, -10)
-actionsContainer.Position = UDim2.new(1, -360, 0, 5)
-actionsContainer.BackgroundTransparency = 1
-actionsContainer.Parent = topNav
-
+-- Action buttons (top-right)
 local actions = {
-    {id = "undo", icon = "↩️", color = Theme.accent.success},
-    {id = "redo", icon = "🔜", color = Theme.accent.warning},
-    {id = "save", icon = "💾", color = Theme.accent.primary},
-    {id = "reset", icon = "🔄", color = Theme.accent.primary},
-    {id = "close", icon = "❌", color = Theme.accent.danger}
+    {id="undo",  ico="↩",  col=T.ok},
+    {id="redo",  ico="↪",  col=T.warn},
+    {id="save",  ico="💾", col=T.acc},
+    {id="reset", ico="⟳",  col=T.bg3},
+    {id="hide",  ico="◐",  col=T.bg3},
+    {id="close", ico="✕",  col=T.err},
 }
 
-App.buttons = {}
+local actBtns = {}
+local actX = 0
 
-for i, action in ipairs(actions) do
-    local btn = UI.createButton({
-        size = UDim2.new(0, 55, 1, 0),
-        position = UDim2.new(0, (i-1) * 65, 0, 0),
-        text = action.icon,
-        backgroundColor = action.color,
-        cornerRadius = 18,
-        parent = actionsContainer
-    })
-    
-    App.buttons[action.id] = btn
+-- place right-to-left
+local rightX = -10
+for i = #actions, 1, -1 do
+    local a = actions[i]
+    local btn = Instance.new("TextButton")
+    btn.Size             = UDim2.new(0, 46, 0, 44)
+    btn.Position         = UDim2.new(1, rightX - 46, 0.5, -22)
+    btn.BackgroundColor3 = a.col
+    btn.Text             = a.ico
+    btn.TextColor3       = T.txt
+    btn.TextSize         = 18
+    btn.Font             = Enum.Font.GothamBold
+    btn.BorderSizePixel  = 0
+    btn.ZIndex           = 12
+    btn.Parent           = topBar
+    corner(btn, 12)
+
+    btn.MouseEnter:Connect(function()
+        tween(btn, {BackgroundTransparency = 0.3}, 0.15)
+    end)
+    btn.MouseLeave:Connect(function()
+        tween(btn, {BackgroundTransparency = 0}, 0.15)
+    end)
+
+    actBtns[a.id] = btn
+    rightX = rightX - 54
 end
 
--- ============================================
--- LEFT SIDEBAR - TOOLS
--- ============================================
-local sidebar = UI.createRoundedFrame({
-    size = UDim2.new(0, 200, 1, -150),
-    position = UDim2.new(0, 10, 0, 85),
-    color = Theme.bg.secondary,
-    stroke = true,
-    parent = mainFrame
-})
+-- ============================================================
+-- LEFT SIDEBAR
+-- ============================================================
+local sidebar = Instance.new("Frame")
+sidebar.Size             = UDim2.new(0, 190, 1, -88)
+sidebar.Position         = UDim2.new(0, 10, 0, 78)
+sidebar.BackgroundColor3 = T.bg1
+sidebar.BorderSizePixel  = 0
+sidebar.ZIndex           = 5
+sidebar.Parent           = root
+corner(sidebar, 14)
+stroke(sidebar, T.line, 1, 0.4)
 
-local sidebarTitle = Instance.new("TextLabel")
-sidebarTitle.Size = UDim2.new(1, -20, 0, 40)
-sidebarTitle.Position = UDim2.new(0, 10, 0, 10)
-sidebarTitle.BackgroundTransparency = 1
-sidebarTitle.Text = "🛠️ TOOLS"
-sidebarTitle.TextColor3 = Theme.text.primary
-sidebarTitle.TextScaled = true
-sidebarTitle.Font = Enum.Font.GothamBold
-sidebarTitle.TextXAlignment = Enum.TextXAlignment.Left
-sidebarTitle.Parent = sidebar
+-- Section heading helper
+local function sectionHead(parent, text, yOff)
+    local h = label(parent, text, 11, Enum.Font.GothamBold, T.txt3, Enum.TextXAlignment.Left)
+    h.Size            = UDim2.new(1,-20,0,20)
+    h.Position        = UDim2.new(0,10,0, yOff)
+    h.ZIndex          = 6
+    h.TextTransparency = 0
+    return h
+end
 
-local toolsScroll = UI.createScrollFrame({
-    size = UDim2.new(1, -10, 1, -60),
-    position = UDim2.new(0, 5, 0, 55),
-    canvasSize = UDim2.new(0, 0, 0, 600),
-    parent = sidebar
-})
+sectionHead(sidebar, "  TOOLS", 10)
 
--- Tools configuration
-local tools = {
-    {id = "brush", name = "Brush", icon = "🖌️", desc = "Standard brush"},
-    {id = "pencil", name = "Pencil", icon = "✏️", desc = "Fine lines"},
-    {id = "marker", name = "Marker", icon = "🖍️", desc = "Bold strokes"},
-    {id = "spray", name = "Spray", icon = "🎨", desc = "Airbrush"},
-    {id = "size", name = "Size", icon = "⚫", desc = "Brush size", special = true},
-    {id = "opacity", name = "Opacity", icon = "⭕", desc = "Transparency", special = true},
-    {id = "fill", name = "Fill", icon = "🪣", desc = "Fill canvas"},
-    {id = "eraser", name = "Eraser", icon = "🧹", desc = "Erase"}
+-- Tools list
+local toolDefs = {
+    {id="brush",  ico="🖌️",  name="Brush",   desc="Smooth stroke"},
+    {id="pencil", ico="✏️",  name="Pencil",  desc="Sharp & thin"},
+    {id="marker", ico="🖍️", name="Marker",  desc="Bold + semi"},
+    {id="spray",  ico="🌫",  name="Spray",   desc="Airbrush"},
+    {id="eraser", ico="⬜",  name="Eraser",  desc="Remove pixels"},
+    {id="fill",   ico="🪣",  name="Fill",    desc="Flood fill"},
+    {id="line",   ico="╱",   name="Line",    desc="Straight line"},
 }
 
-App.tools = {}
+local toolBtns = {}
+local toolScrollContent = Instance.new("Frame")
+toolScrollContent.Size             = UDim2.new(1,-10, 0, #toolDefs*62 + 10)
+toolScrollContent.BackgroundTransparency = 1
+toolScrollContent.BorderSizePixel  = 0
 
-for i, tool in ipairs(tools) do
-    local toolFrame = UI.createRoundedFrame({
-        size = UDim2.new(1, -5, 0, 65),
-        position = UDim2.new(0, 0, 0, (i-1) * 70),
-        color = tool.id == "brush" and Theme.accent.primary or Theme.bg.tertiary,
-        transparency = tool.id == "brush" and 0 or 0.2,
-        cornerRadius = 12,
-        parent = toolsScroll
-    })
-    
-    local toolBtn = Instance.new("TextButton")
-    toolBtn.Size = UDim2.new(1, 0, 1, 0)
-    toolBtn.BackgroundTransparency = 1
-    toolBtn.Text = ""
-    toolBtn.Parent = toolFrame
-    
-    local iconLabel = Instance.new("TextLabel")
-    iconLabel.Size = UDim2.new(0, 45, 0, 45)
-    iconLabel.Position = UDim2.new(0, 10, 0, 10)
-    iconLabel.BackgroundTransparency = 1
-    iconLabel.Text = tool.icon
-    iconLabel.TextScaled = true
-    iconLabel.Parent = toolFrame
-    
-    local infoContainer = Instance.new("Frame")
-    infoContainer.Size = UDim2.new(1, -65, 1, 0)
-    infoContainer.Position = UDim2.new(0, 60, 0, 0)
-    infoContainer.BackgroundTransparency = 1
-    infoContainer.Parent = toolFrame
-    
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
-    nameLabel.Position = UDim2.new(0, 0, 0, 8)
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Text = tool.name
-    nameLabel.TextColor3 = Theme.text.primary
-    nameLabel.TextSize = 16
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.Parent = infoContainer
-    
-    local descLabel = Instance.new("TextLabel")
-    descLabel.Size = UDim2.new(1, 0, 0.5, 0)
-    descLabel.Position = UDim2.new(0, 0, 0.5, 0)
-    descLabel.BackgroundTransparency = 1
-    descLabel.Text = tool.desc
-    descLabel.TextColor3 = Theme.text.secondary
-    descLabel.TextSize = 12
-    descLabel.Font = Enum.Font.Gotham
-    descLabel.TextXAlignment = Enum.TextXAlignment.Left
-    descLabel.Parent = infoContainer
-    
-    App.tools[tool.id] = {
-        frame = toolFrame,
-        button = toolBtn,
-        desc = descLabel,
-        tool = tool
-    }
-    
-    -- Tool button click handler
-    toolBtn.MouseButton1Click:Connect(function()
-        if tool.special then
-            if tool.id == "size" then
-                App.state.brushSize = App.state.brushSize >= 40 and 5 or App.state.brushSize + 5
-                descLabel.Text = "Size: " .. App.state.brushSize .. "px"
-                task.wait(1.5)
-                descLabel.Text = tool.desc
-            elseif tool.id == "opacity" then
-                App.state.opacity = App.state.opacity <= 0.2 and 1 or App.state.opacity - 0.2
-                descLabel.Text = math.floor(App.state.opacity * 100) .. "%"
-                task.wait(1.5)
-                descLabel.Text = tool.desc
-            end
-        else
-            -- Deselect all tools
-            for id, data in pairs(App.tools) do
-                TweenService:Create(data.frame, TweenInfo.new(0.3), {
-                    BackgroundColor3 = Theme.bg.tertiary,
-                    BackgroundTransparency = 0.2
-                }):Play()
-            end
-            
-            -- Select this tool
-            TweenService:Create(toolFrame, TweenInfo.new(0.3), {
-                BackgroundColor3 = Theme.accent.primary,
-                BackgroundTransparency = 0
-            }):Play()
-            
-            App.state.currentTool = tool.id
+local toolScroll = Instance.new("ScrollingFrame")
+toolScroll.Size                = UDim2.new(1,-6, 1, -118)   -- leaves ~110px for sliders
+toolScroll.Position            = UDim2.new(0,3, 0, 35)
+toolScroll.BackgroundTransparency = 1
+toolScroll.BorderSizePixel     = 0
+toolScroll.ScrollBarThickness  = 4
+toolScroll.ScrollBarImageColor3 = T.acc
+toolScroll.CanvasSize          = UDim2.new(0,0,0, #toolDefs*62 + 10)
+toolScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+toolScroll.ZIndex              = 6
+toolScroll.Parent              = sidebar
+
+for i, td in ipairs(toolDefs) do
+    local isActive = td.id == S.tool
+
+    local card = Instance.new("TextButton")
+    card.Size             = UDim2.new(1,-6, 0, 54)
+    card.Position         = UDim2.new(0,3, 0, (i-1)*59 + 4)
+    card.BackgroundColor3 = isActive and T.acc or T.bg2
+    card.BackgroundTransparency = isActive and 0 or 0.2
+    card.Text             = ""
+    card.BorderSizePixel  = 0
+    card.ZIndex           = 7
+    card.Parent           = toolScroll
+    corner(card, 10)
+
+    -- Icon
+    local ico = label(card, td.ico, 22, Enum.Font.Gotham, T.white, Enum.TextXAlignment.Center)
+    ico.Size     = UDim2.new(0,40,1,0)
+    ico.Position = UDim2.new(0,4,0,0)
+    ico.ZIndex   = 8
+
+    -- Name
+    local nm = label(card, td.name, 14, Enum.Font.GothamBold, T.txt, Enum.TextXAlignment.Left)
+    nm.Size     = UDim2.new(1,-54,0,20)
+    nm.Position = UDim2.new(0,50,0,8)
+    nm.ZIndex   = 8
+
+    -- Desc
+    local ds = label(card, td.desc, 11, Enum.Font.Gotham, T.txt3, Enum.TextXAlignment.Left)
+    ds.Size     = UDim2.new(1,-54,0,16)
+    ds.Position = UDim2.new(0,50,1,-22)
+    ds.ZIndex   = 8
+
+    toolBtns[td.id] = card
+
+    card.MouseButton1Click:Connect(function()
+        -- Deactivate all
+        for _, v in pairs(toolBtns) do
+            tween(v, {BackgroundColor3 = T.bg2, BackgroundTransparency = 0.2}, 0.2)
         end
+        -- Activate clicked
+        tween(card, {BackgroundColor3 = T.acc, BackgroundTransparency = 0}, 0.2)
+        S.tool = td.id
+        refreshHint()
     end)
 end
 
--- ============================================
--- CENTER CANVAS AREA
--- ============================================
-local canvasArea = UI.createRoundedFrame({
-    size = UDim2.new(1, -420, 1, -150),
-    position = UDim2.new(0, 220, 0, 85),
-    color = Theme.bg.secondary,
-    stroke = true,
-    parent = mainFrame
-})
+-- Size slider
+-- Sliders anchored from bottom of sidebar
+sectionHead(sidebar, "  BRUSH SIZE", 0).Position = UDim2.new(0,10,1,-100)
 
-canvasArea.ClipsDescendants = true
+local sizeTrack = Instance.new("Frame")
+sizeTrack.Size             = UDim2.new(1,-20, 0, 6)
+sizeTrack.Position         = UDim2.new(0,10, 1, -80)
+sizeTrack.BackgroundColor3 = T.bg3
+sizeTrack.BorderSizePixel  = 0
+sizeTrack.ZIndex           = 6
+sizeTrack.Parent           = sidebar
+corner(sizeTrack, 3)
 
-local canvasContainer = UI.createRoundedFrame({
-    size = UDim2.new(0, 700, 0, 500),
-    position = UDim2.new(0.5, -350, 0.5, -250),
-    color = Color3.new(1, 1, 1),
-    cornerRadius = 16,
-    stroke = true,
-    strokeColor = Theme.accent.primary,
-    strokeThickness = 2,
-    parent = canvasArea
-})
+local sizeFill = Instance.new("Frame")
+sizeFill.Size             = UDim2.new(S.size/60, 0, 1, 0)
+sizeFill.BackgroundColor3 = T.acc
+sizeFill.BorderSizePixel  = 0
+sizeFill.ZIndex           = 7
+sizeFill.Parent           = sizeTrack
+corner(sizeFill, 3)
 
-local drawingCanvas = Instance.new("Frame")
-drawingCanvas.Size = UDim2.new(1, 0, 1, 0)
-drawingCanvas.BackgroundTransparency = 1
-drawingCanvas.Parent = canvasContainer
+local sizeVal = label(sidebar, S.size .. "px", 12, Enum.Font.GothamBold, T.acc, Enum.TextXAlignment.Right)
+sizeVal.Size     = UDim2.new(1,-10,0,16)
+sizeVal.Position = UDim2.new(0,0,1,-68)
+sizeVal.ZIndex   = 7
 
--- ============================================
--- RIGHT PANEL - COLORS
--- ============================================
-local rightPanel = UI.createRoundedFrame({
-    size = UDim2.new(0, 180, 1, -150),
-    position = UDim2.new(1, -190, 0, 85),
-    color = Theme.bg.secondary,
-    stroke = true,
-    parent = mainFrame
-})
+local sizeDragging = false
+sizeTrack.InputBegan:Connect(function(inp)
+    if inp.UserInputType == Enum.UserInputType.MouseButton1
+    or inp.UserInputType == Enum.UserInputType.Touch then
+        sizeDragging = true
+    end
+end)
+UserInputService.InputEnded:Connect(function(inp)
+    if inp.UserInputType == Enum.UserInputType.MouseButton1
+    or inp.UserInputType == Enum.UserInputType.Touch then
+        sizeDragging = false
+    end
+end)
+UserInputService.InputChanged:Connect(function(inp)
+    if sizeDragging and (inp.UserInputType == Enum.UserInputType.MouseMovement
+    or inp.UserInputType == Enum.UserInputType.Touch) then
+        local tPos  = sizeTrack.AbsolutePosition
+        local tSize = sizeTrack.AbsoluteSize
+        local relX  = math.clamp((inp.Position.X - tPos.X) / tSize.X, 0, 1)
+        S.size = math.max(1, math.floor(relX * 60))
+        sizeFill.Size = UDim2.new(relX, 0, 1, 0)
+        sizeVal.Text  = S.size .. "px"
+        refreshHint()
+    end
+end)
 
-local colorTitle = Instance.new("TextLabel")
-colorTitle.Size = UDim2.new(1, -20, 0, 40)
-colorTitle.Position = UDim2.new(0, 10, 0, 10)
-colorTitle.BackgroundTransparency = 1
-colorTitle.Text = "🎨 COLORS"
-colorTitle.TextColor3 = Theme.text.primary
-colorTitle.TextScaled = true
-colorTitle.Font = Enum.Font.GothamBold
-colorTitle.TextXAlignment = Enum.TextXAlignment.Left
-colorTitle.Parent = rightPanel
+-- Opacity slider anchored from bottom
+sectionHead(sidebar, "  OPACITY", 0).Position = UDim2.new(0,10,1,-52)
 
--- Current color preview
-local colorPreview = UI.createRoundedFrame({
-    size = UDim2.new(1, -20, 0, 60),
-    position = UDim2.new(0, 10, 0, 60),
-    color = App.state.currentColor,
-    cornerRadius = 12,
-    stroke = true,
-    parent = rightPanel
-})
+local opTrack = Instance.new("Frame")
+opTrack.Size             = UDim2.new(1,-20, 0, 6)
+opTrack.Position         = UDim2.new(0,10, 1, -34)
+opTrack.BackgroundColor3 = T.bg3
+opTrack.BorderSizePixel  = 0
+opTrack.ZIndex           = 6
+opTrack.Parent           = sidebar
+corner(opTrack, 3)
 
--- Color palette
-local colorScroll = UI.createScrollFrame({
-    size = UDim2.new(1, -20, 1, -140),
-    position = UDim2.new(0, 10, 0, 130),
-    canvasSize = UDim2.new(0, 0, 0, 800),
-    parent = rightPanel
-})
+local opFill = Instance.new("Frame")
+opFill.Size             = UDim2.new(1, 0, 1, 0)
+opFill.BackgroundColor3 = T.acc2
+opFill.BorderSizePixel  = 0
+opFill.ZIndex           = 7
+opFill.Parent           = opTrack
+corner(opFill, 3)
 
-local colorGrid = Instance.new("UIGridLayout")
-colorGrid.CellSize = UDim2.new(0, 28, 0, 28)
-colorGrid.CellPadding = UDim2.new(0, 4, 0, 4)
-colorGrid.Parent = colorScroll
+local opVal = label(sidebar, "100%", 12, Enum.Font.GothamBold, T.acc2, Enum.TextXAlignment.Right)
+opVal.Size     = UDim2.new(1,-10,0,16)
+opVal.Position = UDim2.new(0,0,1,-22)
+opVal.ZIndex   = 7
 
--- Generate color palette
-local colors = {}
+local opDragging = false
+opTrack.InputBegan:Connect(function(inp)
+    if inp.UserInputType == Enum.UserInputType.MouseButton1
+    or inp.UserInputType == Enum.UserInputType.Touch then
+        opDragging = true
+    end
+end)
+UserInputService.InputEnded:Connect(function(inp)
+    if inp.UserInputType == Enum.UserInputType.MouseButton1
+    or inp.UserInputType == Enum.UserInputType.Touch then
+        opDragging = false
+    end
+end)
+UserInputService.InputChanged:Connect(function(inp)
+    if opDragging and (inp.UserInputType == Enum.UserInputType.MouseMovement
+    or inp.UserInputType == Enum.UserInputType.Touch) then
+        local tPos  = opTrack.AbsolutePosition
+        local tSize = opTrack.AbsoluteSize
+        local relX  = math.clamp((inp.Position.X - tPos.X) / tSize.X, 0, 1)
+        S.opacity = relX
+        opFill.Size = UDim2.new(relX, 0, 1, 0)
+        opVal.Text  = math.floor(relX * 100) .. "%"
+        refreshHint()
+    end
+end)
 
--- Rainbow spectrum
+-- ============================================================
+-- RIGHT PANEL — COLORS
+-- ============================================================
+local rightPanel = Instance.new("Frame")
+rightPanel.Size             = UDim2.new(0, 170, 1, -88)
+rightPanel.Position         = UDim2.new(1, -180, 0, 78)
+rightPanel.BackgroundColor3 = T.bg1
+rightPanel.BorderSizePixel  = 0
+rightPanel.ZIndex           = 5
+rightPanel.Parent           = root
+corner(rightPanel, 14)
+stroke(rightPanel, T.line, 1, 0.4)
+
+sectionHead(rightPanel, "  COLORS", 10)
+
+-- Preview swatch
+local preview = Instance.new("Frame")
+preview.Size             = UDim2.new(1,-20, 0, 52)
+preview.Position         = UDim2.new(0,10, 0, 36)
+preview.BackgroundColor3 = S.color
+preview.BorderSizePixel  = 0
+preview.ZIndex           = 6
+preview.Parent           = rightPanel
+corner(preview, 10)
+stroke(preview, T.white, 2, 0.7)
+
+local previewLbl = label(preview, "#6699FF", 11, Enum.Font.GothamMedium, T.white, Enum.TextXAlignment.Center)
+previewLbl.Size            = UDim2.new(1,0,1,0)
+previewLbl.TextTransparency = 0.3
+previewLbl.ZIndex          = 7
+
+-- Color scroll
+local colorScroll = Instance.new("ScrollingFrame")
+colorScroll.Size                = UDim2.new(1,-10, 1, -108)
+colorScroll.Position            = UDim2.new(0,5, 0, 103)
+colorScroll.BackgroundTransparency = 1
+colorScroll.BorderSizePixel     = 0
+colorScroll.ScrollBarThickness  = 4
+colorScroll.ScrollBarImageColor3 = T.acc
+colorScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+colorScroll.CanvasSize          = UDim2.new(0, 0, 0, 0)
+colorScroll.ZIndex              = 6
+colorScroll.Parent              = rightPanel
+
+local grid = Instance.new("UIGridLayout")
+grid.CellSize    = UDim2.new(0, 26, 0, 26)
+grid.CellPadding = UDim2.new(0, 5, 0, 5)
+grid.Parent      = colorScroll
+
+-- Build palette
+local palette = {}
+-- Hue sweeps
 for h = 0, 11 do
-    for s = 1, 0.2, -0.4 do
-        for v = 1, 0.4, -0.3 do
-            table.insert(colors, Color3.fromHSV(h/12, s, v))
-        end
-    end
+    table.insert(palette, Color3.fromHSV(h/12, 0.9, 1.0))
+    table.insert(palette, Color3.fromHSV(h/12, 0.6, 1.0))
+    table.insert(palette, Color3.fromHSV(h/12, 0.9, 0.6))
+end
+-- Pastel
+for h = 0, 5 do
+    table.insert(palette, Color3.fromHSV(h/6, 0.3, 1.0))
+end
+-- Grays
+for i = 0, 9 do
+    local g = i/9
+    table.insert(palette, Color3.new(g, g, g))
+end
+-- Special
+table.insert(palette, Color3.fromRGB(0,0,0))
+table.insert(palette, Color3.fromRGB(255,255,255))
+
+-- CanvasSize is handled automatically by AutomaticCanvasSize = Y
+
+local selColorBtn = nil
+
+local function hexColor(c)
+    return string.format("#%02X%02X%02X",
+        math.floor(c.R*255), math.floor(c.G*255), math.floor(c.B*255))
 end
 
--- Grayscale
-for i = 0, 10 do
-    local gray = i / 10
-    table.insert(colors, Color3.new(gray, gray, gray))
+for i, col in ipairs(palette) do
+    local btn = Instance.new("TextButton")
+    btn.Text             = ""
+    btn.BackgroundColor3 = col
+    btn.BorderSizePixel  = 0
+    btn.ZIndex           = 7
+    btn.Parent           = colorScroll
+    corner(btn, 6)
+
+    local st = stroke(btn, T.line, 1, 0.7)
+
+    btn.MouseButton1Click:Connect(function()
+        S.color = col
+        tween(preview, {BackgroundColor3 = col}, 0.25)
+        previewLbl.Text = hexColor(col)
+
+        if selColorBtn then
+            local os = selColorBtn:FindFirstChildOfClass("UIStroke")
+            if os then tween(os, {Thickness=1, Transparency=0.7, Color=T.line}, 0.15) end
+        end
+        selColorBtn = btn
+        tween(st, {Thickness=2.5, Transparency=0, Color=T.white}, 0.15)
+    end)
+
+    if i == 1 then selColorBtn = btn; st.Thickness=2.5; st.Transparency=0; st.Color=T.white end
 end
 
-local selectedColorBtn = nil
+-- ============================================================
+-- CANVAS AREA
+-- ============================================================
+local canvasArea = Instance.new("Frame")
+canvasArea.Size             = UDim2.new(1, -390, 1, -88)
+canvasArea.Position         = UDim2.new(0, 210, 0, 78)
+canvasArea.BackgroundColor3 = T.bg0
+canvasArea.BorderSizePixel  = 0
+canvasArea.ZIndex           = 2
+canvasArea.ClipsDescendants = true
+canvasArea.Parent           = root
+corner(canvasArea, 14)
+stroke(canvasArea, T.line, 1, 0.6)
 
-for i, color in ipairs(colors) do
-    local colorBtn = Instance.new("TextButton")
-    colorBtn.Text = ""
-    colorBtn.BackgroundColor3 = color
-    colorBtn.BorderSizePixel = 0
-    colorBtn.Parent = colorScroll
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = colorBtn
-    
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Theme.border
-    stroke.Thickness = i == 1 and 2 or 1
-    stroke.Transparency = i == 1 and 0 or 0.7
-    stroke.Parent = colorBtn
-    
-    if i == 1 then
-        selectedColorBtn = colorBtn
-    end
-    
-    colorBtn.MouseButton1Click:Connect(function()
-        App.state.currentColor = color
-        
-        -- Update preview
-        TweenService:Create(colorPreview, TweenInfo.new(0.3), {
-            BackgroundColor3 = color
-        }):Play()
-        
-        -- Update selection
-        if selectedColorBtn then
-            local oldStroke = selectedColorBtn:FindFirstChildOfClass("UIStroke")
-            if oldStroke then
-                TweenService:Create(oldStroke, TweenInfo.new(0.2), {
-                    Thickness = 1,
-                    Transparency = 0.7
-                }):Play()
-            end
+-- Checkerboard background for transparency visualization
+local checker = Instance.new("Frame")
+checker.Size             = UDim2.new(0, CANVAS_W, 0, CANVAS_H)
+checker.Position         = UDim2.new(0.5, -CANVAS_W/2, 0.5, -CANVAS_H/2)
+checker.BackgroundColor3 = Color3.fromRGB(200,200,200)
+checker.BorderSizePixel  = 0
+checker.ZIndex           = 3
+checker.Parent           = canvasArea
+corner(checker, 14)
+
+-- White drawing surface
+local canvasFrame = Instance.new("Frame")
+canvasFrame.Size             = UDim2.new(0, CANVAS_W, 0, CANVAS_H)
+canvasFrame.Position         = UDim2.new(0.5, -CANVAS_W/2, 0.5, -CANVAS_H/2)
+canvasFrame.BackgroundColor3 = T.white
+canvasFrame.BorderSizePixel  = 0
+canvasFrame.ZIndex           = 4
+canvasFrame.ClipsDescendants = true
+canvasFrame.Parent           = canvasArea
+corner(canvasFrame, 14)
+stroke(canvasFrame, T.acc, 2, 0.6)
+
+-- Drawing layers (3 independent layers)
+local layers = {}
+for i = 1, 3 do
+    local l = Instance.new("Frame")
+    l.Size               = UDim2.new(1,0,1,0)
+    l.BackgroundTransparency = 1
+    l.BorderSizePixel    = 0
+    l.ZIndex             = 4 + i
+    l.ClipsDescendants   = true
+    l.Parent             = canvasFrame
+    layers[i] = l
+end
+
+-- Cursor preview dot
+local cursorDot = Instance.new("Frame")
+cursorDot.Size             = UDim2.new(0, S.size, 0, S.size)
+cursorDot.AnchorPoint      = Vector2.new(0.5, 0.5)
+cursorDot.BackgroundColor3 = S.color
+cursorDot.BackgroundTransparency = 0.5
+cursorDot.BorderSizePixel  = 0
+cursorDot.ZIndex           = 20
+cursorDot.Visible          = false
+cursorDot.Parent           = canvasArea
+corner(cursorDot, 999)
+stroke(cursorDot, T.white, 1.5, 0)
+
+-- ============================================================
+-- LAYERS PANEL (mini overlay)
+-- ============================================================
+local layerPanel = Instance.new("Frame")
+layerPanel.Size             = UDim2.new(0, 140, 0, 130)
+layerPanel.Position         = UDim2.new(0, 6, 1, -140)
+layerPanel.BackgroundColor3 = T.bg1
+layerPanel.BackgroundTransparency = 0.1
+layerPanel.BorderSizePixel  = 0
+layerPanel.ZIndex           = 15
+layerPanel.Parent           = canvasArea
+corner(layerPanel, 12)
+stroke(layerPanel, T.line, 1, 0.3)
+
+local lhdr = label(layerPanel, "LAYERS", 11, Enum.Font.GothamBold, T.txt3, Enum.TextXAlignment.Center)
+lhdr.Size     = UDim2.new(1,0,0,22)
+lhdr.Position = UDim2.new(0,0,0,5)
+lhdr.ZIndex   = 16
+
+local layerBtns = {}
+for i = 1, 3 do
+    local lb = Instance.new("TextButton")
+    lb.Size             = UDim2.new(1,-10, 0, 28)
+    lb.Position         = UDim2.new(0,5, 0, 24 + (i-1)*32)
+    lb.BackgroundColor3 = i == S.activeLayer and T.acc or T.bg2
+    lb.BackgroundTransparency = i == S.activeLayer and 0.1 or 0.3
+    lb.Text             = "Layer " .. i .. "  " .. (S.layerVisible[i] and "👁" or "✕")
+    lb.TextColor3       = T.txt
+    lb.TextSize         = 12
+    lb.Font             = Enum.Font.GothamMedium
+    lb.BorderSizePixel  = 0
+    lb.ZIndex           = 16
+    lb.Parent           = layerPanel
+    corner(lb, 7)
+    layerBtns[i] = lb
+
+    lb.MouseButton1Click:Connect(function()
+        S.activeLayer = i
+        for j, b in ipairs(layerBtns) do
+            tween(b, {
+                BackgroundColor3 = j == i and T.acc or T.bg2,
+                BackgroundTransparency = j == i and 0.1 or 0.3
+            }, 0.2)
         end
-        
-        selectedColorBtn = colorBtn
-        TweenService:Create(stroke, TweenInfo.new(0.2), {
-            Thickness = 2,
-            Transparency = 0,
-            Color = Theme.accent.primary
-        }):Play()
+    end)
+
+    lb.MouseButton2Click:Connect(function()
+        S.layerVisible[i] = not S.layerVisible[i]
+        layers[i].Visible = S.layerVisible[i]
+        lb.Text = "Layer " .. i .. "  " .. (S.layerVisible[i] and "👁" or "✕")
     end)
 end
 
--- ============================================
--- BOTTOM STATUS BAR
--- ============================================
-local statusBar = UI.createRoundedFrame({
-    size = UDim2.new(1, -20, 0, 50),
-    position = UDim2.new(0, 10, 1, -60),
-    color = Theme.bg.secondary,
-    stroke = true,
-    parent = mainFrame
-})
+-- ============================================================
+-- STATUS BAR
+-- ============================================================
+local statusBar = Instance.new("Frame")
+statusBar.Size             = UDim2.new(1,-20, 0, 44)
+statusBar.Position         = UDim2.new(0,10, 1, -52)
+statusBar.BackgroundColor3 = T.bg1
+statusBar.BorderSizePixel  = 0
+statusBar.ZIndex           = 10
+statusBar.Parent           = root
+corner(statusBar, 12)
+stroke(statusBar, T.line, 1, 0.5)
 
-local statusText = Instance.new("TextLabel")
-statusText.Size = UDim2.new(1, -200, 1, 0)
-statusText.Position = UDim2.new(0, 20, 0, 0)
-statusText.BackgroundTransparency = 1
-statusText.Text = "✨ Drawing Studio v3.0 • Ready"
-statusText.TextColor3 = Theme.text.secondary
-statusText.TextScaled = true
-statusText.Font = Enum.Font.Gotham
-statusText.TextXAlignment = Enum.TextXAlignment.Left
-statusText.Parent = statusBar
+local statusLbl = label(statusBar, "✨ Drawing Studio v4.0 Professional  •  Ready", 12, Enum.Font.Gotham, T.txt2, Enum.TextXAlignment.Left)
+statusLbl.Size     = UDim2.new(1,-220, 1, 0)
+statusLbl.Position = UDim2.new(0,16,0,0)
+statusLbl.ZIndex   = 11
 
-local clearBtn = UI.createButton({
-    size = UDim2.new(0, 120, 1, -10),
-    position = UDim2.new(1, -130, 0, 5),
-    text = "🗑️ CLEAR",
-    backgroundColor = Theme.accent.danger,
-    cornerRadius = 15,
-    parent = statusBar
-})
+local strokeCounter = label(statusBar, "0 strokes", 12, Enum.Font.GothamMedium, T.txt3, Enum.TextXAlignment.Center)
+strokeCounter.Size     = UDim2.new(0,120, 1, 0)
+strokeCounter.Position = UDim2.new(1,-200, 0,0)
+strokeCounter.ZIndex   = 11
 
--- ============================================
--- CORE FUNCTIONS
--- ============================================
+local clearBtn = Instance.new("TextButton")
+clearBtn.Size             = UDim2.new(0,100, 0,32)
+clearBtn.Position         = UDim2.new(1,-110, 0.5,-16)
+clearBtn.BackgroundColor3 = T.err
+clearBtn.Text             = "🗑  CLEAR"
+clearBtn.TextColor3       = T.white
+clearBtn.TextSize         = 13
+clearBtn.Font             = Enum.Font.GothamBold
+clearBtn.BorderSizePixel  = 0
+clearBtn.ZIndex           = 12
+clearBtn.Parent           = statusBar
+corner(clearBtn, 10)
 
--- History management
-function App:saveHistory()
-    if self.state.historyIndex < #self.state.history then
-        for i = self.state.historyIndex + 1, #self.state.history do
-            self.state.history[i] = nil
-        end
-    end
-    
-    local snapshot = {data = {}, count = self.state.strokeCount}
-    
-    for _, child in ipairs(drawingCanvas:GetChildren()) do
-        if child:IsA("Frame") then
-            table.insert(snapshot.data, {
-                size = child.Size,
-                position = child.Position,
-                color = child.BackgroundColor3,
-                transparency = child.BackgroundTransparency
-            })
-        end
-    end
-    
-    table.insert(self.state.history, snapshot)
-    self.state.historyIndex = #self.state.history
-    
-    if #self.state.history > self.state.maxHistory then
-        table.remove(self.state.history, 1)
-        self.state.historyIndex = self.state.historyIndex - 1
-    end
+clearBtn.MouseEnter:Connect(function() tween(clearBtn, {BackgroundTransparency=0.3}, 0.15) end)
+clearBtn.MouseLeave:Connect(function() tween(clearBtn, {BackgroundTransparency=0}, 0.15) end)
+
+local function setStatus(msg, col)
+    statusLbl.Text      = msg
+    statusLbl.TextColor3 = col or T.txt2
 end
 
-function App:loadHistory(index)
-    if not self.state.history[index] then return end
-    
-    for _, child in ipairs(drawingCanvas:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
-    
-    local snapshot = self.state.history[index]
-    self.state.strokeCount = snapshot.count
-    
-    for _, data in ipairs(snapshot.data) do
-        local dot = Instance.new("Frame")
-        dot.Size = data.size
-        dot.Position = data.position
-        dot.BackgroundColor3 = data.color
-        dot.BackgroundTransparency = data.transparency
-        dot.BorderSizePixel = 0
-        dot.Parent = drawingCanvas
-        
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0.5, 0)
-        corner.Parent = dot
-    end
-end
-
--- Drawing functions
-function App:createStroke(position)
-    local size = self.state.brushSize
-    local color = self.state.currentColor
-    local trans = 1 - self.state.opacity
-    local tool = self.state.currentTool
-    
-    if tool == "pencil" then
-        size = size * 0.6
-    elseif tool == "marker" then
-        size = size * 1.5
-        trans = 0.3
-    elseif tool == "spray" then
-        for i = 1, math.random(5, 10) do
-            local offset = Vector2.new(
-                math.random(-size, size),
-                math.random(-size, size)
-            )
-            local spraySize = math.random(2, size/2)
-            
-            local dot = Instance.new("Frame")
-            dot.Size = UDim2.new(0, spraySize, 0, spraySize)
-            dot.Position = UDim2.new(0, position.X + offset.X - spraySize/2, 
-                                   0, position.Y + offset.Y - spraySize/2)
-            dot.BackgroundColor3 = color
-            dot.BackgroundTransparency = math.random(40, 80) / 100
-            dot.BorderSizePixel = 0
-            dot.Parent = drawingCanvas
-            
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0.5, 0)
-            corner.Parent = dot
-        end
-        return
-    elseif tool == "eraser" then
-        color = Color3.new(1, 1, 1)
-        trans = 0
-    end
-    
-    local dot = Instance.new("Frame")
-    dot.Size = UDim2.new(0, size, 0, size)
-    dot.Position = UDim2.new(0, position.X - size/2, 0, position.Y - size/2)
-    dot.BackgroundColor3 = color
-    dot.BackgroundTransparency = trans
-    dot.BorderSizePixel = 0
-    dot.Parent = drawingCanvas
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.5, 0)
-    corner.Parent = dot
-    
-    self.state.strokeCount = self.state.strokeCount + 1
-end
-
-function App:clearCanvas()
-    for _, child in ipairs(drawingCanvas:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
-    self.state.strokeCount = 0
-    self:saveHistory()
-    statusText.Text = "🗑️ Canvas cleared"
-end
-
-function App:fillCanvas()
-    local fill = Instance.new("Frame")
-    fill.Size = UDim2.new(1, 0, 1, 0)
-    fill.BackgroundColor3 = self.state.currentColor
-    fill.BackgroundTransparency = 1 - self.state.opacity
-    fill.BorderSizePixel = 0
-    fill.Parent = drawingCanvas
-    
-    self:saveHistory()
-    statusText.Text = "🪣 Canvas filled"
-end
-
--- Touch handling
-local function isTouchInCanvas(pos)
-    local cPos = canvasContainer.AbsolutePosition
-    local cSize = canvasContainer.AbsoluteSize
-    return pos.X >= cPos.X and pos.X <= cPos.X + cSize.X and
-           pos.Y >= cPos.Y and pos.Y <= cPos.Y + cSize.Y
-end
-
-local function touchToCanvas(pos)
-    local cPos = canvasContainer.AbsolutePosition
-    return Vector2.new(pos.X - cPos.X, pos.Y - cPos.Y)
-end
-
--- ============================================
--- EVENT HANDLERS
--- ============================================
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.UserInputType == Enum.UserInputType.Touch then
-        if isTouchInCanvas(input.Position) then
-            App.state.isDrawing = true
-            
-            if App.state.currentTool == "fill" then
-                App:fillCanvas()
-            else
-                App:createStroke(touchToCanvas(input.Position))
+-- ============================================================
+-- HISTORY SYSTEM
+-- ============================================================
+local function captureSnapshot()
+    local snap = {}
+    for li = 1, 3 do
+        snap[li] = {}
+        for _, child in ipairs(layers[li]:GetChildren()) do
+            if child:IsA("Frame") then
+                table.insert(snap[li], {
+                    Size     = child.Size,
+                    Position = child.Position,
+                    Color    = child.BackgroundColor3,
+                    Trans    = child.BackgroundTransparency,
+                })
             end
         end
     end
-end)
+    snap.count = S.strokeCount
+    return snap
+end
 
-UserInputService.InputChanged:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.UserInputType == Enum.UserInputType.Touch and App.state.isDrawing then
-        if isTouchInCanvas(input.Position) and App.state.currentTool ~= "fill" then
-            App:createStroke(touchToCanvas(input.Position))
+local function applySnapshot(snap)
+    for li = 1, 3 do
+        for _, child in ipairs(layers[li]:GetChildren()) do
+            if child:IsA("Frame") then child:Destroy() end
+        end
+        for _, d in ipairs(snap[li]) do
+            local f = Instance.new("Frame")
+            f.Size                    = d.Size
+            f.Position                = d.Position
+            f.BackgroundColor3        = d.Color
+            f.BackgroundTransparency  = d.Trans
+            f.BorderSizePixel         = 0
+            f.ZIndex                  = 5 + li
+            f.Parent                  = layers[li]
+            corner(f, 999)
         end
     end
-end)
+    S.strokeCount = snap.count
+    strokeCounter.Text = snap.count .. " strokes"
+end
 
-UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        if App.state.isDrawing then
-            App.state.isDrawing = false
-            App:saveHistory()
-            statusText.Text = "💾 Saved • " .. App.state.strokeCount .. " strokes"
+local function pushHistory()
+    -- Trim redo branch
+    for i = S.histIdx + 1, #S.history do
+        S.history[i] = nil
+    end
+    table.insert(S.history, captureSnapshot())
+    S.histIdx = #S.history
+    if #S.history > MAX_HISTORY then
+        table.remove(S.history, 1)
+        S.histIdx = S.histIdx - 1
+    end
+end
+
+-- ============================================================
+-- DRAWING ENGINE
+-- ============================================================
+local function inCanvas(pos)
+    local p = canvasFrame.AbsolutePosition
+    local sz = canvasFrame.AbsoluteSize
+    return pos.X >= p.X and pos.X <= p.X + sz.X
+        and pos.Y >= p.Y and pos.Y <= p.Y + sz.Y
+end
+
+local function toCanvas(pos)
+    local p = canvasFrame.AbsolutePosition
+    return Vector2.new(pos.X - p.X, pos.Y - p.Y)
+end
+
+local function spawnDot(layer, cx, cy, r, color, trans)
+    local f = Instance.new("Frame")
+    f.Size                   = UDim2.new(0, r*2, 0, r*2)
+    f.Position               = UDim2.new(0, cx - r, 0, cy - r)
+    f.BackgroundColor3       = color
+    f.BackgroundTransparency = trans
+    f.BorderSizePixel        = 0
+    f.ZIndex                 = 5 + layer
+    f.Parent                 = layers[layer]
+    corner(f, 999)
+end
+
+local function interpolateDots(layer, from, to, color, r, trans)
+    -- Fill gaps between last and current position for smooth lines
+    local dx = to.X - from.X
+    local dy = to.Y - from.Y
+    local dist = math.sqrt(dx*dx + dy*dy)
+    local steps = math.max(1, math.floor(dist / math.max(1, r * 0.4)))
+    for i = 0, steps do
+        local t = i / steps
+        local cx = from.X + dx * t
+        local cy = from.Y + dy * t
+        spawnDot(layer, cx, cy, r, color, trans)
+    end
+end
+
+local function drawAt(pos)
+    if not inCanvas(pos) then return end
+    local cp    = toCanvas(pos)
+    local layer = S.activeLayer
+    local color = S.color
+    local trans = 1 - S.opacity
+    local r     = S.size / 2
+
+    if S.tool == "brush" then
+        if S.lastPos then
+            interpolateDots(layer, S.lastPos, cp, color, r, trans)
+        else
+            spawnDot(layer, cp.X, cp.Y, r, color, trans)
         end
+
+    elseif S.tool == "pencil" then
+        local pr = math.max(1, r * 0.5)
+        if S.lastPos then
+            interpolateDots(layer, S.lastPos, cp, color, pr, trans)
+        else
+            spawnDot(layer, cp.X, cp.Y, pr, color, trans)
+        end
+
+    elseif S.tool == "marker" then
+        local mr = r * 1.6
+        local mt = math.min(1, trans + 0.35)
+        if S.lastPos then
+            interpolateDots(layer, S.lastPos, cp, color, mr, mt)
+        else
+            spawnDot(layer, cp.X, cp.Y, mr, color, mt)
+        end
+
+    elseif S.tool == "spray" then
+        for _ = 1, SPRAY_PARTICLES do
+            local ox  = math.random(-S.size, S.size)
+            local oy  = math.random(-S.size, S.size)
+            local sr  = math.random(1, math.max(2, math.floor(r*0.5)))
+            local sT  = math.random(40, 80) / 100
+            spawnDot(layer, cp.X + ox, cp.Y + oy, sr, color, sT)
+        end
+
+    elseif S.tool == "eraser" then
+        local er = r * 1.2
+        if S.lastPos then
+            interpolateDots(layer, S.lastPos, cp, T.white, er, 0)
+        else
+            spawnDot(layer, cp.X, cp.Y, er, T.white, 0)
+        end
+
+    elseif S.tool == "fill" then
+        local fill = Instance.new("Frame")
+        fill.Size                   = UDim2.new(1,0,1,0)
+        fill.BackgroundColor3       = color
+        fill.BackgroundTransparency = trans
+        fill.BorderSizePixel        = 0
+        fill.ZIndex                 = 5 + layer
+        fill.Parent                 = layers[layer]
+        S.strokeCount += 1
+        return true -- single action, signal stop
+    end
+
+    S.lastPos = cp
+    S.strokeCount += 1
+    strokeCounter.Text = S.strokeCount .. " strokes"
+end
+
+-- Line tool state
+local lineStart = nil
+local linePreview = nil
+
+-- ============================================================
+-- INPUT HANDLERS
+-- ============================================================
+local function inputPos(inp)
+    return inp.Position
+end
+
+local function beginDraw(pos)
+    if not inCanvas(pos) then return false end
+    S.drawing = true
+    S.lastPos = nil
+
+    if S.tool == "line" then
+        lineStart = toCanvas(pos)
+        -- create preview
+        linePreview = Instance.new("Frame")
+        linePreview.BackgroundColor3 = S.color
+        linePreview.BackgroundTransparency = 1 - S.opacity
+        linePreview.BorderSizePixel  = 0
+        linePreview.ZIndex           = 18
+        linePreview.Size             = UDim2.new(0, S.size, 0, S.size)
+        linePreview.Parent           = canvasFrame
+        corner(linePreview, 999)
+    else
+        drawAt(pos)
+    end
+    return true
+end
+
+local function continueDraw(pos)
+    if not S.drawing then return end
+
+    if S.tool == "line" and lineStart and linePreview then
+        local cp = toCanvas(pos)
+        local dx = cp.X - lineStart.X
+        local dy = cp.Y - lineStart.Y
+        local len = math.sqrt(dx*dx + dy*dy)
+        local angle = math.atan2(dy, dx)
+        linePreview.Size     = UDim2.new(0, math.max(S.size, len), 0, S.size)
+        linePreview.Position = UDim2.new(0, lineStart.X, 0, lineStart.Y - S.size/2)
+        linePreview.Rotation = math.deg(angle)
+    else
+        drawAt(pos)
+    end
+end
+
+local function endDraw(pos)
+    if not S.drawing then return end
+
+    if S.tool == "line" and lineStart then
+        local cp = toCanvas(pos)
+        local dx = cp.X - lineStart.X
+        local dy = cp.Y - lineStart.Y
+        local len = math.sqrt(dx*dx + dy*dy)
+        local angle = math.atan2(dy, dx)
+        if linePreview then
+            linePreview.Size     = UDim2.new(0, math.max(S.size, len), 0, S.size)
+            linePreview.Position = UDim2.new(0, lineStart.X, 0, lineStart.Y - S.size/2)
+            linePreview.Rotation = math.deg(angle)
+            linePreview.ZIndex   = 5 + S.activeLayer
+            linePreview.Parent   = layers[S.activeLayer]
+            linePreview = nil
+        end
+        lineStart = nil
+        S.strokeCount += 1
+    end
+
+    S.drawing  = false
+    S.lastPos  = nil
+    pushHistory()
+    setStatus("💾 Saved • " .. S.strokeCount .. " strokes", T.ok)
+    task.delay(2, function()
+        setStatus("✨ Drawing Studio v4.0 Professional  •  Ready", T.txt2)
+    end)
+end
+
+-- Mouse
+UserInputService.InputBegan:Connect(function(inp, gp)
+    if gp then return end
+    if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+        beginDraw(inp.Position)
+    elseif inp.UserInputType == Enum.UserInputType.Touch then
+        beginDraw(inp.Position)
     end
 end)
 
--- Button handlers
-App.buttons.undo.MouseButton1Click:Connect(function()
-    if App.state.historyIndex > 1 then
-        App.state.historyIndex = App.state.historyIndex - 1
-        App:loadHistory(App.state.historyIndex)
-        statusText.Text = "↶ Undo • History: " .. App.state.historyIndex
+UserInputService.InputChanged:Connect(function(inp, gp)
+    if inp.UserInputType == Enum.UserInputType.MouseMovement then
+        local cp = inp.Position
+        -- Move cursor preview
+        if inCanvas(cp) then
+            cursorDot.Visible          = true
+            cursorDot.Size             = UDim2.new(0, S.size, 0, S.size)
+            cursorDot.BackgroundColor3 = S.color
+            local rel = toCanvas(cp)
+            cursorDot.Position = UDim2.new(0, rel.X - S.size/2, 0, rel.Y - S.size/2)
+        else
+            cursorDot.Visible = false
+        end
+
+        if not gp then continueDraw(cp) end
+    end
+
+    if inp.UserInputType == Enum.UserInputType.Touch and not gp then
+        continueDraw(inp.Position)
     end
 end)
 
-App.buttons.redo.MouseButton1Click:Connect(function()
-    if App.state.historyIndex < #App.state.history then
-        App.state.historyIndex = App.state.historyIndex + 1
-        App:loadHistory(App.state.historyIndex)
-        statusText.Text = "↷ Redo • History: " .. App.state.historyIndex
+UserInputService.InputEnded:Connect(function(inp, gp)
+    if inp.UserInputType == Enum.UserInputType.MouseButton1
+    or inp.UserInputType == Enum.UserInputType.Touch then
+        endDraw(inp.Position)
     end
 end)
 
-App.buttons.save.MouseButton1Click:Connect(function()
-    statusText.Text = "💾 Artwork saved to memory"
+-- Keyboard shortcuts
+UserInputService.InputBegan:Connect(function(inp, gp)
+    if gp then return end
+    if inp.UserInputType ~= Enum.UserInputType.Keyboard then return end
+
+    local k = inp.KeyCode
+    local ctrl = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+        or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+
+    if ctrl and k == Enum.KeyCode.Z then
+        -- Undo
+        actBtns.undo:GetPropertyChangedSignal("BackgroundColor3"):Wait()
+        -- direct call
+        if S.histIdx > 1 then
+            S.histIdx -= 1
+            applySnapshot(S.history[S.histIdx])
+            setStatus("↩ Undo  (" .. S.histIdx .. "/" .. #S.history .. ")", T.warn)
+        end
+
+    elseif ctrl and k == Enum.KeyCode.Y then
+        if S.histIdx < #S.history then
+            S.histIdx += 1
+            applySnapshot(S.history[S.histIdx])
+            setStatus("↪ Redo  (" .. S.histIdx .. "/" .. #S.history .. ")", T.ok)
+        end
+
+    elseif k == Enum.KeyCode.B then S.tool = "brush";   refreshHint()
+    elseif k == Enum.KeyCode.P then S.tool = "pencil";  refreshHint()
+    elseif k == Enum.KeyCode.E then S.tool = "eraser";  refreshHint()
+    elseif k == Enum.KeyCode.F then S.tool = "fill";    refreshHint()
+    elseif k == Enum.KeyCode.L then S.tool = "line";    refreshHint()
+    elseif k == Enum.KeyCode.LeftBracket then
+        S.size = math.max(1, S.size - 2)
+        sizeFill.Size = UDim2.new(S.size/60,0,1,0)
+        sizeVal.Text  = S.size .. "px"
+        refreshHint()
+    elseif k == Enum.KeyCode.RightBracket then
+        S.size = math.min(60, S.size + 2)
+        sizeFill.Size = UDim2.new(S.size/60,0,1,0)
+        sizeVal.Text  = S.size .. "px"
+        refreshHint()
+    end
+
+    -- Update tool selection highlight
+    for id, btn in pairs(toolBtns) do
+        tween(btn, {
+            BackgroundColor3       = id == S.tool and T.acc or T.bg2,
+            BackgroundTransparency = id == S.tool and 0 or 0.2
+        }, 0.2)
+    end
 end)
 
-App.buttons.reset.MouseButton1Click:Connect(function()
-    canvasContainer.Size = UDim2.new(0, 700, 0, 500)
-    TweenService:Create(canvasContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-        Position = UDim2.new(0.5, -350, 0.5, -250)
-    }):Play()
-    App.state.canvasScale = 1
-    statusText.Text = "🔄 Canvas reset to center"
+-- ============================================================
+-- BUTTON ACTIONS
+-- ============================================================
+actBtns.undo.MouseButton1Click:Connect(function()
+    if S.histIdx > 1 then
+        S.histIdx -= 1
+        applySnapshot(S.history[S.histIdx])
+        setStatus("↩ Undo  (" .. S.histIdx .. "/" .. #S.history .. ")", T.warn)
+    else
+        setStatus("⚠ Nothing to undo", T.err)
+    end
 end)
 
-App.buttons.close.MouseButton1Click:Connect(function()
-    -- Smooth closing animation
-    TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0)
-    }):Play()
-    
-    task.wait(0.6)
-    screenGui:Destroy()
+actBtns.redo.MouseButton1Click:Connect(function()
+    if S.histIdx < #S.history then
+        S.histIdx += 1
+        applySnapshot(S.history[S.histIdx])
+        setStatus("↪ Redo  (" .. S.histIdx .. "/" .. #S.history .. ")", T.ok)
+    else
+        setStatus("⚠ Nothing to redo", T.err)
+    end
+end)
+
+actBtns.save.MouseButton1Click:Connect(function()
+    setStatus("💾 Artwork saved to memory  •  " .. S.strokeCount .. " strokes", T.acc)
+    task.delay(3, function()
+        setStatus("✨ Drawing Studio v4.0 Professional  •  Ready", T.txt2)
+    end)
+end)
+
+actBtns.reset.MouseButton1Click:Connect(function()
+    tween(canvasFrame, {
+        Size     = UDim2.new(0, CANVAS_W, 0, CANVAS_H),
+        Position = UDim2.new(0.5, -CANVAS_W/2, 0.5, -CANVAS_H/2)
+    }, 0.5, Enum.EasingStyle.Back)
+    setStatus("⟳ Canvas position reset", T.warn)
+end)
+
+actBtns.hide.MouseButton1Click:Connect(function()
+    S.showUI = not S.showUI
+    local targets = {sidebar, rightPanel, topNav}
+    for _, t in ipairs(targets) do
+        tween(t, {BackgroundTransparency = S.showUI and 0 or 0.85}, 0.3)
+    end
+    setStatus(S.showUI and "◑ UI restored" or "◐ Minimal mode", T.txt3)
+end)
+
+actBtns.close.MouseButton1Click:Connect(function()
+    tween(root, {Size = UDim2.new(0,0,0,0), Position = UDim2.new(0.5,0,0.5,0)},
+        0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+    task.delay(0.5, function() sg:Destroy() end)
 end)
 
 clearBtn.MouseButton1Click:Connect(function()
-    App:clearCanvas()
-end)
-
--- ============================================
--- INITIALIZATION
--- ============================================
-
--- Opening animation
-mainFrame.Size = UDim2.new(0, 0, 0, 0)
-mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-TweenService:Create(mainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Back), {
-    Size = UDim2.new(1, 0, 1, 0),
-    Position = UDim2.new(0, 0, 0, 0)
-}):Play()
-
--- Initialize first history snapshot
-App:saveHistory()
-
--- Welcome message
-task.wait(0.8)
-statusText.Text = "✨ Drawing Studio v3.0 Ultimate • " .. #colors .. " colors • " .. #tools .. " tools"
-
--- Console output
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("🎨 DRAWING STUDIO v3.0 ULTIMATE")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("✅ Fully loaded and optimized")
-print("🛠️ Tools: " .. #tools)
-print("🌈 Colors: " .. #colors)
-print("💾 History: " .. App.state.maxHistory .. " levels")
-print("🎯 Status: Ready to create")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
--- Performance monitor (optional)
-local lastFPS = 0
-RunService.Heartbeat:Connect(function()
-    local fps = math.floor(1 / RunService.Heartbeat:Wait())
-    if math.abs(fps - lastFPS) > 5 then
-        lastFPS = fps
-        -- Update performance if needed
+    for li = 1, 3 do
+        for _, child in ipairs(layers[li]:GetChildren()) do
+            if child:IsA("Frame") then child:Destroy() end
+        end
     end
+    S.strokeCount = 0
+    strokeCounter.Text = "0 strokes"
+    pushHistory()
+    setStatus("🗑 All layers cleared", T.err)
+    task.delay(2, function()
+        setStatus("✨ Drawing Studio v4.0 Professional  •  Ready", T.txt2)
+    end)
 end)
+
+-- ============================================================
+-- INIT — push empty snapshot so undo works from start
+-- ============================================================
+pushHistory()
+
+-- ============================================================
+-- PRINT SUMMARY
+-- ============================================================
+task.wait(1)
+print("╔══════════════════════════════════════╗")
+print("║  🎨 DRAWING STUDIO v4.0 PROFESSIONAL  ║")
+print("╠══════════════════════════════════════╣")
+print("║  Tools   : " .. #toolDefs .. " (+ line tool)            ║")
+print("║  Colors  : " .. #palette .. "                        ║")
+print("║  Layers  : 3 independent               ║")
+print("║  History : " .. MAX_HISTORY .. " levels (undo/redo)         ║")
+print("║  Input   : Mouse + Touch               ║")
+print("║  Shortcuts:                            ║")
+print("║   B=Brush P=Pencil E=Eraser            ║")
+print("║   F=Fill  L=Line                       ║")
+print("║   [/] = brush size                     ║")
+print("║   Ctrl+Z / Ctrl+Y = undo/redo          ║")
+print("╚══════════════════════════════════════╝")
+
+setStatus("✨ Drawing Studio v4.0  •  " .. #palette .. " colors  •  3 layers  •  Ready", T.acc)
