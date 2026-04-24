@@ -1,715 +1,705 @@
--- XNOS GRAPHICS V6.0 by XNOS Team
--- Clean rewrite, zero errors
-
-local Lighting = game:GetService("Lighting")
-local Players = game:GetService("Players")
+-- XNOS GRAPHICS V6.0 - CLEAN FINAL
+local Lighting   = game:GetService("Lighting")
+local Players    = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local SoundService = game:GetService("SoundService")
+local Workspace  = game:GetService("Workspace")
 
-local player = Players.LocalPlayer
+local player    = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-
-local fps = 0
-local currentTab = "enhance"
+local fps       = 0
+local curTab    = "weather"
 local uiVisible = true
 
--- ScreenGui
 local gui = Instance.new("ScreenGui")
-gui.Name = "XnosGraphics_" .. tostring(math.random(1000, 9999))
+gui.Name = "XnosGraphics_"..tostring(math.random(1000,9999))
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
--- Main Frame
+-- Main frame (nhỏ gọn hơn)
 local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 520, 0, 400)
-main.Position = UDim2.new(0.5, -260, 0.5, -200)
-main.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+main.Size = UDim2.new(0, 420, 0, 340)
+main.Position = UDim2.new(0.5,-210,0.5,-170)
+main.BackgroundColor3 = Color3.fromRGB(15,15,25)
 main.BorderSizePixel = 0
 main.Parent = gui
+Instance.new("UICorner",main).CornerRadius = UDim.new(0,16)
 
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 20)
-
--- Glow border
+-- Glow
 local glow = Instance.new("Frame")
-glow.Size = UDim2.new(1, 8, 1, 8)
-glow.Position = UDim2.new(0, -4, 0, -4)
-glow.BackgroundColor3 = Color3.fromRGB(255, 0, 100)
+glow.Size = UDim2.new(1,6,1,6)
+glow.Position = UDim2.new(0,-3,0,-3)
+glow.BackgroundColor3 = Color3.fromRGB(255,0,100)
 glow.BackgroundTransparency = 0.5
 glow.BorderSizePixel = 0
 glow.ZIndex = 0
 glow.Parent = main
-Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 24)
-
-TweenService:Create(glow, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-    BackgroundColor3 = Color3.fromRGB(0, 120, 255),
-    BackgroundTransparency = 0.3
+Instance.new("UICorner",glow).CornerRadius = UDim.new(0,18)
+TweenService:Create(glow,TweenInfo.new(2,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),{
+    BackgroundColor3=Color3.fromRGB(0,120,255),BackgroundTransparency=0.3
 }):Play()
 
 -- Header
 local header = Instance.new("Frame")
-header.Size = UDim2.new(1, 0, 0, 75)
-header.BackgroundColor3 = Color3.fromRGB(200, 0, 80)
+header.Size = UDim2.new(1,0,0,50)
+header.BackgroundColor3 = Color3.fromRGB(200,0,80)
 header.BorderSizePixel = 0
 header.Parent = main
-Instance.new("UICorner", header).CornerRadius = UDim.new(0, 20)
-
+Instance.new("UICorner",header).CornerRadius = UDim.new(0,16)
 do
-    local g = Instance.new("UIGradient", header)
-    g.Color = ColorSequence.new(Color3.fromRGB(255, 50, 120), Color3.fromRGB(180, 0, 80))
+    local g = Instance.new("UIGradient",header)
+    g.Color = ColorSequence.new(Color3.fromRGB(255,50,120),Color3.fromRGB(180,0,80))
     g.Rotation = 45
 end
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(0.72, 0, 0.65, 0)
-titleLabel.Position = UDim2.new(0, 18, 0, 5)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "⚡ XNOS GRAPHICS V6.0"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextScaled = true
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.Parent = header
+local titleLbl = Instance.new("TextLabel",header)
+titleLbl.Size = UDim2.new(0.7,0,1,0)
+titleLbl.Position = UDim2.new(0,12,0,0)
+titleLbl.BackgroundTransparency = 1
+titleLbl.Text = "⚡ XNOS GRAPHICS V6"
+titleLbl.TextColor3 = Color3.fromRGB(255,255,255)
+titleLbl.TextScaled = true
+titleLbl.Font = Enum.Font.GothamBold
+titleLbl.TextXAlignment = Enum.TextXAlignment.Left
 
-local subLabel = Instance.new("TextLabel")
-subLabel.Size = UDim2.new(0.5, 0, 0.3, 0)
-subLabel.Position = UDim2.new(0, 18, 0.68, 0)
-subLabel.BackgroundTransparency = 1
-subLabel.Text = "4X POWER EDITION"
-subLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-subLabel.TextScaled = true
-subLabel.Font = Enum.Font.GothamBold
-subLabel.TextXAlignment = Enum.TextXAlignment.Left
-subLabel.Parent = header
-
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 50, 0, 50)
-closeBtn.Position = UDim2.new(1, -60, 0, 12)
-closeBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+local closeBtn = Instance.new("TextButton",header)
+closeBtn.Size = UDim2.new(0,36,0,36)
+closeBtn.Position = UDim2.new(1,-42,0,7)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255,50,50)
 closeBtn.Text = "✕"
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 closeBtn.TextScaled = true
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.BorderSizePixel = 0
-closeBtn.Parent = header
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 25)
+Instance.new("UICorner",closeBtn).CornerRadius = UDim.new(0,18)
 
 -- Drag
-local dragging, dragStart, startPos = false, nil, nil
-header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = main.Position
+local drag,ds,dp = false,nil,nil
+header.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then drag=true;ds=i.Position;dp=main.Position end
+end)
+header.InputChanged:Connect(function(i)
+    if drag and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-ds
+        main.Position=UDim2.new(dp.X.Scale,dp.X.Offset+d.X,dp.Y.Scale,dp.Y.Offset+d.Y)
     end
 end)
-header.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local d = input.Position - dragStart
-        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
-    end
-end)
-header.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+header.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then drag=false end
 end)
 
 -- Tab bar
-local tabBar = Instance.new("Frame")
-tabBar.Size = UDim2.new(1, -20, 0, 50)
-tabBar.Position = UDim2.new(0, 10, 0, 85)
+local tabBar = Instance.new("Frame",main)
+tabBar.Size = UDim2.new(1,-14,0,34)
+tabBar.Position = UDim2.new(0,7,0,56)
 tabBar.BackgroundTransparency = 1
-tabBar.Parent = main
 
-local tabEnhance = Instance.new("TextButton")
-tabEnhance.Size = UDim2.new(0.48, 0, 1, 0)
-tabEnhance.BackgroundColor3 = Color3.fromRGB(220, 0, 90)
-tabEnhance.Text = "✨ TĂNG ĐỒ HỌA"
-tabEnhance.TextColor3 = Color3.fromRGB(255, 255, 255)
-tabEnhance.TextScaled = true
-tabEnhance.Font = Enum.Font.GothamBold
-tabEnhance.BorderSizePixel = 0
-tabEnhance.Parent = tabBar
-Instance.new("UICorner", tabEnhance).CornerRadius = UDim.new(0, 14)
-
-local tabPerf = Instance.new("TextButton")
-tabPerf.Size = UDim2.new(0.48, 0, 1, 0)
-tabPerf.Position = UDim2.new(0.52, 0, 0, 0)
-tabPerf.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-tabPerf.Text = "🚀 GIẢM ĐỒ HỌA"
-tabPerf.TextColor3 = Color3.fromRGB(160, 160, 160)
-tabPerf.TextScaled = true
-tabPerf.Font = Enum.Font.GothamBold
-tabPerf.BorderSizePixel = 0
-tabPerf.Parent = tabBar
-Instance.new("UICorner", tabPerf).CornerRadius = UDim.new(0, 14)
-
--- Content area
-local contentArea = Instance.new("Frame")
-contentArea.Size = UDim2.new(1, -20, 0, 215)
-contentArea.Position = UDim2.new(0, 10, 0, 145)
-contentArea.BackgroundTransparency = 1
-contentArea.Parent = main
-
--- Enhance scroll
-local enhanceScroll = Instance.new("ScrollingFrame")
-enhanceScroll.Size = UDim2.new(1, 0, 1, 0)
-enhanceScroll.BackgroundTransparency = 1
-enhanceScroll.BorderSizePixel = 0
-enhanceScroll.ScrollBarThickness = 6
-enhanceScroll.ScrollBarImageColor3 = Color3.fromRGB(220, 0, 90)
-enhanceScroll.Visible = true
-enhanceScroll.Parent = contentArea
-
-local enhanceGrid = Instance.new("UIGridLayout", enhanceScroll)
-enhanceGrid.CellSize = UDim2.new(0, 155, 0, 52)
-enhanceGrid.CellPadding = UDim2.new(0, 8, 0, 8)
-enhanceGrid.SortOrder = Enum.SortOrder.LayoutOrder
-
--- Performance scroll
-local perfScroll = Instance.new("ScrollingFrame")
-perfScroll.Size = UDim2.new(1, 0, 1, 0)
-perfScroll.BackgroundTransparency = 1
-perfScroll.BorderSizePixel = 0
-perfScroll.ScrollBarThickness = 6
-perfScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 140, 255)
-perfScroll.Visible = false
-perfScroll.Parent = contentArea
-
-local perfGrid = Instance.new("UIGridLayout", perfScroll)
-perfGrid.CellSize = UDim2.new(0, 155, 0, 52)
-perfGrid.CellPadding = UDim2.new(0, 8, 0, 8)
-perfGrid.SortOrder = Enum.SortOrder.LayoutOrder
-
--- Status bar
-local statusBar = Instance.new("Frame")
-statusBar.Size = UDim2.new(1, -20, 0, 32)
-statusBar.Position = UDim2.new(0, 10, 1, -42)
-statusBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
-statusBar.BorderSizePixel = 0
-statusBar.Parent = main
-Instance.new("UICorner", statusBar).CornerRadius = UDim.new(0, 16)
-
-local fpsLabel = Instance.new("TextLabel")
-fpsLabel.Size = UDim2.new(0.5, 0, 1, 0)
-fpsLabel.Position = UDim2.new(0, 6, 0, 0)
-fpsLabel.BackgroundTransparency = 1
-fpsLabel.Text = "📊 FPS: --"
-fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-fpsLabel.TextScaled = true
-fpsLabel.Font = Enum.Font.GothamBold
-fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
-fpsLabel.Parent = statusBar
-
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(0.5, -6, 1, 0)
-statusLabel.Position = UDim2.new(0.5, 0, 0, 0)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "⚡ Ready"
-statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-statusLabel.TextScaled = true
-statusLabel.Font = Enum.Font.GothamBold
-statusLabel.TextXAlignment = Enum.TextXAlignment.Right
-statusLabel.Parent = statusBar
-
--- Notification
-local function notify(text, color, dur)
-    dur = dur or 3
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0, 380, 0, 65)
-    f.Position = UDim2.new(0.5, -190, 0, -80)
-    f.BackgroundColor3 = color or Color3.fromRGB(220, 0, 90)
-    f.BackgroundTransparency = 1
-    f.BorderSizePixel = 0
-    f.Parent = gui
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 16)
-
-    local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(1, -16, 1, -8)
-    t.Position = UDim2.new(0, 8, 0, 4)
-    t.BackgroundTransparency = 1
-    t.Text = text
-    t.TextColor3 = Color3.fromRGB(255, 255, 255)
+local function mkTab(txt,x)
+    local t = Instance.new("TextButton",tabBar)
+    t.Size = UDim2.new(0.31,0,1,0)
+    t.Position = UDim2.new(x,0,0,0)
+    t.BackgroundColor3 = Color3.fromRGB(55,55,75)
+    t.Text = txt
+    t.TextColor3 = Color3.fromRGB(150,150,150)
     t.TextScaled = true
     t.Font = Enum.Font.GothamBold
-
-    TweenService:Create(f, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0.5, -190, 0, 25),
-        BackgroundTransparency = 0
-    }):Play()
-
-    task.delay(dur, function()
-        TweenService:Create(f, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            Position = UDim2.new(0.5, -190, 0, -80),
-            BackgroundTransparency = 1
-        }):Play()
-        task.wait(0.35)
-        f:Destroy()
-    end)
+    t.BorderSizePixel = 0
+    Instance.new("UICorner",t).CornerRadius = UDim.new(0,10)
+    return t
 end
+local tabW = mkTab("🌤️ THỜI TIẾT",0)
+local tabP = mkTab("🚀 GIẢM",0.345)
+local tabC = mkTab("🎛️ CHỈNH",0.69)
 
--- Button creator
-local function makeBtn(icon, label, color, parent, order, fn)
-    local btn = Instance.new("TextButton")
-    btn.BackgroundColor3 = color
-    btn.BorderSizePixel = 0
-    btn.Text = ""
-    btn.LayoutOrder = order
-    btn.Parent = parent
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+-- Content
+local content = Instance.new("Frame",main)
+content.Size = UDim2.new(1,-14,0,210)
+content.Position = UDim2.new(0,7,0,96)
+content.BackgroundTransparency = 1
 
-    local ig = Instance.new("TextLabel", btn)
-    ig.Size = UDim2.new(1, 0, 0.52, 0)
-    ig.BackgroundTransparency = 1
-    ig.Text = icon
-    ig.TextColor3 = Color3.fromRGB(255, 255, 255)
-    ig.TextScaled = true
-    ig.Font = Enum.Font.GothamBold
+-- Status bar
+local statusBar = Instance.new("Frame",main)
+statusBar.Size = UDim2.new(1,-14,0,26)
+statusBar.Position = UDim2.new(0,7,1,-32)
+statusBar.BackgroundColor3 = Color3.fromRGB(22,22,38)
+statusBar.BorderSizePixel = 0
+Instance.new("UICorner",statusBar).CornerRadius = UDim.new(0,13)
 
-    local lb = Instance.new("TextLabel", btn)
-    lb.Size = UDim2.new(1, -6, 0.44, 0)
-    lb.Position = UDim2.new(0, 3, 0.53, 0)
-    lb.BackgroundTransparency = 1
-    lb.Text = label
-    lb.TextColor3 = Color3.fromRGB(255, 255, 255)
-    lb.TextScaled = true
-    lb.Font = Enum.Font.GothamBold
+local fpsLbl = Instance.new("TextLabel",statusBar)
+fpsLbl.Size = UDim2.new(0.45,0,1,0)
+fpsLbl.Position = UDim2.new(0,5,0,0)
+fpsLbl.BackgroundTransparency = 1
+fpsLbl.Text = "📊 FPS: --"
+fpsLbl.TextColor3 = Color3.fromRGB(0,255,100)
+fpsLbl.TextScaled = true
+fpsLbl.Font = Enum.Font.GothamBold
+fpsLbl.TextXAlignment = Enum.TextXAlignment.Left
 
-    btn.MouseButton1Click:Connect(function() pcall(fn) end)
-    return btn
-end
+local statusLbl = Instance.new("TextLabel",statusBar)
+statusLbl.Size = UDim2.new(0.55,-5,1,0)
+statusLbl.Position = UDim2.new(0.45,0,0,0)
+statusLbl.BackgroundTransparency = 1
+statusLbl.Text = "⚡ Ready"
+statusLbl.TextColor3 = Color3.fromRGB(255,255,0)
+statusLbl.TextScaled = true
+statusLbl.Font = Enum.Font.GothamBold
+statusLbl.TextXAlignment = Enum.TextXAlignment.Right
 
--- Clear all lighting effects helper
-local function clearEffects()
-    for _, e in ipairs(Lighting:GetChildren()) do
+-- Helpers
+local function clearFX()
+    for _,e in ipairs(Lighting:GetChildren()) do
         if e:IsA("PostEffect") then e:Destroy() end
     end
 end
 
--- LIGHTING FUNCTIONS
+-- Button maker
+local function mkBtn(icon,lbl,color,parent,order,fn)
+    local btn = Instance.new("TextButton",parent)
+    btn.BackgroundColor3 = color
+    btn.BorderSizePixel = 0
+    btn.Text = ""
+    btn.LayoutOrder = order
+    Instance.new("UICorner",btn).CornerRadius = UDim.new(0,10)
+    local ig = Instance.new("TextLabel",btn)
+    ig.Size = UDim2.new(1,0,0.52,0)
+    ig.BackgroundTransparency = 1
+    ig.Text = icon
+    ig.TextColor3 = Color3.fromRGB(255,255,255)
+    ig.TextScaled = true
+    ig.Font = Enum.Font.GothamBold
+    local lb = Instance.new("TextLabel",btn)
+    lb.Size = UDim2.new(1,-4,0.45,0)
+    lb.Position = UDim2.new(0,2,0.53,0)
+    lb.BackgroundTransparency = 1
+    lb.Text = lbl
+    lb.TextColor3 = Color3.fromRGB(255,255,255)
+    lb.TextScaled = true
+    lb.Font = Enum.Font.GothamBold
+    btn.MouseButton1Click:Connect(function() pcall(fn) end)
+    return btn
+end
+
+local function mkScroll(color)
+    local s = Instance.new("ScrollingFrame",content)
+    s.Size = UDim2.new(1,0,1,0)
+    s.BackgroundTransparency = 1
+    s.BorderSizePixel = 0
+    s.ScrollBarThickness = 4
+    s.ScrollBarImageColor3 = color
+    s.Visible = false
+    local g = Instance.new("UIGridLayout",s)
+    g.CellSize = UDim2.new(0,122,0,48)
+    g.CellPadding = UDim2.new(0,6,0,6)
+    g.SortOrder = Enum.SortOrder.LayoutOrder
+    return s,g
+end
+
+-- ===================== TAB 1: WEATHER =====================
+local wScroll = mkScroll(Color3.fromRGB(60,160,255))
+wScroll.Visible = true
+
+local function wBase()
+    clearFX()
+    Lighting.Technology=Enum.Technology.Future
+    Lighting.GlobalShadows=true
+    Lighting.FogEnd=100000; Lighting.FogStart=0
+end
+
+local wDefs = {
+    {"✨","RTX",        Color3.fromRGB(0,200,170), function()
+        wBase();statusLbl.Text="✨ RTX";statusLbl.TextColor3=Color3.fromRGB(0,255,200)
+        Lighting.Brightness=2.2;Lighting.Ambient=Color3.fromRGB(60,65,80);Lighting.OutdoorAmbient=Color3.fromRGB(130,140,165)
+        Lighting.ShadowSoftness=0.2;Lighting.ExposureCompensation=0.1
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.05;c.Contrast=0.25;c.Saturation=0.3;c.TintColor=Color3.fromRGB(255,252,248)
+        local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.5;bl.Size=24;bl.Threshold=0.8
+        local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=0.12;sr.Spread=0.4
+    end},
+    {"🌟","Ultra",      Color3.fromRGB(210,170,0),  function()
+        wBase();statusLbl.Text="🌟 Ultra";statusLbl.TextColor3=Color3.fromRGB(255,215,0)
+        Lighting.Brightness=2.5;Lighting.Ambient=Color3.fromRGB(70,70,90);Lighting.OutdoorAmbient=Color3.fromRGB(140,140,170)
+        Lighting.ShadowSoftness=0.2;Lighting.ExposureCompensation=0.15
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.1;c.Contrast=0.2;c.Saturation=0.25
+        local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.6;bl.Size=28;bl.Threshold=0.85
+    end},
+    {"💡","Fullbright", Color3.fromRGB(180,160,0),  function()
+        wBase();statusLbl.Text="💡 Fullbright";statusLbl.TextColor3=Color3.fromRGB(255,255,0)
+        Lighting.Brightness=3.5;Lighting.Ambient=Color3.fromRGB(220,220,220);Lighting.OutdoorAmbient=Color3.fromRGB(235,235,235)
+        Lighting.GlobalShadows=false;Lighting.Technology=Enum.Technology.Compatibility;Lighting.ExposureCompensation=0
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.08;c.Contrast=0.05;c.Saturation=0.05
+    end},
+    {"☀️","Clear Sky",  Color3.fromRGB(50,160,210), function()
+        wBase();statusLbl.Text="☀️ Clear";statusLbl.TextColor3=Color3.fromRGB(100,220,255)
+        Lighting.Brightness=2.4;Lighting.Ambient=Color3.fromRGB(90,100,120);Lighting.OutdoorAmbient=Color3.fromRGB(150,165,190)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.1;c.Contrast=0.2;c.Saturation=0.3;c.TintColor=Color3.fromRGB(230,245,255)
+        local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=0.18;sr.Spread=0.5
+    end},
+    {"🌅","Sunset",     Color3.fromRGB(210,120,30), function()
+        wBase();statusLbl.Text="🌅 Sunset";statusLbl.TextColor3=Color3.fromRGB(255,180,60)
+        Lighting.Brightness=1.6;Lighting.Ambient=Color3.fromRGB(160,100,60);Lighting.OutdoorAmbient=Color3.fromRGB(200,130,70)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.05;c.Contrast=0.3;c.Saturation=0.4;c.TintColor=Color3.fromRGB(255,200,140)
+        local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.8;bl.Size=30;bl.Threshold=0.7
+        local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=0.25;sr.Spread=0.6
+    end},
+    {"🌄","Morning",    Color3.fromRGB(190,150,50), function()
+        wBase();statusLbl.Text="🌄 Morning";statusLbl.TextColor3=Color3.fromRGB(255,220,120)
+        Lighting.Brightness=1.8;Lighting.Ambient=Color3.fromRGB(120,110,90);Lighting.OutdoorAmbient=Color3.fromRGB(180,160,120)
+        Lighting.FogEnd=2000;Lighting.FogStart=500;Lighting.FogColor=Color3.fromRGB(220,200,170)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.08;c.Contrast=0.2;c.Saturation=0.25;c.TintColor=Color3.fromRGB(255,235,190)
+        local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.5;bl.Size=20;bl.Threshold=0.9
+    end},
+    {"🌧️","Rain",       Color3.fromRGB(60,120,200), function()
+        wBase();statusLbl.Text="🌧️ Rain";statusLbl.TextColor3=Color3.fromRGB(100,180,255)
+        Lighting.Brightness=1.2;Lighting.Ambient=Color3.fromRGB(80,90,110);Lighting.OutdoorAmbient=Color3.fromRGB(100,115,140)
+        Lighting.FogEnd=800;Lighting.FogStart=200;Lighting.FogColor=Color3.fromRGB(140,150,170)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=-0.08;c.Contrast=0.1;c.Saturation=-0.2;c.TintColor=Color3.fromRGB(190,210,255)
+    end},
+    {"⛈️","Heavy Rain", Color3.fromRGB(40,80,160), function()
+        wBase();statusLbl.Text="⛈️ Heavy Rain";statusLbl.TextColor3=Color3.fromRGB(60,120,220)
+        Lighting.Brightness=0.8;Lighting.Ambient=Color3.fromRGB(55,60,80);Lighting.OutdoorAmbient=Color3.fromRGB(70,80,100)
+        Lighting.FogEnd=400;Lighting.FogStart=100;Lighting.FogColor=Color3.fromRGB(100,110,140)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=-0.18;c.Contrast=0.15;c.Saturation=-0.35;c.TintColor=Color3.fromRGB(160,180,230)
+    end},
+    {"🌙","Night",      Color3.fromRGB(50,60,140), function()
+        wBase();statusLbl.Text="🌙 Night";statusLbl.TextColor3=Color3.fromRGB(120,140,255)
+        Lighting.Brightness=0.3;Lighting.Ambient=Color3.fromRGB(20,20,45);Lighting.OutdoorAmbient=Color3.fromRGB(30,30,65)
+        Lighting.FogEnd=600;Lighting.FogStart=150;Lighting.FogColor=Color3.fromRGB(15,15,40)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=-0.2;c.Contrast=0.2;c.Saturation=-0.15;c.TintColor=Color3.fromRGB(120,140,220)
+    end},
+    {"🌑","Midnight",   Color3.fromRGB(25,25,80), function()
+        wBase();statusLbl.Text="🌑 Midnight";statusLbl.TextColor3=Color3.fromRGB(80,80,180)
+        Lighting.Brightness=0.05;Lighting.Ambient=Color3.fromRGB(8,8,20);Lighting.OutdoorAmbient=Color3.fromRGB(10,10,28)
+        Lighting.FogEnd=300;Lighting.FogStart=80;Lighting.FogColor=Color3.fromRGB(5,5,15)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=-0.3;c.Contrast=0.1;c.Saturation=-0.3;c.TintColor=Color3.fromRGB(80,90,180)
+    end},
+    {"🌫️","Dense Fog",  Color3.fromRGB(120,120,135), function()
+        wBase();statusLbl.Text="🌫️ Fog";statusLbl.TextColor3=Color3.fromRGB(200,200,200)
+        Lighting.Brightness=1.4;Lighting.Ambient=Color3.fromRGB(160,160,165);Lighting.OutdoorAmbient=Color3.fromRGB(170,170,175)
+        Lighting.FogEnd=250;Lighting.FogStart=30;Lighting.FogColor=Color3.fromRGB(200,200,205)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.05;c.Contrast=-0.05;c.Saturation=-0.3
+    end},
+    {"❄️","Snow",       Color3.fromRGB(110,160,215), function()
+        wBase();statusLbl.Text="❄️ Snow";statusLbl.TextColor3=Color3.fromRGB(200,230,255)
+        Lighting.Brightness=2.0;Lighting.Ambient=Color3.fromRGB(160,175,200);Lighting.OutdoorAmbient=Color3.fromRGB(190,205,225)
+        Lighting.FogEnd=700;Lighting.FogStart=200;Lighting.FogColor=Color3.fromRGB(210,220,240)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.12;c.Contrast=0.05;c.Saturation=-0.25;c.TintColor=Color3.fromRGB(220,235,255)
+    end},
+    {"🌪️","Storm",      Color3.fromRGB(55,55,85), function()
+        wBase();statusLbl.Text="🌪️ Storm";statusLbl.TextColor3=Color3.fromRGB(160,160,220)
+        Lighting.Brightness=0.6;Lighting.Ambient=Color3.fromRGB(45,45,65);Lighting.OutdoorAmbient=Color3.fromRGB(55,55,80)
+        Lighting.FogEnd=300;Lighting.FogStart=60;Lighting.FogColor=Color3.fromRGB(80,80,110)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=-0.25;c.Contrast=0.2;c.Saturation=-0.4;c.TintColor=Color3.fromRGB(140,150,200)
+    end},
+    {"🌈","Rainbow",    Color3.fromRGB(170,90,195), function()
+        wBase();statusLbl.Text="🌈 Rainbow";statusLbl.TextColor3=Color3.fromRGB(200,180,255)
+        Lighting.Brightness=2.0;Lighting.Ambient=Color3.fromRGB(100,110,130);Lighting.OutdoorAmbient=Color3.fromRGB(140,155,175)
+        local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.08;c.Contrast=0.15;c.Saturation=0.6;c.TintColor=Color3.fromRGB(240,235,255)
+        local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.6;bl.Size=22;bl.Threshold=0.85
+    end},
+    {"🔄","Reset",      Color3.fromRGB(170,95,0), function()
+        clearFX()
+        Lighting.Brightness=1;Lighting.Ambient=Color3.fromRGB(70,70,70);Lighting.OutdoorAmbient=Color3.fromRGB(70,70,70)
+        Lighting.Technology=Enum.Technology.Compatibility;Lighting.GlobalShadows=false
+        Lighting.FogEnd=100000;Lighting.FogStart=0;Lighting.ExposureCompensation=0
+        statusLbl.Text="⚡ Ready";statusLbl.TextColor3=Color3.fromRGB(255,255,0)
+    end},
+}
+for i,d in ipairs(wDefs) do mkBtn(d[1],d[2],d[3],wScroll,i,d[4]) end
+wScroll.CanvasSize = UDim2.new(0,0,0,math.ceil((#wDefs)/3)*54)
+
+-- ===================== TAB 2: PERFORMANCE =====================
+local pScroll = mkScroll(Color3.fromRGB(0,140,255))
 
 local function doRTX()
-    statusLabel.Text = "✨ RTX Active"
-    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 200)
-    clearEffects()
-
-    Lighting.Brightness = 2.2
-    Lighting.Ambient = Color3.fromRGB(60, 65, 80)
-    Lighting.OutdoorAmbient = Color3.fromRGB(130, 140, 165)
-    Lighting.Technology = Enum.Technology.Future
-    Lighting.GlobalShadows = true
-    Lighting.ShadowSoftness = 0.2
-    Lighting.ExposureCompensation = 0.1
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0.05
-    cc.Contrast = 0.25
-    cc.Saturation = 0.3
-    cc.TintColor = Color3.fromRGB(255, 252, 248)
-
-    local bloom = Instance.new("BloomEffect", Lighting)
-    bloom.Intensity = 0.5
-    bloom.Size = 24
-    bloom.Threshold = 0.8
-
-    local sun = Instance.new("SunRaysEffect", Lighting)
-    sun.Intensity = 0.12
-    sun.Spread = 0.4
-
-    notify("✨ RTX MODE ON!", Color3.fromRGB(0, 200, 180))
+    statusLbl.Text="✨ RTX";statusLbl.TextColor3=Color3.fromRGB(0,255,200)
+    clearFX();Lighting.Brightness=2.2;Lighting.Ambient=Color3.fromRGB(60,65,80);Lighting.OutdoorAmbient=Color3.fromRGB(130,140,165)
+    Lighting.Technology=Enum.Technology.Future;Lighting.GlobalShadows=true;Lighting.ShadowSoftness=0.2;Lighting.ExposureCompensation=0.1
+    local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.05;c.Contrast=0.25;c.Saturation=0.3;c.TintColor=Color3.fromRGB(255,252,248)
+    local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.5;bl.Size=24;bl.Threshold=0.8
+    local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=0.12;sr.Spread=0.4
 end
-
 local function doUltra()
-    statusLabel.Text = "🌟 Ultra Active"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-    clearEffects()
-
-    Lighting.Brightness = 2.5
-    Lighting.Ambient = Color3.fromRGB(70, 70, 90)
-    Lighting.OutdoorAmbient = Color3.fromRGB(140, 140, 170)
-    Lighting.Technology = Enum.Technology.Future
-    Lighting.GlobalShadows = true
-    Lighting.ShadowSoftness = 0.2
-    Lighting.ExposureCompensation = 0.15
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0.1
-    cc.Contrast = 0.2
-    cc.Saturation = 0.25
-
-    local bloom = Instance.new("BloomEffect", Lighting)
-    bloom.Intensity = 0.6
-    bloom.Size = 28
-    bloom.Threshold = 0.85
-
-    notify("🌟 ULTRA MODE ON!", Color3.fromRGB(220, 180, 0))
+    statusLbl.Text="🌟 Ultra";statusLbl.TextColor3=Color3.fromRGB(255,215,0)
+    clearFX();Lighting.Brightness=2.5;Lighting.Ambient=Color3.fromRGB(70,70,90);Lighting.OutdoorAmbient=Color3.fromRGB(140,140,170)
+    Lighting.Technology=Enum.Technology.Future;Lighting.GlobalShadows=true;Lighting.ShadowSoftness=0.2;Lighting.ExposureCompensation=0.15
+    local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.1;c.Contrast=0.2;c.Saturation=0.25
+    local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.6;bl.Size=28;bl.Threshold=0.85
 end
-
 local function doGaming()
-    statusLabel.Text = "🎮 Gaming Active"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 100, 255)
-    clearEffects()
-
-    Lighting.Brightness = 2.0
-    Lighting.Ambient = Color3.fromRGB(75, 75, 90)
-    Lighting.OutdoorAmbient = Color3.fromRGB(120, 120, 145)
-    Lighting.Technology = Enum.Technology.ShadowMap
-    Lighting.GlobalShadows = true
-    Lighting.ShadowSoftness = 0.05
-    Lighting.ExposureCompensation = 0.05
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0.05
-    cc.Contrast = 0.15
-    cc.Saturation = 0.2
-
-    local bloom = Instance.new("BloomEffect", Lighting)
-    bloom.Intensity = 0.3
-    bloom.Size = 18
-    bloom.Threshold = 1.0
-
-    notify("🎮 GAMING MODE ON!", Color3.fromRGB(200, 80, 200))
+    statusLbl.Text="🎮 Gaming";statusLbl.TextColor3=Color3.fromRGB(255,100,255)
+    clearFX();Lighting.Brightness=2.0;Lighting.Ambient=Color3.fromRGB(75,75,90);Lighting.OutdoorAmbient=Color3.fromRGB(120,120,145)
+    Lighting.Technology=Enum.Technology.ShadowMap;Lighting.GlobalShadows=true;Lighting.ShadowSoftness=0.05;Lighting.ExposureCompensation=0.05
+    local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.05;c.Contrast=0.15;c.Saturation=0.2
+    local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=0.3;bl.Size=18;bl.Threshold=1.0
 end
-
-local function doEnhanced()
-    statusLabel.Text = "🌈 Enhanced"
-    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
-    clearEffects()
-
-    Lighting.Brightness = 2.2
-    Lighting.Ambient = Color3.fromRGB(65, 65, 80)
-    Lighting.OutdoorAmbient = Color3.fromRGB(135, 135, 165)
-    Lighting.Technology = Enum.Technology.Future
-    Lighting.GlobalShadows = true
-    Lighting.ShadowSoftness = 0.15
-    Lighting.ExposureCompensation = 0.1
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0.08
-    cc.Contrast = 0.2
-    cc.Saturation = 0.25
-
-    local bloom = Instance.new("BloomEffect", Lighting)
-    bloom.Intensity = 0.45
-    bloom.Size = 24
-    bloom.Threshold = 0.9
-
-    notify("🌈 ENHANCED MODE ON!", Color3.fromRGB(0, 200, 100))
-end
-
-local function doCinematic()
-    statusLabel.Text = "🎬 Cinematic"
-    statusLabel.TextColor3 = Color3.fromRGB(180, 80, 255)
-    clearEffects()
-
-    Lighting.Brightness = 1.8
-    Lighting.Ambient = Color3.fromRGB(45, 50, 65)
-    Lighting.OutdoorAmbient = Color3.fromRGB(110, 130, 160)
-    Lighting.Technology = Enum.Technology.Future
-    Lighting.GlobalShadows = true
-    Lighting.ShadowSoftness = 0.25
-    Lighting.ExposureCompensation = 0.05
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0
-    cc.Contrast = 0.3
-    cc.Saturation = 0.15
-    cc.TintColor = Color3.fromRGB(220, 230, 255)
-
-    local bloom = Instance.new("BloomEffect", Lighting)
-    bloom.Intensity = 0.4
-    bloom.Size = 22
-    bloom.Threshold = 1.0
-
-    notify("🎬 CINEMATIC MODE ON!", Color3.fromRGB(140, 60, 220))
-end
-
 local function doFullbright()
-    statusLabel.Text = "💡 Fullbright"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-    clearEffects()
-
-    Lighting.Brightness = 3.5
-    Lighting.Ambient = Color3.fromRGB(220, 220, 220)
-    Lighting.OutdoorAmbient = Color3.fromRGB(235, 235, 235)
-    Lighting.GlobalShadows = false
-    Lighting.Technology = Enum.Technology.Compatibility
-    Lighting.ExposureCompensation = 0
-
-    local cc = Instance.new("ColorCorrectionEffect", Lighting)
-    cc.Brightness = 0.08
-    cc.Contrast = 0.05
-    cc.Saturation = 0.05
-
-    notify("💡 FULLBRIGHT ON!", Color3.fromRGB(220, 200, 0))
+    statusLbl.Text="💡 Fullbright";statusLbl.TextColor3=Color3.fromRGB(255,255,0)
+    clearFX();Lighting.Brightness=3.5;Lighting.Ambient=Color3.fromRGB(220,220,220);Lighting.OutdoorAmbient=Color3.fromRGB(235,235,235)
+    Lighting.GlobalShadows=false;Lighting.Technology=Enum.Technology.Compatibility;Lighting.ExposureCompensation=0
+    local c=Instance.new("ColorCorrectionEffect",Lighting);c.Brightness=0.08;c.Contrast=0.05;c.Saturation=0.05
 end
-
--- PERFORMANCE FUNCTIONS
-
 local function doSmart()
-    statusLabel.Text = "🧠 Smart Active"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
-
-    local level = fps < 20 and 3 or fps < 35 and 2 or 1
-
-    Lighting.GlobalShadows = false
-    Lighting.Technology = level >= 2 and Enum.Technology.Compatibility or Enum.Technology.ShadowMap
-
-    for _, obj in ipairs(game:GetService("Workspace"):GetDescendants()) do
-        pcall(function()
-            if obj:IsA("ParticleEmitter") then
-                obj.Rate = math.min(obj.Rate, level == 3 and 5 or level == 2 and 15 or 25)
-            elseif obj:IsA("MeshPart") then
-                obj.RenderFidelity = Enum.RenderFidelity.Performance
-            elseif obj:IsA("BasePart") then
-                obj.CastShadow = false
-            end
-        end)
-    end
-
-    if level == 3 then clearEffects() end
-
-    notify("🧠 SMART MODE L" .. level .. " ON!", Color3.fromRGB(220, 170, 0))
+    statusLbl.Text="🧠 Smart";statusLbl.TextColor3=Color3.fromRGB(255,200,0)
+    local lv=fps<20 and 3 or fps<35 and 2 or 1
+    Lighting.GlobalShadows=false
+    Lighting.Technology=lv>=2 and Enum.Technology.Compatibility or Enum.Technology.ShadowMap
+    for _,o in ipairs(Workspace:GetDescendants()) do pcall(function()
+        if o:IsA("ParticleEmitter") then o.Rate=math.min(o.Rate,lv==3 and 5 or lv==2 and 15 or 25)
+        elseif o:IsA("MeshPart") then o.RenderFidelity=Enum.RenderFidelity.Performance
+        elseif o:IsA("BasePart") then o.CastShadow=false end
+    end) end
+    if lv==3 then clearFX() end
 end
-
 local function doExtreme()
-    statusLabel.Text = "🚀 Extreme Active"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 69, 0)
-    clearEffects()
-
-    Lighting.Technology = Enum.Technology.Compatibility
-    Lighting.GlobalShadows = false
-    Lighting.ShadowSoftness = 0
-    Lighting.Brightness = 1.5
-    Lighting.Ambient = Color3.fromRGB(190, 190, 190)
-    Lighting.OutdoorAmbient = Color3.fromRGB(190, 190, 190)
-    Lighting.ExposureCompensation = 0
-
-    local count = 0
-    for _, obj in ipairs(game:GetService("Workspace"):GetDescendants()) do
-        pcall(function()
-            if obj:IsA("BasePart") then
-                obj.Material = Enum.Material.SmoothPlastic
-                obj.CastShadow = false
-                count += 1
-            elseif obj:IsA("MeshPart") then
-                obj.RenderFidelity = Enum.RenderFidelity.Performance
-                obj.TextureID = ""
-                count += 1
-            elseif obj:IsA("ParticleEmitter") then
-                obj.Rate = math.min(obj.Rate, 4)
-                count += 1
-            elseif obj:IsA("Fire") or obj:IsA("Smoke") then
-                obj.Enabled = false
-                count += 1
-            end
-        end)
-    end
-
-    for i = 1, 10 do
-        task.wait(0.05)
-        pcall(function() collectgarbage("collect") end)
-    end
-
-    notify("🚀 EXTREME: " .. count .. " optimized!", Color3.fromRGB(220, 60, 0))
+    statusLbl.Text="🚀 Extreme";statusLbl.TextColor3=Color3.fromRGB(255,69,0)
+    clearFX();Lighting.Technology=Enum.Technology.Compatibility;Lighting.GlobalShadows=false
+    Lighting.ShadowSoftness=0;Lighting.Brightness=1.5;Lighting.ExposureCompensation=0
+    Lighting.Ambient=Color3.fromRGB(190,190,190);Lighting.OutdoorAmbient=Color3.fromRGB(190,190,190);Lighting.FogEnd=100000
+    for _,o in ipairs(Workspace:GetDescendants()) do pcall(function()
+        if o:IsA("BasePart") then o.Material=Enum.Material.SmoothPlastic;o.CastShadow=false;o.TopSurface=Enum.SurfaceType.Smooth;o.BottomSurface=Enum.SurfaceType.Smooth
+        elseif o:IsA("MeshPart") then o.RenderFidelity=Enum.RenderFidelity.Performance;o.TextureID=""
+        elseif o:IsA("UnionOperation") then o.UsePartColor=true;o.RenderFidelity=Enum.RenderFidelity.Performance
+        elseif o:IsA("ParticleEmitter") then o.Rate=math.min(o.Rate,4);o.Lifetime=NumberRange.new(0.2,0.5)
+        elseif o:IsA("Fire") or o:IsA("Smoke") then o.Enabled=false
+        elseif o:IsA("Decal") or o:IsA("Texture") then o.Transparency=1 end
+    end) end
+    for i=1,12 do task.wait(0.05);pcall(function() collectgarbage("collect") end) end
+    pcall(function() SoundService.AmbientReverb=Enum.ReverbType.NoReverb end)
+end
+local function doAntiLag()
+    statusLbl.Text="🛡️ Anti-Lag";statusLbl.TextColor3=Color3.fromRGB(0,255,100)
+    for _,o in ipairs(Workspace:GetDescendants()) do pcall(function()
+        if o:IsA("ParticleEmitter") then
+            if o.Rate>60 then o:Destroy() elseif o.Rate>20 then o.Rate=8;o.Lifetime=NumberRange.new(0.3,0.8) end
+        elseif o:IsA("Fire") then if o.Size>8 then o:Destroy() elseif o.Size>3 then o.Size=2 end
+        elseif o:IsA("Smoke") then if o.Size>6 then o:Destroy() elseif o.Size>2 then o.Size=1 end
+        elseif o:IsA("Explosion") then o.Visible=false
+        elseif o:IsA("Beam") or o:IsA("Trail") then o.Enabled=false
+        elseif o:IsA("Sound") then if o.Volume>0.7 and not o.Playing then o.Volume=0.2 end
+        elseif o:IsA("BasePart") then o.CastShadow=false
+        elseif o:IsA("MeshPart") then o.RenderFidelity=Enum.RenderFidelity.Performance end
+    end) end
+    Lighting.GlobalShadows=false;Lighting.ShadowSoftness=0
+    for _,e in ipairs(Lighting:GetChildren()) do pcall(function()
+        if e:IsA("DepthOfFieldEffect") then e:Destroy()
+        elseif e:IsA("BloomEffect") and e.Intensity>1 then e.Intensity=0.5
+        elseif e:IsA("SunRaysEffect") and e.Intensity>0.3 then e.Intensity=0.15 end
+    end) end
+    for i=1,18 do task.wait(0.04);pcall(function() collectgarbage("collect") end) end
+    pcall(function() SoundService.AmbientReverb=Enum.ReverbType.NoReverb;SoundService.DopplerScale=0 end)
+end
+local function doReset()
+    clearFX();Lighting.Brightness=1;Lighting.Ambient=Color3.fromRGB(70,70,70);Lighting.OutdoorAmbient=Color3.fromRGB(70,70,70)
+    Lighting.Technology=Enum.Technology.Compatibility;Lighting.GlobalShadows=false;Lighting.FogEnd=100000;Lighting.FogStart=0;Lighting.ExposureCompensation=0
+    statusLbl.Text="⚡ Ready";statusLbl.TextColor3=Color3.fromRGB(255,255,0)
 end
 
-local function doAntiLag()
-    statusLabel.Text = "🛡️ Anti-Lag Active"
-    statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+mkBtn("🧠","Smart",     Color3.fromRGB(200,150,0),  pScroll,1,doSmart)
+mkBtn("🚀","Extreme",   Color3.fromRGB(210,55,0),   pScroll,2,doExtreme)
+mkBtn("🛡️","Anti-Lag",  Color3.fromRGB(0,180,80),   pScroll,3,doAntiLag)
+mkBtn("🔄","Reset All", Color3.fromRGB(170,95,0),   pScroll,4,doReset)
+pScroll.CanvasSize = UDim2.new(0,0,0,math.ceil(4/3)*54)
 
-    local destroyed, optimized = 0, 0
+-- ===================== TAB 3: CUSTOM =====================
+local cScroll = Instance.new("ScrollingFrame",content)
+cScroll.Size = UDim2.new(1,0,1,0)
+cScroll.BackgroundTransparency = 1
+cScroll.BorderSizePixel = 0
+cScroll.ScrollBarThickness = 4
+cScroll.ScrollBarImageColor3 = Color3.fromRGB(100,200,100)
+cScroll.Visible = false
 
-    for _, obj in ipairs(game:GetService("Workspace"):GetDescendants()) do
-        pcall(function()
-            if obj:IsA("ParticleEmitter") then
-                if obj.Rate > 60 then
-                    obj:Destroy(); destroyed += 1
-                elseif obj.Rate > 20 then
-                    obj.Rate = 8; optimized += 1
-                end
-            elseif obj:IsA("Fire") or obj:IsA("Smoke") then
-                if obj.Size > 5 then obj:Destroy(); destroyed += 1 end
-            elseif obj:IsA("Sound") then
-                if obj.Volume > 0.7 and not obj.Playing then
-                    obj.Volume = 0.2; optimized += 1
-                end
-            elseif obj:IsA("BasePart") then
-                obj.CastShadow = false; optimized += 1
-            end
-        end)
-    end
+local cY = 4
 
-    Lighting.GlobalShadows = false
+-- Input row builder
+local function mkInput(label,min,max,default,onSet)
+    local row = Instance.new("Frame",cScroll)
+    row.Size = UDim2.new(1,-12,0,30)
+    row.Position = UDim2.new(0,6,0,cY)
+    row.BackgroundColor3 = Color3.fromRGB(26,26,40)
+    row.BorderSizePixel = 0
+    Instance.new("UICorner",row).CornerRadius = UDim.new(0,8)
 
-    for i = 1, 15 do
-        task.wait(0.04)
-        pcall(function() collectgarbage("collect") end)
-    end
+    local lbl = Instance.new("TextLabel",row)
+    lbl.Size = UDim2.new(0.53,0,1,0)
+    lbl.Position = UDim2.new(0,6,0,0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = label
+    lbl.TextColor3 = Color3.fromRGB(195,195,195)
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
 
-    pcall(function()
-        SoundService.AmbientReverb = Enum.ReverbType.NoReverb
+    local box = Instance.new("TextBox",row)
+    box.Size = UDim2.new(0.27,0,0.72,0)
+    box.Position = UDim2.new(0.54,0,0.14,0)
+    box.BackgroundColor3 = Color3.fromRGB(38,38,58)
+    box.Text = tostring(default)
+    box.TextColor3 = Color3.fromRGB(255,255,100)
+    box.TextScaled = true
+    box.Font = Enum.Font.GothamBold
+    box.ClearTextOnFocus = false
+    box.BorderSizePixel = 0
+    Instance.new("UICorner",box).CornerRadius = UDim.new(0,6)
+
+    local setBtn = Instance.new("TextButton",row)
+    setBtn.Size = UDim2.new(0.16,0,0.72,0)
+    setBtn.Position = UDim2.new(0.83,0,0.14,0)
+    setBtn.BackgroundColor3 = Color3.fromRGB(220,0,90)
+    setBtn.Text = "SET"
+    setBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    setBtn.TextScaled = true
+    setBtn.Font = Enum.Font.GothamBold
+    setBtn.BorderSizePixel = 0
+    Instance.new("UICorner",setBtn).CornerRadius = UDim.new(0,6)
+
+    setBtn.MouseButton1Click:Connect(function()
+        local v = tonumber(box.Text)
+        if v then
+            v = math.clamp(v,min,max)
+            box.Text = tostring(v)
+            onSet(v)
+            TweenService:Create(setBtn,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(0,200,80)}):Play()
+            task.delay(0.35,function() TweenService:Create(setBtn,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(220,0,90)}):Play() end)
+        end
     end)
 
-    local total = destroyed + optimized
-    notify("🛡️ ANTI-LAG: " .. total .. " fixed!", Color3.fromRGB(0, 200, 80))
-    task.delay(1, function() notify("🗑️ Destroyed: " .. destroyed .. " | Optimized: " .. optimized, Color3.fromRGB(255, 100, 0), 3) end)
+    cY = cY + 34
 end
 
-local function doReset()
-    statusLabel.Text = "⚡ Ready"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-    clearEffects()
-
-    Lighting.Brightness = 1
-    Lighting.Ambient = Color3.fromRGB(70, 70, 70)
-    Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
-    Lighting.Technology = Enum.Technology.Compatibility
-    Lighting.GlobalShadows = false
-    Lighting.ExposureCompensation = 0
-
-    notify("🔄 RESET DONE!", Color3.fromRGB(200, 120, 0))
+-- Section label
+local function mkSec(txt)
+    local f = Instance.new("TextLabel",cScroll)
+    f.Size = UDim2.new(1,-12,0,20)
+    f.Position = UDim2.new(0,6,0,cY)
+    f.BackgroundTransparency = 1
+    f.Text = txt
+    f.TextColor3 = Color3.fromRGB(255,200,0)
+    f.TextScaled = true
+    f.Font = Enum.Font.GothamBold
+    f.TextXAlignment = Enum.TextXAlignment.Left
+    cY = cY + 23
 end
 
--- Tab switch
+-- Live values table for apply
+local lv = {brightness=1,contrast=0,saturation=0,bloomI=0,bloomS=24,bloomT=0.9,srI=0,srS=0.5,shadow=0,exposure=0,tintR=255,tintG=255,tintB=255,ambR=70,ambG=70,ambB=70,outR=70,outG=70,outB=70}
+
+mkSec("☀️ LIGHTING")
+mkInput("Brightness (0.1-10)",    0.1, 10,  1,   function(v) lv.brightness=v end)
+mkInput("Exposure (-5 to 5)",     -5,  5,   0,   function(v) lv.exposure=v end)
+mkSec("🎨 COLOR")
+mkInput("Contrast (0-5)",         0,   5,   0,   function(v) lv.contrast=v end)
+mkInput("Saturation (0-5)",       0,   5,   0,   function(v) lv.saturation=v end)
+mkInput("Tint R (0-255)",         0,   255, 255, function(v) lv.tintR=v end)
+mkInput("Tint G (0-255)",         0,   255, 255, function(v) lv.tintG=v end)
+mkInput("Tint B (0-255)",         0,   255, 255, function(v) lv.tintB=v end)
+mkSec("✨ BLOOM")
+mkInput("Bloom Intensity (0-10)", 0,   10,  0,   function(v) lv.bloomI=v end)
+mkInput("Bloom Size (1-50)",      1,   50,  24,  function(v) lv.bloomS=v end)
+mkInput("Bloom Threshold (0-2)",  0,   2,   0.9, function(v) lv.bloomT=v end)
+mkSec("☀️ SUN RAYS")
+mkInput("Sun Rays (0-1)",         0,   1,   0,   function(v) lv.srI=v end)
+mkInput("Spread (0-1)",           0,   1,   0.5, function(v) lv.srS=v end)
+mkSec("🌑 SHADOW")
+mkInput("Shadow Softness (0-1)",  0,   1,   0,   function(v) lv.shadow=v end)
+mkSec("🌙 AMBIENT")
+mkInput("Ambient R (0-255)",      0,   255, 70,  function(v) lv.ambR=v end)
+mkInput("Ambient G (0-255)",      0,   255, 70,  function(v) lv.ambG=v end)
+mkInput("Ambient B (0-255)",      0,   255, 70,  function(v) lv.ambB=v end)
+mkInput("Outdoor R (0-255)",      0,   255, 70,  function(v) lv.outR=v end)
+mkInput("Outdoor G (0-255)",      0,   255, 70,  function(v) lv.outG=v end)
+mkInput("Outdoor B (0-255)",      0,   255, 70,  function(v) lv.outB=v end)
+
+-- Apply button
+local applyBtn = Instance.new("TextButton",cScroll)
+applyBtn.Size = UDim2.new(1,-12,0,38)
+applyBtn.Position = UDim2.new(0,6,0,cY)
+applyBtn.BackgroundColor3 = Color3.fromRGB(220,0,90)
+applyBtn.Text = "✅ ÁP DỤNG TẤT CẢ"
+applyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+applyBtn.TextScaled = true
+applyBtn.Font = Enum.Font.GothamBold
+applyBtn.BorderSizePixel = 0
+Instance.new("UICorner",applyBtn).CornerRadius = UDim.new(0,10)
+cY = cY + 46
+
+applyBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        clearFX()
+        statusLbl.Text="🎛️ Custom";statusLbl.TextColor3=Color3.fromRGB(100,255,100)
+        Lighting.Brightness=lv.brightness
+        Lighting.Technology=Enum.Technology.Future
+        Lighting.GlobalShadows=true
+        Lighting.ShadowSoftness=lv.shadow
+        Lighting.ExposureCompensation=lv.exposure
+        Lighting.Ambient=Color3.fromRGB(lv.ambR,lv.ambG,lv.ambB)
+        Lighting.OutdoorAmbient=Color3.fromRGB(lv.outR,lv.outG,lv.outB)
+        if lv.contrast~=0 or lv.saturation~=0 or lv.tintR~=255 or lv.tintG~=255 or lv.tintB~=255 then
+            local c=Instance.new("ColorCorrectionEffect",Lighting)
+            c.Contrast=lv.contrast;c.Saturation=lv.saturation;c.Brightness=0
+            c.TintColor=Color3.fromRGB(lv.tintR,lv.tintG,lv.tintB)
+        end
+        if lv.bloomI>0 then
+            local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=lv.bloomI;bl.Size=lv.bloomS;bl.Threshold=lv.bloomT
+        end
+        if lv.srI>0 then
+            local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=lv.srI;sr.Spread=lv.srS
+        end
+    end)
+    TweenService:Create(applyBtn,TweenInfo.new(0.12),{BackgroundColor3=Color3.fromRGB(0,200,80)}):Play()
+    task.delay(0.5,function() TweenService:Create(applyBtn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(220,0,90)}):Play() end)
+end)
+
+-- Preset section (mẫu có sẵn thay vì slot)
+mkSec("💾 PRESET MẪU")
+
+local presetDefs = {
+    {name="🏙️ Cinematic",   v={brightness=1.8,contrast=0.5,saturation=0.3,bloomI=0.4,bloomS=22,bloomT=1.0,srI=0,srS=0.5,shadow=0.25,exposure=0.05,tintR=220,tintG=230,tintB=255,ambR=45,ambG=50,ambB=65,outR=110,outG=130,outB=160}},
+    {name="🎮 Gaming",       v={brightness=2.0,contrast=0.15,saturation=0.2,bloomI=0.3,bloomS=18,bloomT=1.0,srI=0,srS=0.5,shadow=0.05,exposure=0.05,tintR=255,tintG=255,tintB=255,ambR=75,ambG=75,ambB=90,outR=120,outG=120,outB=145}},
+    {name="🌃 Night City",   v={brightness=0.4,contrast=0.3,saturation=0.8,bloomI=1.2,bloomS=35,bloomT=0.5,srI=0,srS=0.5,shadow=0.1,exposure=-0.1,tintR=180,tintG=160,tintB=255,ambR=20,ambG=15,ambB=45,outR=30,outG=25,outB=60}},
+    {name="🌅 Warm",         v={brightness=2.0,contrast=0.3,saturation=0.45,bloomI=0.7,bloomS=28,bloomT=0.75,srI=0.2,srS=0.55,shadow=0.2,exposure=0.08,tintR=255,tintG=210,tintB=160,ambR=150,ambG=100,ambB=60,outR=200,outG=140,outB=80}},
+    {name="🧊 Cold",         v={brightness=1.8,contrast=0.2,saturation=-0.1,bloomI=0.3,bloomS=20,bloomT=0.9,srI=0.08,srS=0.4,shadow=0.15,exposure=0,tintR=200,tintG=220,tintB=255,ambR=80,ambG=95,ambB=130,outR=130,outG=150,outB=190}},
+    {name="🔥 Neon Cyberpunk",v={brightness=0.6,contrast=0.6,saturation=1.2,bloomI=1.8,bloomS=42,bloomT=0.3,srI=0,srS=0.5,shadow=0.05,exposure=-0.05,tintR=255,tintG=80,tintB=200,ambR=15,ambG=10,ambB=40,outR=25,outG=15,outB=60}},
+    {name="🌿 Nature",       v={brightness=2.2,contrast=0.2,saturation=0.5,bloomI=0.4,bloomS=22,bloomT=0.9,srI=0.1,srS=0.45,shadow=0.2,exposure=0.05,tintR=230,tintG=255,tintB=220,ambR=70,ambG=90,ambB=60,outR=120,outG=150,outB=100}},
+    {name="🏜️ Desert",       v={brightness=2.8,contrast=0.35,saturation=0.4,bloomI=0.5,bloomS=25,bloomT=0.7,srI=0.3,srS=0.7,shadow=0.1,exposure=0.15,tintR=255,tintG=235,tintB=180,ambR=180,ambG=155,ambB=90,outR=220,outG=195,outB=130}},
+    {name="🌊 Ocean",        v={brightness=1.9,contrast=0.15,saturation=0.35,bloomI=0.35,bloomS=20,bloomT=0.95,srI=0.12,srS=0.5,shadow=0.18,exposure=0.05,tintR=200,tintG=235,tintB=255,ambR=65,ambG=100,ambB=140,outR=110,outG=155,outB=200}},
+    {name="🌸 Sakura",       v={brightness=2.2,contrast=0.1,saturation=0.3,bloomI=0.6,bloomS=26,bloomT=0.85,srI=0.08,srS=0.4,shadow=0.12,exposure=0.08,tintR=255,tintG=220,tintB=235,ambR=140,ambG=100,ambB=120,outR=200,outG=160,outB=180}},
+    {name="🎬 Film Noir",    v={brightness=1.2,contrast=0.7,saturation=-0.6,bloomI=0.2,bloomS=18,bloomT=1.2,srI=0,srS=0.5,shadow=0.4,exposure=-0.15,tintR=220,tintG=215,tintB=200,ambR=30,ambG=28,ambB=25,outR=60,outG=58,outB=55}},
+    {name="☢️ Apocalypse",   v={brightness=1.4,contrast=0.5,saturation=0.3,bloomI=0.6,bloomS=30,bloomT=0.6,srI=0.15,srS=0.6,shadow=0.1,exposure=0,tintR=255,tintG=160,tintB=80,ambR=120,ambG=80,ambB=30,outR=180,outG=110,outB=40}},
+}
+
+for _,pre in ipairs(presetDefs) do
+    local pb = Instance.new("TextButton",cScroll)
+    pb.Size = UDim2.new(1,-12,0,30)
+    pb.Position = UDim2.new(0,6,0,cY)
+    pb.BackgroundColor3 = Color3.fromRGB(35,35,55)
+    pb.Text = pre.name
+    pb.TextColor3 = Color3.fromRGB(220,220,220)
+    pb.TextScaled = true
+    pb.Font = Enum.Font.GothamBold
+    pb.BorderSizePixel = 0
+    Instance.new("UICorner",pb).CornerRadius = UDim.new(0,9)
+    pb.MouseButton1Click:Connect(function()
+        for k,v in pairs(pre.v) do lv[k]=v end
+        TweenService:Create(pb,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(0,160,80)}):Play()
+        task.delay(0.5,function() TweenService:Create(pb,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(35,35,55)}):Play() end)
+        pcall(function()
+            clearFX()
+            statusLbl.Text="💾 "..pre.name;statusLbl.TextColor3=Color3.fromRGB(100,255,100)
+            Lighting.Brightness=lv.brightness;Lighting.Technology=Enum.Technology.Future
+            Lighting.GlobalShadows=true;Lighting.ShadowSoftness=lv.shadow
+            Lighting.ExposureCompensation=lv.exposure
+            Lighting.Ambient=Color3.fromRGB(lv.ambR,lv.ambG,lv.ambB)
+            Lighting.OutdoorAmbient=Color3.fromRGB(lv.outR,lv.outG,lv.outB)
+            if lv.contrast~=0 or lv.saturation~=0 or lv.tintR~=255 or lv.tintG~=255 or lv.tintB~=255 then
+                local c=Instance.new("ColorCorrectionEffect",Lighting)
+                c.Contrast=lv.contrast;c.Saturation=lv.saturation;c.Brightness=0
+                c.TintColor=Color3.fromRGB(lv.tintR,lv.tintG,lv.tintB)
+            end
+            if lv.bloomI>0 then
+                local bl=Instance.new("BloomEffect",Lighting);bl.Intensity=lv.bloomI;bl.Size=lv.bloomS;bl.Threshold=lv.bloomT
+            end
+            if lv.srI>0 then
+                local sr=Instance.new("SunRaysEffect",Lighting);sr.Intensity=lv.srI;sr.Spread=lv.srS
+            end
+        end)
+    end)
+    cY = cY + 34
+end
+
+cScroll.CanvasSize = UDim2.new(0,0,0,cY+10)
+
+-- ===================== TAB SWITCH =====================
 local function switchTab(tab)
-    currentTab = tab
-    if tab == "enhance" then
-        tabEnhance.BackgroundColor3 = Color3.fromRGB(220, 0, 90)
-        tabEnhance.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabPerf.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-        tabPerf.TextColor3 = Color3.fromRGB(160, 160, 160)
-        enhanceScroll.Visible = true
-        perfScroll.Visible = false
-    else
-        tabPerf.BackgroundColor3 = Color3.fromRGB(0, 130, 220)
-        tabPerf.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabEnhance.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-        tabEnhance.TextColor3 = Color3.fromRGB(160, 160, 160)
-        perfScroll.Visible = true
-        enhanceScroll.Visible = false
-    end
+    curTab = tab
+    wScroll.Visible  = tab=="weather"
+    pScroll.Visible  = tab=="performance"
+    cScroll.Visible  = tab=="custom"
+    local off = Color3.fromRGB(55,55,75)
+    local offT = Color3.fromRGB(150,150,150)
+    tabW.BackgroundColor3 = tab=="weather"     and Color3.fromRGB(30,140,210) or off
+    tabW.TextColor3       = tab=="weather"     and Color3.fromRGB(255,255,255) or offT
+    tabP.BackgroundColor3 = tab=="performance" and Color3.fromRGB(0,130,220)  or off
+    tabP.TextColor3       = tab=="performance" and Color3.fromRGB(255,255,255) or offT
+    tabC.BackgroundColor3 = tab=="custom"      and Color3.fromRGB(0,165,75)   or off
+    tabC.TextColor3       = tab=="custom"      and Color3.fromRGB(255,255,255) or offT
 end
+tabW.MouseButton1Click:Connect(function() switchTab("weather")     end)
+tabP.MouseButton1Click:Connect(function() switchTab("performance") end)
+tabC.MouseButton1Click:Connect(function() switchTab("custom")      end)
 
-tabEnhance.MouseButton1Click:Connect(function() switchTab("enhance") end)
-tabPerf.MouseButton1Click:Connect(function() switchTab("performance") end)
-
--- Make buttons
-makeBtn("✨", "RTX Mode",   Color3.fromRGB(0, 200, 170),  enhanceScroll, 1, doRTX)
-makeBtn("🌟", "Ultra",      Color3.fromRGB(210, 170, 0),  enhanceScroll, 2, doUltra)
-makeBtn("🎮", "Gaming",     Color3.fromRGB(190, 70, 200), enhanceScroll, 3, doGaming)
-makeBtn("🌈", "Enhanced",   Color3.fromRGB(50, 120, 180), enhanceScroll, 4, doEnhanced)
-makeBtn("🎬", "Cinematic",  Color3.fromRGB(120, 40, 200), enhanceScroll, 5, doCinematic)
-makeBtn("💡", "Fullbright", Color3.fromRGB(180, 160, 0),  enhanceScroll, 6, doFullbright)
-
-makeBtn("🧠", "Smart Mode", Color3.fromRGB(200, 150, 0),  perfScroll, 1, doSmart)
-makeBtn("🚀", "Extreme",    Color3.fromRGB(210, 55, 0),   perfScroll, 2, doExtreme)
-makeBtn("🛡️", "Anti-Lag",   Color3.fromRGB(0, 180, 80),   perfScroll, 3, doAntiLag)
-makeBtn("🔄", "Reset All",  Color3.fromRGB(190, 120, 0),  perfScroll, 4, doReset)
-
--- Canvas size
-enhanceScroll.CanvasSize = UDim2.new(0, 0, 0, math.ceil(6 / 3) * 60)
-perfScroll.CanvasSize = UDim2.new(0, 0, 0, math.ceil(4 / 3) * 60)
-
--- FPS counter
-local fc, lt = 0, tick()
+-- FPS
+local fc,lt = 0,tick()
 RunService.Heartbeat:Connect(function()
-    fc += 1
-    if fc >= 30 then
-        fps = math.floor(30 / (tick() - lt))
-        lt = tick(); fc = 0
-        fpsLabel.Text = "📊 FPS: " .. fps
-        fpsLabel.TextColor3 = fps >= 50 and Color3.fromRGB(0,255,100)
-            or fps >= 30 and Color3.fromRGB(255,255,0)
-            or Color3.fromRGB(255,60,60)
+    fc=fc+1
+    if fc>=30 then
+        fps=math.floor(30/(tick()-lt)); lt=tick(); fc=0
+        fpsLbl.Text="📊 FPS: "..fps
+        fpsLbl.TextColor3=fps>=50 and Color3.fromRGB(0,255,100) or fps>=30 and Color3.fromRGB(255,255,0) or Color3.fromRGB(255,60,60)
     end
 end)
 
--- Close / hide
+-- Close
 closeBtn.MouseButton1Click:Connect(function()
     uiVisible = not uiVisible
     if not uiVisible then
-        main:TweenPosition(UDim2.new(0.5,-260,0,-450),"Out","Back",0.5,true)
-        task.delay(0.5, function() main.Visible = false end)
-
-        local fb = Instance.new("TextButton")
-        fb.Size = UDim2.new(0, 55, 0, 55)
-        fb.Position = UDim2.new(1, -65, 0, 10)
-        fb.BackgroundColor3 = Color3.fromRGB(220, 0, 90)
-        fb.Text = "⚡"
-        fb.TextScaled = true
-        fb.Font = Enum.Font.GothamBold
-        fb.TextColor3 = Color3.fromRGB(255, 255, 255)
-        fb.BorderSizePixel = 0
-        fb.Parent = gui
-        Instance.new("UICorner", fb).CornerRadius = UDim.new(0, 27)
-
-        TweenService:Create(fb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-            BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-        }):Play()
-
+        main:TweenPosition(UDim2.new(0.5,-210,0,-400),"Out","Back",0.45,true)
+        task.delay(0.45,function() main.Visible=false end)
+        local fb=Instance.new("TextButton",gui)
+        fb.Size=UDim2.new(0,46,0,46);fb.Position=UDim2.new(1,-56,0,10)
+        fb.BackgroundColor3=Color3.fromRGB(220,0,90);fb.Text="⚡"
+        fb.TextScaled=true;fb.Font=Enum.Font.GothamBold
+        fb.TextColor3=Color3.fromRGB(255,255,255);fb.BorderSizePixel=0
+        Instance.new("UICorner",fb).CornerRadius=UDim.new(0,23)
+        TweenService:Create(fb,TweenInfo.new(1.5,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,-1,true),{BackgroundColor3=Color3.fromRGB(0,120,255)}):Play()
         fb.MouseButton1Click:Connect(function()
-            uiVisible = true
-            main.Visible = true
-            main:TweenPosition(UDim2.new(0.5,-260,0.5,-200),"Out","Back",0.6,true)
+            uiVisible=true;main.Visible=true
+            main:TweenPosition(UDim2.new(0.5,-210,0.5,-170),"Out","Back",0.55,true)
             fb:Destroy()
-            notify("👁️ XNOS GRAPHICS RESTORED!", Color3.fromRGB(220, 0, 90))
         end)
-
-        notify("🔍 UI Hidden - Still running!", Color3.fromRGB(200, 120, 0))
     end
 end)
 
 -- Hotkeys
-UserInputService.InputBegan:Connect(function(input, gp)
+UserInputService.InputBegan:Connect(function(i,gp)
     if gp then return end
     pcall(function()
-        local k = input.KeyCode
-        if k == Enum.KeyCode.F1 then doRTX()
-        elseif k == Enum.KeyCode.F2 then doSmart()
-        elseif k == Enum.KeyCode.F3 then doAntiLag()
-        elseif k == Enum.KeyCode.F4 then closeBtn.MouseButton1Click:Fire()
-        elseif k == Enum.KeyCode.F5 then doReset()
-        elseif k == Enum.KeyCode.F6 then doFullbright()
-        elseif k == Enum.KeyCode.F7 then doGaming()
-        elseif k == Enum.KeyCode.F8 then switchTab(currentTab == "enhance" and "performance" or "enhance")
-        elseif k == Enum.KeyCode.F9 then doUltra()
-        elseif k == Enum.KeyCode.F10 then doExtreme()
-        end
+        local k=i.KeyCode
+        if k==Enum.KeyCode.F1 then doRTX()
+        elseif k==Enum.KeyCode.F2 then doSmart()
+        elseif k==Enum.KeyCode.F3 then doAntiLag()
+        elseif k==Enum.KeyCode.F4 then closeBtn.MouseButton1Click:Fire()
+        elseif k==Enum.KeyCode.F5 then doReset()
+        elseif k==Enum.KeyCode.F6 then doFullbright()
+        elseif k==Enum.KeyCode.F7 then doGaming()
+        elseif k==Enum.KeyCode.F8 then
+            local tabs={"weather","performance","custom"}
+            local idx=1
+            for i2,v in ipairs(tabs) do if v==curTab then idx=i2 end end
+            switchTab(tabs[(idx%#tabs)+1])
+        elseif k==Enum.KeyCode.F9 then doUltra()
+        elseif k==Enum.KeyCode.F10 then doExtreme() end
     end)
 end)
 
 -- Background optimizer
 task.spawn(function()
     while task.wait(25) do
-        if fps < 28 then
+        if fps<28 then
             pcall(function()
-                for _, obj in ipairs(game:GetService("Workspace"):GetDescendants()) do
-                    if obj:IsA("ParticleEmitter") and obj.Rate > 30 then
-                        obj.Rate = 12
-                    end
+                for _,o in ipairs(Workspace:GetDescendants()) do
+                    if o:IsA("ParticleEmitter") and o.Rate>30 then o.Rate=12 end
                 end
             end)
         end
     end
 end)
 
--- Cleanup
 Players.PlayerRemoving:Connect(function(p)
-    if p == player then pcall(function() gui:Destroy() end) end
+    if p==player then pcall(function() gui:Destroy() end) end
 end)
 
--- Welcome
-task.spawn(function()
-    task.wait(1)
-    notify("⚡ XNOS GRAPHICS V6.0 READY!", Color3.fromRGB(220, 0, 90), 5)
-    task.wait(2)
-    notify("🚀 Zero errors - Maximum stability!", Color3.fromRGB(0, 200, 80), 4)
-    task.wait(1.5)
-    notify("⌨️ Hotkeys: F1-F10 active!", Color3.fromRGB(0, 140, 255), 3)
-end)
-
-print("⚡ XNOS GRAPHICS V6.0 - Loaded successfully!")
-print("✨ Tab 1: RTX | Ultra | Gaming | Enhanced | Cinematic | Fullbright")
-print("🚀 Tab 2: Smart | Extreme | Anti-Lag | Reset")
-print("⌨️  F1=RTX  F2=Smart  F3=AntiLag  F4=Toggle  F5=Reset  F6=Full  F7=Gaming  F8=SwitchTab  F9=Ultra  F10=Extreme")
+print("⚡ XNOS GRAPHICS V6.0 LOADED")
+print("Tab1:Weather(11) | Tab2:Perf+Lighting(8) | Tab3:Custom inputs + 6 Preset mẫu")
+print("F1=RTX F2=Smart F3=AntiLag F4=Toggle F5=Reset F6=Full F7=Gaming F8=Tab F9=Ultra F10=Extreme")
